@@ -37,19 +37,17 @@ CPlayer::~CPlayer()
 //*****************************************************************************
 HRESULT CPlayer::Init()
 {
-	m_Pos = INIT_POS;
+	SetPos(INIT_POS);
 
-	m_OldPos = INIT_POS;
+	SetOldPos(INIT_POS);
 
-	m_Move = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	SetMove(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
-	m_Rot =  D3DXVECTOR3(0.0f,0.0f,0.0f);
+	SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
 	CRead cRead;
 
-	m_nMotionNum = cRead.ReadMotion("data/MOTION/motionplayer.txt");
-
-	CMotionParts::SetLight(m_Light, m_nMotionNum);
+	SetMotionNum(cRead.ReadMotion("data/MOTION/motionplayer.txt"));
 
 	return S_OK;
 }
@@ -124,36 +122,22 @@ void CPlayer::Update()
 		add.z += cosf(rotY + D3DX_PI * 0.5f) * 5.0f;
 	}
 
-	if (pInput->Trigger(DIK_SPACE))
-	{
-		m_Move.y += 100;
-	}
-
+	
 	if (pInput->Press(DIK_Z))
 	{
-		m_Rot += (D3DXVECTOR3(0.0f, D3DXToRadian(-10), 0.0f));
+		AddRot(D3DXVECTOR3(0.0f, D3DXToRadian(-10), 0.0f));
 	}
 	else if (pInput->Press(DIK_X))
 	{
-		m_Rot += (D3DXVECTOR3(0.0f, D3DXToRadian(10), 0.0f));
+		AddRot(D3DXVECTOR3(0.0f, D3DXToRadian(10), 0.0f));
 	}
 
-	m_Move.y -= 4.0f;
-
-	m_Move.y += (0.0f - m_Move.y) * 0.1f;
-
-	//OldPos‚ÌXV
-	m_OldPos = m_Pos;
+	AddPos(add);
 
 
-	m_Pos += m_Move;
-
-	m_Pos += add;
-
-	
 	D3DXVECTOR3 pos, groundpos;
 
-	pos = m_Pos;
+	pos = GetPos();
 
 	groundpos = pGame->GetMeshfield()->Collision(pos);
 
@@ -162,30 +146,30 @@ void CPlayer::Update()
 		if (groundpos != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
 		{
 			pos = groundpos;
-			m_Pos = (groundpos);
+			SetPos(groundpos);
 		}
 	}
 
 	if (pos.y < -100.0f)
 	{
 		pos.y = 0.0f;
-		m_Pos = (pos);
+		SetPos(pos);
 	}
 
 	
 
 	if (groundpos != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
 	{
-		CMotionParts::AllSetShadowPos(groundpos, m_nMotionNum);
+		CMotionParts::AllSetShadowPos(groundpos, GetMotionNum());
 	}
 
 	if (pInput->Press(KEY_MOVE) || pInput->Press(DIK_0))
 	{
-		CMotionParts::MoveMotionModel(m_Pos, m_Rot, m_nMotionNum,1);
+		CMotionParts::MoveMotionModel(GetPos(), GetRot(), GetMotionNum(),1);
 	}
 	else
 	{
-		CMotionParts::MoveMotionModel(m_Pos, m_Rot, m_nMotionNum,0);
+		CMotionParts::MoveMotionModel(GetPos(), GetRot(), GetMotionNum(),0);
 	}
 }
 

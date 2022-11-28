@@ -232,8 +232,8 @@ void CMeshfield::SetMeshfield(MeshfieldStructure meshfieldStructure)
 		{
 
 			//float fY = sinf(D3DXToRadian(0.5f) * (nCntX + m_nCntMeshfield)) * 10.0f;
-			float fY = rand() % 50;
-			//float fY = 0.0f;
+			//float fY = rand() % 50;
+			float fY = 0.0f;
 
 			//頂点座標の設定//ローカル座標で
 			pVtx[0].pos = D3DXVECTOR3(meshfieldStructure.fRadiusX * nCntX, fY, -meshfieldStructure.fRadiusZ * nCntZ);

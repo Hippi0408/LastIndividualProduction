@@ -165,6 +165,7 @@
     <ClCompile Include="manager.cpp" />
     <ClCompile Include="meshfield.cpp" />
     <ClCompile Include="motion_parts.cpp" />
+    <ClCompile Include="movable_obj.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="read.cpp" />
@@ -193,6 +194,7 @@
     <ClInclude Include="manager.h" />
     <ClInclude Include="meshfield.h" />
     <ClInclude Include="motion_parts.h" />
+    <ClInclude Include="movable_obj.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="read.h" />
