@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// player.cpp
+// enemy.cpp
 // Author : koduna hirohito
 //
 //=============================================================================
@@ -8,34 +8,32 @@
 //*****************************************************************************
 // インクルード
 //*****************************************************************************
-#include "player.h"
-#include "input.h"
+#include "enemy.h"
 #include "read.h"
-#include "texture.h"
 #include "game.h"
-#include "camera.h"
 #include "meshfield.h"
 #include "motion_parts.h"
+#include "player.h"
 
-const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f,10.0f,0.0f);
+const D3DXVECTOR3 CEnemy::INIT_POS = D3DXVECTOR3(400.0f, 0.0f, -200.0f);
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
-CPlayer::CPlayer()
+CEnemy::CEnemy()
 {
 }
 
 //*****************************************************************************
 // デストラクタ
 //*****************************************************************************
-CPlayer::~CPlayer()
+CEnemy::~CEnemy()
 {
 }
 
 //*****************************************************************************
 // 初期化
 //*****************************************************************************
-HRESULT CPlayer::Init()
+HRESULT CEnemy::Init()
 {
 	SetLife(INIT_LIFE);
 
@@ -49,7 +47,7 @@ HRESULT CPlayer::Init()
 
 	CRead cRead;
 
-	SetMotionNum(cRead.ReadMotion("data/MOTION/motionplayer.txt"));
+	SetMotionNum(cRead.ReadMotion("data/MOTION/motionenemy.txt"));
 
 	return S_OK;
 }
@@ -57,7 +55,7 @@ HRESULT CPlayer::Init()
 //*****************************************************************************
 // 終了処理
 //*****************************************************************************
-void CPlayer::Uninit()
+void CEnemy::Uninit()
 {
 
 }
@@ -65,76 +63,15 @@ void CPlayer::Uninit()
 //*****************************************************************************
 // 更新処理
 //*****************************************************************************
-void CPlayer::Update()
+void CEnemy::Update()
 {
-	CInput *pInput = CInput::GetKey();
 	CManager *pManager = GetManager();
 
 	CGame* pGame = (CGame*)pManager->GetGameObject();
 
-	float rotY = pGame->GetCamera()->GetRot();
-
 	D3DXVECTOR3 add = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
-	//視点移動
-	if (pInput->Press(DIK_W))
-	{//上キーが押された
-		if (pInput->Press(DIK_A))
-		{
-			add.x -= sinf(rotY + D3DX_PI * 0.75f) * 5.0f;
-			add.z -= cosf(rotY + D3DX_PI * 0.75f) * 5.0f;
-		}
-		else if (pInput->Press(DIK_D))
-		{
-			add.x -= sinf(rotY + D3DX_PI * -0.75f) * 5.0f;
-			add.z -= cosf(rotY + D3DX_PI * -0.75f) * 5.0f;
-		}
-		else
-		{
-			add.x += sinf(rotY) * 5.0f;
-			add.z += cosf(rotY) * 5.0f;
-		}
-	}
-	else if (pInput->Press(DIK_S))
-	{//下キーが押された
-		if (pInput->Press(DIK_A))
-		{
-			add.x -= sinf(rotY + D3DX_PI * 0.25f) * 5.0f;
-			add.z -= cosf(rotY + D3DX_PI * 0.25f) * 5.0f;
-		}
-		else if (pInput->Press(DIK_D))
-		{
-			add.x -= sinf(rotY + D3DX_PI * -0.25f) * 5.0f;
-			add.z -= cosf(rotY + D3DX_PI * -0.25f) * 5.0f;
-		}
-		else
-		{
-			add.x += sinf(rotY + D3DX_PI) * 5.0f;
-			add.z += cosf(rotY + D3DX_PI) * 5.0f;
-		}
-	}
-	else if (pInput->Press(DIK_A))
-	{//左キーが押された
-		add.x += sinf(rotY + D3DX_PI * -0.5f) * 5.0f;
-		add.z += cosf(rotY + D3DX_PI * -0.5f) * 5.0f;
-	}
-	else if (pInput->Press(DIK_D))
-	{//右キーが押された
-		add.x += sinf(rotY + D3DX_PI * 0.5f) * 5.0f;
-		add.z += cosf(rotY + D3DX_PI * 0.5f) * 5.0f;
-	}
-
-	
-	if (pInput->Press(DIK_Z))
-	{
-		AddRot(D3DXVECTOR3(0.0f, D3DXToRadian(-10), 0.0f));
-	}
-	else if (pInput->Press(DIK_X))
-	{
-		AddRot(D3DXVECTOR3(0.0f, D3DXToRadian(10), 0.0f));
-	}
-
-	//add.y -= 4.0f;
+	add.y -= 4.0f;
 
 	AddPos(add);
 
@@ -160,30 +97,24 @@ void CPlayer::Update()
 		SetPos(pos);
 	}
 
-	
 
-	if (groundpos != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
+	CMotionParts::MoveMotionModel(GetPos(), GetRot(), GetMotionNum(), 0);
+
+	pos = CMotionParts::AllCollision(pGame->GetPlayer()->GetMotionNum(), pGame->GetPlayer()->GetPos(), GetOldPos());
+
+	if (pos != pGame->GetPlayer()->GetPos())
 	{
-		CMotionParts::AllSetShadowPos(groundpos, GetMotionNum());
+		SetLife(0);
+		CMotionParts::SetBoolDraw(true, GetMotionNum());
 	}
 
-	if (pInput->Press(KEY_MOVE) || pInput->Press(DIK_0))
-	{
-		CMotionParts::MoveMotionModel(GetPos(), GetRot(), GetMotionNum(),1);
-	}
-	else
-	{
-		CMotionParts::MoveMotionModel(GetPos(), GetRot(), GetMotionNum(),0);
-	}
-
-
-	
+	int n = GetLife();
 
 }
 
 //*****************************************************************************
 // 描画処理
 //*****************************************************************************
-void CPlayer::Draw()
+void CEnemy::Draw()
 {
 }

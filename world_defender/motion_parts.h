@@ -100,6 +100,8 @@ public:
 	void SetMotionRarent(CMotionParts* pMotionRarent) { m_pRarent = pMotionRarent; }
 	bool GetMotionParts(int nMotionNum, int nPartsNum);//引数との一致があるかどうか
 	bool GetMotionParts(int nMotionNum);//引数との一致があるかどうか
+	void SetBoolDraw(bool bDraw) { m_bDraw = bDraw; }
+	bool GetBoolDraw() { return m_bDraw; }
 
 	static void ALLUninit();//すべての終了処理
 	static void ALLUpdate();//すべての更新処理
@@ -114,6 +116,7 @@ public:
 	static CMotionParts* GetMotionPartsPointer(int nMotionNum, int nPartsNum);
 
 	static void MoveMotionModel(D3DXVECTOR3 pos, D3DXVECTOR3 rot,int nModelNum, int nMotionNum = 0);//モーションモデルの移動
+	static void SetBoolDraw(bool bDraw, int nMotionNum);//モーションモデルの描画の有無
 	static void SetLight(D3DXVECTOR3 vec, int nMotionNum);//モーションモデルのライトベクトル
 	static void AllSetShadowPos(D3DXVECTOR3 pos, int nMotionNum);//影の設定
 	static void SetMotionFileData(const MotionMoveData MotionMoveData, int nMotionNum);//モーションの登録
@@ -137,6 +140,7 @@ private:
 	int m_nFrame;					//現在のフレーム
 	int m_nKey;						//現在のキー
 	int m_nPartsNum;				//動く物体の中の番号
+	bool m_bDraw;					//描画をするかしないか
 
 };
 

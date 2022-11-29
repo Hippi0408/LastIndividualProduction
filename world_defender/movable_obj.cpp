@@ -59,3 +59,26 @@ void CMovable_Obj::Update()
 void CMovable_Obj::Draw()
 {
 }
+
+//*****************************************************************************
+//ライフが指定数以下(false)、以上（true）の場合,trueを返す
+//*****************************************************************************
+bool CMovable_Obj::CheckLife(int nLife, bool b)
+{
+	if (b)
+	{//ライフが指定数,以上（true）の場合
+		if (m_nLife >= nLife)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	if (m_nLife <= nLife)
+	{//ライフが指定数,以下(false)の場合
+		return true;
+	}
+
+	return false;
+}

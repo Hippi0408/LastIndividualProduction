@@ -1,11 +1,11 @@
 //=============================================================================
 //
-// player.h
+// enemyu.h
 // Author : koduna hirohito
 //
 //=============================================================================
-#ifndef _PLAYER_H_			//このマクロ定義がされなかったら
-#define _PLAYER_H_			//2重インクルード防止のマクロ定義
+#ifndef _ENEMY_H_			//このマクロ定義がされなかったら
+#define _ENEMY_H_			//2重インクルード防止のマクロ定義
 
 //*****************************************************************************
 // インクルード
@@ -15,19 +15,18 @@
 //*****************************************************************************
 // 前方宣言
 //*****************************************************************************
-class CShadow;
 
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class CPlayer : public CMovable_Obj
+class CEnemy : public CMovable_Obj
 {
 private:
-	static const int INIT_LIFE = 100;
+	static const int INIT_LIFE = 1;
 	static const D3DXVECTOR3 INIT_POS;
 public:
-	CPlayer();
-	~CPlayer() override;
+	CEnemy();
+	~CEnemy() override;
 
 	HRESULT Init() override;
 	void Uninit() override;
@@ -35,7 +34,7 @@ public:
 	void Draw() override;
 
 private:
-	
+
 };
 
 #endif

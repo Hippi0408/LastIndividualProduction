@@ -28,6 +28,7 @@ public:
 	virtual void Update() override;
 	virtual void Draw() override;
 
+	//基本情報のGet、Set、Add
 	void SetPos(D3DXVECTOR3 pos) { m_Pos = pos; }
 	D3DXVECTOR3 GetPos() {return m_Pos; }
 	void AddPos(D3DXVECTOR3 addpos) { m_Pos += addpos; }
@@ -42,10 +43,19 @@ public:
 	void SetMove(D3DXVECTOR3 move) { m_Move = move; }
 	D3DXVECTOR3 GetMove() { return m_Move; }
 
-	void SetLight(D3DXVECTOR3 vec) { m_Light = vec; }
-
+	//使用しているモーションモデル番号のGet、Set
 	int GetMotionNum() { return m_nMotionNum; }
 	void SetMotionNum(int nMotionNum) { m_nMotionNum = nMotionNum; }
+
+	//ライトの方向VecのSet
+	void SetLight(D3DXVECTOR3 vec) { m_Light = vec; }
+
+	//ライフのGet、Set、Add
+	int GetLife() { return m_nLife; }
+	void SetLife(int nLife) { m_nLife = nLife; }
+	void AddLife(int nAdd) { m_nLife += nAdd; }
+	//ライフが指定数以下(false)、以上（true）の場合,trueを返す
+	bool CheckLife(int nLife = 0, bool b = false);
 
 private:
 	D3DXVECTOR3 m_Pos;			//位置
@@ -54,6 +64,7 @@ private:
 	D3DXVECTOR3 m_OldRot;		//前回の向き
 	D3DXVECTOR3 m_Move;			//移動量
 
+	int m_nLife;				//ライフ
 	int m_nMotionNum;			//使用するモーションモデル番号
 	D3DXVECTOR3 m_Light;		//ライトの向き（必ず必要ではない）
 };

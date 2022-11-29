@@ -47,7 +47,8 @@ public:
 		D3DXVECTOR3 rot;					//向き
 		D3DXVECTOR3 pos;					//位置
 		D3DXVECTOR3 move;					//移動
-		D3DXVECTOR3 vtxMin, vtxMax;			//モデルのサイズ
+		D3DXVECTOR3 vtxMin, vtxMax;			//モデルのサイズ(元)
+		D3DXVECTOR3 vtxMin2, vtxMax2;		//モデルのサイズ(ワールドマトリックスで変換したもの)
 		D3DXVECTOR3 posMove;				//位置動く時用
 		int nPattn;							//モデルのパターン
 	}Model;
@@ -90,7 +91,9 @@ public:
 	void SetNormal();			//法線設定
 	void UpdateNormal();		//法線の向きの更新
 	virtual D3DXVECTOR3 Collision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos);//当たり判定
-	bool TriangleInOut(D3DXVECTOR3 pos , D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3);//三角形の内にいるかどうか
+	virtual bool NormalCollision(D3DXVECTOR3 pos);//当たり判定
+	bool TriangleInOut(D3DXVECTOR3 pos, D3DXVECTOR3 vtx0, D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2);//三角形の内にいるかどうか
+	bool SquareInOut(D3DXVECTOR3 pos , D3DXVECTOR3 vtx0, D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3);//四角形の内にいるかどうか
 	D3DXVECTOR3 GetVtxMin() { return m_Model.vtxMin; }
 	D3DXVECTOR3 GetVtxMax() { return m_Model.vtxMax; }
 

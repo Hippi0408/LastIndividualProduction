@@ -20,6 +20,7 @@ class CLight;
 class C3DPolygon;
 class CMeshfield;
 class CPlayer;
+class CEnemy;
 class CBillcoard;
 
 //*****************************************************************************
@@ -40,12 +41,14 @@ public:
 
 	CCamera* GetCamera() { return m_pCamera; }
 	CMeshfield* GetMeshfield() { return m_pMeshfieldBG; }
+	CPlayer* GetPlayer() { return m_pPlayer; }
 
 private:
 	CCamera* m_pCamera;
 	CLight* m_pLight;
 	CMeshfield* m_pMeshfieldBG;
 	CPlayer* m_pPlayer;
+	CEnemy* m_pEnmey;
 	CBillcoard* m_pBillcoard;
 };
 

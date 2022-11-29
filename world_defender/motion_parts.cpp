@@ -27,6 +27,7 @@ CMotionParts::CMotionParts()
 	m_nFrame = 0;
 	m_nKey = 0;
 	m_pRarent = nullptr;
+	m_bDraw = false;
 
 	if (m_pMotionPartsTop == nullptr)
 	{
@@ -405,6 +406,11 @@ void CMotionParts::ALLDraw()
 
 	while (pMotionParts != nullptr)
 	{
+		if (pMotionParts->GetBoolDraw())
+		{
+			pMotionParts = pMotionParts->GetNextMotionParts();
+			continue;
+		}
 		pMotionParts->Draw();
 		pMotionParts = pMotionParts->GetNextMotionParts();
 	}
@@ -425,9 +431,11 @@ int CMotionParts::CreateMotionObj(MotionData* pMotionData, int nPartsMax)
 		}
 
 		pMotionParts->SetPartsNum(nCnt);//一つのモーションの中の番号
-		pMotionParts->SetModelPattnNum(pMotionData[nCnt].nModelPattern);//使用するモデルのインデックス
-		pMotionParts->SetPos(pMotionData[nCnt].pos);//モデルの位置
+		//pMotionParts->SetModelPattnNum(pMotionData[nCnt].nModelPattern);//使用するモデルのインデックス
+		//pMotionParts->SetPos(pMotionData[nCnt].pos);//モデルの位置
 		pMotionParts->SetRot(pMotionData[nCnt].rot);//モデルの向き
+
+		pMotionParts->Set3DObject(pMotionData[nCnt].nModelPattern, pMotionData[nCnt].pos);
 		
 		if (pMotionData[nCnt].nParentNum >= 0)
 		{
@@ -481,6 +489,23 @@ void CMotionParts::MoveMotionModel(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nModelN
 
 	GetMotionPartsPointer(nModelNum, 0)->SetParentPos(pos);
 	GetMotionPartsPointer(nModelNum, 0)->SetParentRot(rot);
+}
+
+//*****************************************************************************
+//モーションモデルの描画の有無
+//*****************************************************************************
+void CMotionParts::SetBoolDraw(bool bDraw, int nMotionNum)
+{
+	CMotionParts* pMotionParts = m_pMotionPartsTop;
+
+	while (pMotionParts != nullptr)
+	{
+		if (pMotionParts->GetMotionParts(nMotionNum))
+		{
+			pMotionParts->SetBoolDraw(bDraw);
+		}
+		pMotionParts = pMotionParts->GetNextMotionParts();
+	}
 }
 
 //*****************************************************************************
@@ -571,10 +596,15 @@ D3DXVECTOR3 CMotionParts::AllCollision(int nMotionNum, D3DXVECTOR3 pos, D3DXVECT
 	{
 		if (!pMotionParts->GetMotionParts(nMotionNum))
 		{
-			D3DXVECTOR3 Add = pMotionParts->Collision(pos, oldpos);
-			if (Add != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
+			//D3DXVECTOR3 Add = pMotionParts->Collision(pos, oldpos);
+			/*if (Add != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
 			{
 				return Add;
+			}*/
+
+			if (pMotionParts->NormalCollision(pos))
+			{
+				return pos * -1.0f;
 			}
 			
 		}

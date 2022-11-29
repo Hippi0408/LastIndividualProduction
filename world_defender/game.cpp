@@ -16,6 +16,7 @@
 #include "light.h"
 #include "meshfield.h"
 #include "player.h"
+#include "enemy.h"
 #include "billboard.h"
 #include "motion_parts.h"
 
@@ -85,6 +86,13 @@ HRESULT CGame::Init()
 	}
 	m_pPlayer->SetLight(m_pLight->GetLightVec());
 
+	m_pEnmey = new CEnemy;
+	if (FAILED(m_pEnmey->Init()))
+	{
+		return -1;
+	}
+	
+
 	m_pBillcoard = new CBillcoard;
 	if (FAILED(m_pBillcoard->Init()))
 	{
@@ -144,6 +152,13 @@ void CGame::Uninit()
 		m_pPlayer = nullptr;
 	}
 
+	if (m_pEnmey != nullptr)
+	{
+		m_pEnmey->Uninit();
+		delete m_pEnmey;
+		m_pEnmey = nullptr;
+	}
+
 	C3DObject::UninitAllModel();
 
 	CMotionParts::ALLUninit();
@@ -154,6 +169,7 @@ void CGame::Uninit()
 //*****************************************************************************
 void CGame::Update()
 {
+	m_pEnmey->Update();
 	m_pPlayer->Update();
 	CInput *pInput = CInput::GetKey();
 
@@ -225,7 +241,7 @@ void CGame::Update()
 
 	CMotionParts::ALLUpdate();
 
-	if (pInput->Trigger(KEY_DECISION))
+	if (pInput->Trigger(KEY_DECISION) || m_pEnmey->CheckLife())
 	{
 		CManager * pManager = GetManager();
 		pManager->NextMode(TYPE_RESULT);
@@ -241,8 +257,6 @@ void CGame::Draw()
 	m_pCamera->SetCamera();
 
 	m_pMeshfieldBG->Draw();
-
-	m_pPlayer->Draw();
 
 	CMotionParts::ALLDraw();
 

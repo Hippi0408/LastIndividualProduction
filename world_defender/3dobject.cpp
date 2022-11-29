@@ -248,7 +248,7 @@ void C3DObject::Set3DObject(int nPattn, D3DXVECTOR3 pos)
 	m_ModelPattern[m_Model.nPattn].pMeshModel->UnlockVertexBuffer();
 
 	//法線の設定
-	SetNormal();
+	//SetNormal();
 }
 
 //*****************************************************************************
@@ -299,6 +299,14 @@ void C3DObject::CalculationMatrix()
 
 	//モデルのマトリックス　＊　親のワールドマトリックス(向きだけ)
 	D3DXMatrixMultiply(&m_Model.mtxWorldRot, &mtxRotChild, &mtxRotParent);
+
+
+	m_Model.vtxMax2 = m_Model.pos + m_Model.vtxMax;
+	m_Model.vtxMin2 = m_Model.pos + m_Model.vtxMin;
+
+	//モデルの最大最小をワールドマトリックス変換し別保存
+	D3DXVec3TransformCoord(&m_Model.vtxMax2, &m_Model.vtxMax, &m_Model.mtxWorld);
+	D3DXVec3TransformCoord(&m_Model.vtxMin2, &m_Model.vtxMin, &m_Model.mtxWorld);
 
 }
 
@@ -435,22 +443,55 @@ void C3DObject::SetNormal()
 //*****************************************************************************
 void C3DObject::UpdateNormal()
 {
-//	int nNumVix;		//頂点数
-//	D3DXVECTOR3 vec;
-//
-//	//頂点数の取得
-//	nNumVix = m_ModelPattern[m_Model.nPattn].pMeshModel->GetNumVertices();
-//
-//	//法線の更新
-//	for (int nCntVtx = 0; nCntVtx < nNumVix; nCntVtx++)
-//	{
-//		//法線ベクトルの一時保存
-//		vec = m_Model.pNormalPolygon[nCntVtx];
-//		//ワールドマトリックスを使った向き変換
-//		D3DXVec3TransformCoord(&vec,&vec, &m_Model.mtxWorld);
-//		//面の法線ベクトルの保存
-//		m_Model.pNormalPolygon[nCntVtx] = vec;
-//	}
+	int nNumPolygon;	//ポリゴン数
+	//ポリゴン数の取得
+	nNumPolygon = m_ModelPattern[m_Model.nPattn].pMeshModel->GetNumFaces();
+
+	BYTE *pIndexBuff;	//インデックスバッファへのポインタ
+
+	//インデックスバッファのロック
+	m_ModelPattern[m_Model.nPattn].pMeshModel->LockIndexBuffer(D3DLOCK_READONLY, (void**)&pIndexBuff);
+
+	int nIndex1, nIndex2, nIndex3;
+	//法線の計算
+	for (int nCnt = 0; nCnt < nNumPolygon; nCnt++)
+	{
+
+		nIndex1 = *(WORD*)pIndexBuff;
+		nIndex2 = *((WORD*)pIndexBuff + 1);
+		nIndex3 = *((WORD*)pIndexBuff + 2);
+
+		//頂点座標の代入
+		D3DXVECTOR3 vtx1 = m_Model.pTopPos[nIndex1];
+		D3DXVECTOR3 vtx2 = m_Model.pTopPos[nIndex2];
+		D3DXVECTOR3 vtx3 = m_Model.pTopPos[nIndex3];
+
+		D3DXVECTOR3 vec1, vec2, vecResult;
+
+		vec1 = vtx2 - vtx1;
+		vec2 = vtx3 - vtx1;
+
+		//外積
+		/*if (nCnt % 2 == 1)
+		{
+		D3DXVec3Cross(&vecResult, &vec2, &vec1);
+		}
+		else
+		{*/
+		D3DXVec3Cross(&vecResult, &vec1, &vec2);
+		//}
+		//正規化
+		D3DXVec3Normalize(&vecResult, &vecResult);
+
+		//面の法線ベクトルの保存
+		m_Model.pNormalPolygon[nCnt] = vecResult;
+
+		//データを進める
+		pIndexBuff += sizeof(WORD) * 3;
+	}
+
+	//インデックスバッファのアンロック
+	m_ModelPattern[m_Model.nPattn].pMeshModel->UnlockIndexBuffer();
 }
 
 //*****************************************************************************
@@ -458,107 +499,38 @@ void C3DObject::UpdateNormal()
 //*****************************************************************************
 D3DXVECTOR3 C3DObject::Collision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos)
 {
-	int nNumVix;		//頂点数
-	int nNumIndex;		//インデックス数
-	int nNumPolygon;	//ポリゴン数
+	return D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+}
 
-	BYTE *pIndexBuff;	//インデックスバッファへのポインタ
+bool C3DObject::NormalCollision(D3DXVECTOR3 pos)
+{
+	D3DXVECTOR3 vtx[8];
 
-	//頂点数の取得
-	nNumVix = m_ModelPattern[m_Model.nPattn].pMeshModel->GetNumVertices();
-	//ポリゴン数の取得
-	nNumPolygon = m_ModelPattern[m_Model.nPattn].pMeshModel->GetNumFaces();
-	//インデクス数の取得
-	nNumIndex = nNumPolygon + 2;
+	vtx[0] = D3DXVECTOR3(m_Model.vtxMin2.x, m_Model.vtxMax2.y, m_Model.vtxMin2.z);
+	vtx[1] = D3DXVECTOR3(m_Model.vtxMax2.x, m_Model.vtxMax2.y, m_Model.vtxMin2.z);
+	vtx[2] = D3DXVECTOR3(m_Model.vtxMax2.x, m_Model.vtxMin2.y, m_Model.vtxMin2.z);
+	vtx[3] = D3DXVECTOR3(m_Model.vtxMin2.x, m_Model.vtxMin2.y, m_Model.vtxMin2.z);
 
-	//インデックスバッファのロック
-	m_ModelPattern[m_Model.nPattn].pMeshModel->LockIndexBuffer(D3DLOCK_READONLY, (void**)&pIndexBuff);
+	vtx[4] = D3DXVECTOR3(m_Model.vtxMin2.x, m_Model.vtxMax2.y, m_Model.vtxMax2.z);
+	vtx[5] = D3DXVECTOR3(m_Model.vtxMax2.x, m_Model.vtxMax2.y, m_Model.vtxMax2.z);
+	vtx[6] = D3DXVECTOR3(m_Model.vtxMax2.x, m_Model.vtxMin2.y, m_Model.vtxMax2.z);
+	//vtx[7] = D3DXVECTOR3(m_Model.vtxMin2.x, m_Model.vtxMin2.y, m_Model.vtxMax2.z);
 
-	int nIndex1, nIndex2, nIndex3;
-
-	//すべての頂点POSの取得
-	for (int nCnt = 0; nCnt < nNumPolygon; nCnt++)
+	//四角形の内にいるかどうか
+	if(!SquareInOut(pos, vtx[0], vtx[1], vtx[2], vtx[3]))
 	{
-		//法線の取得
-		D3DXVECTOR3 Normal = m_Model.pNormalPolygon[nCnt];
-		//ワールドマトリックスとの掛け算
-		D3DXVec3TransformCoord(&Normal, &Normal, &m_Model.mtxWorldRot);
-		//正規化
-		D3DXVec3Normalize(&Normal, &Normal);
-
-		//インデックスから頂点番号の取得
-		nIndex1 = *(WORD*)pIndexBuff;
-		nIndex2 = *((WORD*)pIndexBuff + 1);
-		nIndex3 = *((WORD*)pIndexBuff + 2);
-
-		D3DXVECTOR3 vtx0, vtx1, vtx2;
-		//頂点座標の代入
-		//ワールドマトリックスとの掛け算
-		D3DXVec3TransformCoord(&vtx0, &m_Model.pTopPos[nIndex1], &m_Model.mtxWorld);
-		D3DXVec3TransformCoord(&vtx1, &m_Model.pTopPos[nIndex2], &m_Model.mtxWorld);
-		D3DXVec3TransformCoord(&vtx2, &m_Model.pTopPos[nIndex3], &m_Model.mtxWorld);
-
-
-		//平面情報
-		D3DXPLANE Plane;
-		D3DXPlaneFromPointNormal(&Plane, &vtx0, &Normal);
-
-		//交点
-		D3DXVECTOR3 IntersectionPos;
-
-		//平面を突き抜ける直線の貫通点を取得
-		D3DXPlaneIntersectLine(&IntersectionPos, &Plane, &pos, &oldpos);
-
-		if (IntersectionPos == D3DXVECTOR3(0.0f, 0.0f, 0.0f))
-		{
-			continue;
-		}
-
-
-		D3DXVECTOR3 vec1 = pos - oldpos;
-		D3DXVECTOR3 vec2 = IntersectionPos - oldpos;
-
-		if (D3DXVec3Dot(&Normal, &vec1) >= 0.0f)
-		{
-			continue;
-		}
-
-		float fSize1 = D3DXVec3Length(&vec1);
-		float fSize2 = D3DXVec3Length(&vec2);
-
-		if (fSize1 > fSize2)
-		{
-			//三角形の内にいるかどうか
-			if (TriangleInOut(pos, vtx0, vtx1, vtx2))
-			{
-				D3DXVECTOR3 IntersectionPosVec1 = IntersectionPos - pos;
-				D3DXVECTOR3 IntersectionPosVec2 = IntersectionPos - oldpos;
-
-				D3DXVec3Normalize(&IntersectionPosVec1, &IntersectionPosVec1);
-				D3DXVec3Normalize(&IntersectionPosVec2, &IntersectionPosVec2);
-
-				D3DXVECTOR3 Criteria = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-				if (
-					((IntersectionPosVec1 > Criteria && IntersectionPosVec2 > Criteria)
-						|| (IntersectionPosVec1 < Criteria && IntersectionPosVec2 < Criteria))
-					)
-				{
-
-					D3DXVECTOR3 WallSlide = (vec1 - D3DXVec3Dot(&vec1, &Normal) * Normal) * 1.0f;
-
-					return IntersectionPos + WallSlide;
-
-				}
-			}
-		}
-		//データを進める
-		pIndexBuff += sizeof(WORD) * 3;
+		return false;
+	}
+	if (!SquareInOut(pos, vtx[1], vtx[5], vtx[6], vtx[2]))
+	{
+		return false;
+	}
+	if (!SquareInOut(pos, vtx[4], vtx[5], vtx[1], vtx[0]))
+	{
+		return false;
 	}
 
-	//インデックスバッファのアンロック
-	m_ModelPattern[m_Model.nPattn].pMeshModel->UnlockIndexBuffer();
-
-	return D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	return true;
 }
 
 //*****************************************************************************
@@ -610,6 +582,71 @@ bool C3DObject::TriangleInOut(D3DXVECTOR3 pos, D3DXVECTOR3 vtx0, D3DXVECTOR3 vtx
 	if (
 		(fInnerProduct0[2] > 0.0f && fInnerProduct1[2] > 0.0f && fInnerProduct2[2] > 0.0f)
 		|| (fInnerProduct0[2] < 0.0f && fInnerProduct1[2] < 0.0f && fInnerProduct2[2] < 0.0f)
+		)
+	{
+		return true;
+	}
+
+
+	return false;
+}
+
+//*****************************************************************************
+//四角形の内にいるかどうか
+//*****************************************************************************
+bool C3DObject::SquareInOut(D3DXVECTOR3 pos, D3DXVECTOR3 vtx0, D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3)
+{
+	D3DXVECTOR3 vec1, vec2;
+	float fInnerProduct0[3], fInnerProduct1[3], fInnerProduct2[3] , fInnerProduct3[3];
+
+	vec1 = vtx1 - vtx0;
+	vec2 = pos - vtx0;
+
+	fInnerProduct0[0] = vec1.x * vec2.z - vec1.z * vec2.x;
+	fInnerProduct0[1] = vec1.y * vec2.x - vec1.x * vec2.y;
+	fInnerProduct0[2] = vec1.z * vec2.y - vec1.y * vec2.z;
+
+	vec1 = vtx2 - vtx1;
+	vec2 = pos - vtx1;
+
+	fInnerProduct1[0] = vec1.x * vec2.z - vec1.z * vec2.x;
+	fInnerProduct1[1] = vec1.y * vec2.x - vec1.x * vec2.y;
+	fInnerProduct1[2] = vec1.z * vec2.y - vec1.y * vec2.z;
+
+	vec1 = vtx3 - vtx2;
+	vec2 = pos - vtx2;
+
+	fInnerProduct2[0] = vec1.x * vec2.z - vec1.z * vec2.x;
+	fInnerProduct2[1] = vec1.y * vec2.x - vec1.x * vec2.y;
+	fInnerProduct2[2] = vec1.z * vec2.y - vec1.y * vec2.z;
+
+	vec1 = vtx0 - vtx3;
+	vec2 = pos - vtx3;
+
+	fInnerProduct3[0] = vec1.x * vec2.z - vec1.z * vec2.x;
+	fInnerProduct3[1] = vec1.y * vec2.x - vec1.x * vec2.y;
+	fInnerProduct3[2] = vec1.z * vec2.y - vec1.y * vec2.z;
+
+
+	if (
+		(fInnerProduct0[0] > 0.0f && fInnerProduct1[0] > 0.0f && fInnerProduct2[0] > 0.0f && fInnerProduct3[0] > 0.0f)
+		|| (fInnerProduct0[0] < 0.0f && fInnerProduct1[0] < 0.0f && fInnerProduct2[0] < 0.0f && fInnerProduct3[0] < 0.0f)
+		)
+	{
+		return true;
+	}
+
+	if (
+		(fInnerProduct0[1] > 0.0f && fInnerProduct1[1] > 0.0f && fInnerProduct2[1] > 0.0f && fInnerProduct3[1] > 0.0f)
+		|| (fInnerProduct0[1] < 0.0f && fInnerProduct1[1] < 0.0f && fInnerProduct2[1] < 0.0f && fInnerProduct3[1] < 0.0f)
+		)
+	{
+		return true;
+	}
+
+	if (
+		(fInnerProduct0[2] > 0.0f && fInnerProduct1[2] > 0.0f && fInnerProduct2[2] > 0.0f && fInnerProduct3[2] > 0.0f)
+		|| (fInnerProduct0[2] < 0.0f && fInnerProduct1[2] < 0.0f && fInnerProduct2[2] < 0.0f && fInnerProduct3[2] < 0.0f)
 		)
 	{
 		return true;
