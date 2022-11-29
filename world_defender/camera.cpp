@@ -16,7 +16,7 @@
 //*****************************************************************************
 CCamera::CCamera()
 {
-	ZeroMemory(&m_Camera, sizeof(m_Camera));
+	
 }
 
 //*****************************************************************************
@@ -32,16 +32,14 @@ CCamera::~CCamera()
 HRESULT CCamera::Init()
 {
 
-	m_Camera.posV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_Camera.posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_posV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 
-	m_Camera.vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	m_vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
-	float fData = m_Camera.posV.x - m_Camera.posR.x;
-	float fData1 = m_Camera.posV.z - m_Camera.posR.z;
-
-	//m_Camera.fDistance = ThreeSquareTheorem(fData, fData1);
+	float fData = m_posV.x - m_posR.x;
+	float fData1 = m_posV.z - m_posR.z;
 
 	return S_OK;
 }
@@ -80,30 +78,30 @@ void CCamera::SetCamera()
 	pD3DDevice = pManager->GetDeviceManager();
 
 	//ビューマトリックスの初期化
-	D3DXMatrixIdentity(&m_Camera.mtxView);
+	D3DXMatrixIdentity(&m_mtxView);
 
-	D3DXMatrixLookAtLH(&m_Camera.mtxView, &m_Camera.posV, &m_Camera.posR, &m_Camera.vecU);
+	D3DXMatrixLookAtLH(&m_mtxView, &m_posV, &m_posR, &m_vecU);
 
 	//ビューマトリックスの設定
-	pD3DDevice->SetTransform(D3DTS_VIEW, &m_Camera.mtxView);
+	pD3DDevice->SetTransform(D3DTS_VIEW, &m_mtxView);
 
 	//プロジェクションマトリックスの初期化
-	D3DXMatrixIdentity(&m_Camera.mtxProjection);
+	D3DXMatrixIdentity(&m_mtxProjection);
 
 	//プロジェクションマトリックスの作成
-	D3DXMatrixPerspectiveFovLH(&m_Camera.mtxProjection,
+	D3DXMatrixPerspectiveFovLH(&m_mtxProjection,
 		D3DXToRadian(45.0f),//視野角
 		(float)SCREEN_WIDTH / (float)SCREEN_HEIGHT,//アスペクト比
 		10.0f,//どこからどこまでカメラで表示するか
 		50000.0f);
 
 	//プロジェクションマトリックスの設定
-	pD3DDevice->SetTransform(D3DTS_PROJECTION, &m_Camera.mtxProjection);
+	pD3DDevice->SetTransform(D3DTS_PROJECTION, &m_mtxProjection);
 }
 
 float CCamera::GetRot()
 {
-	D3DXVECTOR3 vec = m_Camera.posR - m_Camera.posV;
+	D3DXVECTOR3 vec = m_posR - m_posV;
 
 	float fAngle = atan2f(vec.x, vec.z);
 

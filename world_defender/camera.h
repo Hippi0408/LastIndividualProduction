@@ -22,38 +22,39 @@
 class CCamera : public CObject
 {
 private:
-	//カメラ構造体
-	typedef struct
-	{
-		D3DXVECTOR3 posV;		//視点
-		D3DXVECTOR3 posVDest;		//視点
-		D3DXVECTOR3 posR;		//注視点
-		D3DXVECTOR3 posRDest;		//注視点
-		D3DXVECTOR3 vecU;		//上方向ベクトル
-		D3DXMATRIX mtxProjection; //プロジェクションマトリックス
-		D3DXMATRIX mtxView;		  //ビューマトリックス
-		float fDistance;			//視点か注視点のまでの距離
-	}Camera;
-
+	
 public:
 	CCamera();
-	~CCamera() override;
+	virtual ~CCamera() override;
 
-	HRESULT Init() override;
-	void Uninit() override;
-	void Update() override;
-	void Draw() override;
+	virtual HRESULT Init() override;
+	virtual void Uninit() override;
+	virtual void Update() override;
+	virtual void Draw() override;
 	void SetCamera();
 
-	void SetPosV(D3DXVECTOR3 posV) { m_Camera.posV = posV; }
-	void AddPosV(D3DXVECTOR3 addV) { m_Camera.posV += addV; }
-	void SetPosR(D3DXVECTOR3 posR) { m_Camera.posR = posR; }
-	void AddPosR(D3DXVECTOR3 addR) { m_Camera.posR += addR; }
-	void SetVecU(D3DXVECTOR3 vecU) { m_Camera.vecU = vecU; }
+	//基本情報
+	D3DXVECTOR3 GetPosV() { return m_posV; }
+	void SetPosV(D3DXVECTOR3 posV) { m_posV = posV; }
+	void AddPosV(D3DXVECTOR3 addV) { m_posV += addV; }
+
+	D3DXVECTOR3 GetPosR() { return m_posR; }
+	void SetPosR(D3DXVECTOR3 posR) { m_posR = posR; }
+	void AddPosR(D3DXVECTOR3 addR) { m_posR += addR; }
+
+
+	void SetVecU(D3DXVECTOR3 vecU) { m_vecU = vecU; }
 	float GetRot();
 
 private:
-	Camera m_Camera;
+	D3DXVECTOR3 m_posV;		//視点
+	D3DXVECTOR3 m_posVDest;		//視点
+	D3DXVECTOR3 m_posR;		//注視点
+	D3DXVECTOR3 m_posRDest;		//注視点
+	D3DXVECTOR3 m_vecU;		//上方向ベクトル
+	D3DXMATRIX m_mtxProjection; //プロジェクションマトリックス
+	D3DXMATRIX m_mtxView;		  //ビューマトリックス
+	float fDistance;			//視点か注視点のまでの距離
 };
 
 #endif
