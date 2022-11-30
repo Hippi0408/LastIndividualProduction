@@ -479,13 +479,18 @@ CMotionParts * CMotionParts::GetMotionPartsPointer(int nMotionNum, int nPartsNum
 //*****************************************************************************
 //モーションモデルの移動
 //*****************************************************************************
-void CMotionParts::MoveMotionModel(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nModelNum, int nMotionNum)
+void CMotionParts::MoveMotionModel(int nModelNum, int nMotionNum, D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 {
 	if (m_nMotionPlayMotonNum[nModelNum] != nMotionNum)
 	{
 		m_nMotionPlayMotonNum[nModelNum] = nMotionNum;
 		//全体の次までの位置の計算
 		AllNextMotionPosition(nModelNum);
+	}
+
+	if (pos == rot)
+	{
+		return;
 	}
 
 	GetMotionPartsPointer(nModelNum, 0)->SetParentPos(pos);
@@ -589,13 +594,19 @@ void CMotionParts::SetMotionFileData(const MotionMoveData MotionMoveData, int nM
 //*****************************************************************************
 //当たり判定（自分のモデル番号、自分の位置）
 //*****************************************************************************
-D3DXVECTOR3 CMotionParts::AllCollision(int nMotionNum, D3DXVECTOR3 pos, D3DXVECTOR3 oldpos)
+D3DXVECTOR3 CMotionParts::AllCollision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, int nMotionNum, int nIgnored1, int nIgnored2, int nIgnored3, int nIgnored4)
 {
 	CMotionParts* pMotionParts = m_pMotionPartsTop;
 
 	while (pMotionParts != nullptr)
 	{
-		if (!pMotionParts->GetMotionParts(nMotionNum))
+		int nNum = pMotionParts->GetModelObjNum();
+		if (nNum != nMotionNum 
+			&& nNum != nIgnored1
+			&& nNum != nIgnored2
+			&& nNum != nIgnored3
+			&& nNum != nIgnored4
+			)
 		{
 			//D3DXVECTOR3 Add = pMotionParts->Collision(pos, oldpos);
 			/*if (Add != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
@@ -613,4 +624,47 @@ D3DXVECTOR3 CMotionParts::AllCollision(int nMotionNum, D3DXVECTOR3 pos, D3DXVECT
 	}
 
 	return pos;
+}
+
+//*****************************************************************************
+//親を後天的に設定する（子供番号、親番号）
+//*****************************************************************************
+void CMotionParts::SettingParent(int nChildren, int nParent)
+{
+	if (nChildren == nParent)
+	{
+		return;
+	}
+
+	CMotionParts* pMotionPartsChildren = nullptr;
+	CMotionParts* pMotionPartsParent = nullptr;
+
+	CMotionParts* pMotionParts = m_pMotionPartsTop;
+
+	while (pMotionParts != nullptr)
+	{
+		if(pMotionParts->GetMotionParts(nChildren,0))
+		{
+			pMotionPartsChildren = pMotionParts;
+		}
+
+		if (pMotionParts->GetMotionParts(nParent, 0))
+		{
+			pMotionPartsParent = pMotionParts;
+		}
+
+		pMotionParts = pMotionParts->GetNextMotionParts();
+	}
+
+	if (pMotionPartsChildren == nullptr || pMotionPartsParent == nullptr)
+	{
+		return;
+	}
+
+	if (pMotionPartsChildren->GetMotionRarent() == nullptr)
+	{
+		pMotionPartsChildren->SetMotionRarent(pMotionPartsParent);
+	}
+
+
 }

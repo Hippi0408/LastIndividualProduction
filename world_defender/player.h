@@ -34,8 +34,10 @@ public:
 	void Update() override;
 	void Draw() override;
 
+	int GetMotionNum1() { return m_nMotionNum1; }
+
 private:
-	
+	int m_nMotionNum1;
 };
 
 #endif

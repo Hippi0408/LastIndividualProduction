@@ -98,9 +98,11 @@ void CEnemy::Update()
 	}
 
 
-	CMotionParts::MoveMotionModel(GetPos(), GetRot(), GetMotionNum(), 0);
+	CMotionParts::MoveMotionModel(GetMotionNum(), 0, GetPos(), GetRot());
 
-	pos = CMotionParts::AllCollision(pGame->GetPlayer()->GetMotionNum(), pGame->GetPlayer()->GetPos(), GetOldPos());
+	CPlayer* pPlayer = pGame->GetPlayer();
+
+	pos = CMotionParts::AllCollision(pPlayer->GetPos(), GetOldPos(), pPlayer->GetMotionNum(), pPlayer->GetMotionNum1());
 
 	if (pos != pGame->GetPlayer()->GetPos())
 	{

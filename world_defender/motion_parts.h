@@ -98,6 +98,7 @@ public:
 	void NextMotionPosition();//次の位置までの計算
 	static void AllNextMotionPosition(int nMotionNum);//全部のパーツ次の位置までの計算
 	void SetMotionRarent(CMotionParts* pMotionRarent) { m_pRarent = pMotionRarent; }
+	CMotionParts* GetMotionRarent() { return m_pRarent; }
 	bool GetMotionParts(int nMotionNum, int nPartsNum);//引数との一致があるかどうか
 	bool GetMotionParts(int nMotionNum);//引数との一致があるかどうか
 	void SetBoolDraw(bool bDraw) { m_bDraw = bDraw; }
@@ -115,12 +116,13 @@ public:
 	static int CreateMotionObj(MotionData* pMotionData,int nPartsMax);//動くOBJの生成
 	static CMotionParts* GetMotionPartsPointer(int nMotionNum, int nPartsNum);
 
-	static void MoveMotionModel(D3DXVECTOR3 pos, D3DXVECTOR3 rot,int nModelNum, int nMotionNum = 0);//モーションモデルの移動
+	static void MoveMotionModel(int nModelNum, int nMotionNum,D3DXVECTOR3 pos = D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f));//モーションモデルの移動
 	static void SetBoolDraw(bool bDraw, int nMotionNum);//モーションモデルの描画の有無
 	static void SetLight(D3DXVECTOR3 vec, int nMotionNum);//モーションモデルのライトベクトル
 	static void AllSetShadowPos(D3DXVECTOR3 pos, int nMotionNum);//影の設定
 	static void SetMotionFileData(const MotionMoveData MotionMoveData, int nMotionNum);//モーションの登録
-	static D3DXVECTOR3 AllCollision(int nMotionNum,D3DXVECTOR3 pos, D3DXVECTOR3 oldpos);//当たり判定（自分のモデル番号、自分の位置）
+	static D3DXVECTOR3 AllCollision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, int nMotionNum, int nIgnored1 = -1, int nIgnored2 = -1, int nIgnored3 = -1, int nIgnored4 = -1);//当たり判定（自分のモデル番号、自分の位置）
+	static void SettingParent(int nChildren, int nParent);//親を後天的に設定する（子供番号、親番号）
 
 private:
 	static CMotionParts* m_pMotionPartsTop;//リスト構造の初め

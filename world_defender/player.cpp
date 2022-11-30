@@ -49,7 +49,12 @@ HRESULT CPlayer::Init()
 
 	CRead cRead;
 
-	SetMotionNum(cRead.ReadMotion("data/MOTION/motionplayer.txt"));
+	SetMotionNum(cRead.ReadMotion("data/MOTION/motionplayer1.txt"));
+
+	m_nMotionNum1 = cRead.ReadMotion("data/MOTION/motionplayer2.txt");
+
+
+	CMotionParts::SettingParent(m_nMotionNum1, GetMotionNum());
 
 	return S_OK;
 }
@@ -174,11 +179,13 @@ void CPlayer::Update()
 
 	if (pInput->Press(KEY_MOVE) || pInput->Press(DIK_0))
 	{
-		CMotionParts::MoveMotionModel(GetPos(), GetRot(), GetMotionNum(),1);
+		CMotionParts::MoveMotionModel(GetMotionNum(), 1,GetPos(), rot);
+		CMotionParts::MoveMotionModel(m_nMotionNum1, 1);
 	}
 	else
 	{
-		CMotionParts::MoveMotionModel(GetPos(), GetRot(), GetMotionNum(),0);
+		CMotionParts::MoveMotionModel(GetMotionNum(), 0, GetPos(), rot);
+		CMotionParts::MoveMotionModel(m_nMotionNum1, 0);
 	}
 
 
