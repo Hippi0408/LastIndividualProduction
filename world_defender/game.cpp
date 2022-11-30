@@ -19,6 +19,7 @@
 #include "enemy.h"
 #include "billboard.h"
 #include "motion_parts.h"
+#include "tps_camera.h"
 
 //*****************************************************************************
 // コンストラクタ
@@ -40,15 +41,15 @@ CGame::~CGame()
 HRESULT CGame::Init()
 {
 	//カメラ
-	m_pCamera = new CCamera;
+	m_pCamera = new CTpsCamera;
 	if (FAILED(m_pCamera->Init()))
 	{
 		return -1;
 	}
 
-	m_pCamera->SetPosV(D3DXVECTOR3(0.0f, 200.0f, -1000.0f));
-	m_pCamera->SetPosR(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	m_pCamera->SetVecU(D3DXVECTOR3(0.0f, 1.0f, 0.0f));
+	//m_pCamera->SetPosV(D3DXVECTOR3(0.0f, 200.0f, -1000.0f));
+	//m_pCamera->SetPosR(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	//m_pCamera->SetVecU(D3DXVECTOR3(0.0f, 1.0f, 0.0f));
 
 	//ライト
 	m_pLight = new CLight;
@@ -169,6 +170,7 @@ void CGame::Uninit()
 //*****************************************************************************
 void CGame::Update()
 {
+	m_pCamera->Update();
 	m_pEnmey->Update();
 	m_pPlayer->Update();
 	CInput *pInput = CInput::GetKey();

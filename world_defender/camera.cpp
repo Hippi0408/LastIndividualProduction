@@ -38,9 +38,9 @@ HRESULT CCamera::Init()
 
 	m_vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
-	float fData = m_posV.x - m_posR.x;
+	/*float fData = m_posV.x - m_posR.x;
 	float fData1 = m_posV.z - m_posR.z;
-
+*/
 	return S_OK;
 }
 

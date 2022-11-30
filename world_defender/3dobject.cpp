@@ -311,43 +311,6 @@ void C3DObject::CalculationMatrix()
 }
 
 //*****************************************************************************
-// ROT‚Ì³‹K‰»
-//*****************************************************************************
-D3DXVECTOR3 C3DObject::NormalizationRot(D3DXVECTOR3 In)
-{
-	D3DXVECTOR3 rot = In;
-
-	if (rot.x > D3DX_PI)
-	{
-		rot.x -= D3DX_PI * 2.0f;
-	}
-	else if (rot.x < -D3DX_PI)
-	{
-		rot.x += D3DX_PI * 2.0f;
-	}
-
-	if (rot.y > D3DX_PI)
-	{
-		rot.y -= D3DX_PI * 2.0f;
-	}
-	else if (rot.y < -D3DX_PI)
-	{
-		rot.y += D3DX_PI * 2.0f;
-	}
-
-	if (rot.z > D3DX_PI)
-	{
-		rot.z -= D3DX_PI * 2.0f;
-	}
-	else if (rot.z < -D3DX_PI)
-	{
-		rot.z += D3DX_PI * 2.0f;
-	}
-
-	return rot;
-}
-
-//*****************************************************************************
 //–@üÝ’è
 //*****************************************************************************
 void C3DObject::SetNormal()

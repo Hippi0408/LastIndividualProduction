@@ -153,6 +153,7 @@
     <ClCompile Include="3dpolygon.cpp" />
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="convenience_function.cpp" />
     <ClCompile Include="DirectInput.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="fade.cpp" />
@@ -183,6 +184,7 @@
     <ClInclude Include="3dpolygon.h" />
     <ClInclude Include="billboard.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="convenience_function.h" />
     <ClInclude Include="DirectInput.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="fade.h" />

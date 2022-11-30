@@ -87,7 +87,6 @@ public:
 	D3DXVECTOR3 GetSize();
 	void SetModelPattnNum(int nPattnNum) { m_Model.nPattn = nPattnNum; }
 	void CalculationMatrix();
-	D3DXVECTOR3 NormalizationRot(D3DXVECTOR3 In);
 	void SetNormal();			//法線設定
 	void UpdateNormal();		//法線の向きの更新
 	virtual D3DXVECTOR3 Collision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos);//当たり判定

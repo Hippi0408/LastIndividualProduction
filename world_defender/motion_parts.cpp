@@ -11,6 +11,7 @@
 #include "motion_parts.h"
 #include "manager.h"
 #include <assert.h>
+#include "convenience_function.h"
 
 const D3DXVECTOR3 CMotionParts::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 CMotionParts *CMotionParts::m_pMotionPartsTop = nullptr;
@@ -135,7 +136,7 @@ void CMotionParts::Update()
 	D3DXVECTOR3 rot = GetRot();
 
 	//ê≥ãKâª
-	rot = NormalizationRot(rot);
+	rot = CConvenience_Function::NormalizationRot(rot);
 
 	SetRot(rot);
 
@@ -293,7 +294,7 @@ void CMotionParts::NextMotionPosition()
 	D3DXVECTOR3 rot = nextRot - nowRot;
 
 	//ê≥ãKâª
-	rot = NormalizationRot(rot);
+	rot = CConvenience_Function::NormalizationRot(rot);
 
 	//äÑçáåvéZ
 	//à íu
@@ -303,7 +304,7 @@ void CMotionParts::NextMotionPosition()
 	rotMove = rot / nFrameRatio;
 
 	//ê≥ãKâª
-	rot = NormalizationRot(rotMove);
+	rot = CConvenience_Function::NormalizationRot(rotMove);
 
 	m_RotMove = rotMove;
 

@@ -17,7 +17,7 @@
 #include "meshfield.h"
 #include "motion_parts.h"
 
-const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f,10.0f,0.0f);
+const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f,0.0f,0.0f);
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
@@ -160,6 +160,11 @@ void CPlayer::Update()
 		SetPos(pos);
 	}
 
+
+	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, rotY + D3DX_PI, 0.0f);
+
+
+	SetRot(rot);
 	
 
 	if (groundpos != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
