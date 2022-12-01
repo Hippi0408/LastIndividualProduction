@@ -116,7 +116,7 @@ public:
 	static int CreateMotionObj(MotionData* pMotionData,int nPartsMax);//動くOBJの生成
 	static CMotionParts* GetMotionPartsPointer(int nMotionNum, int nPartsNum);
 
-	static void MoveMotionModel(int nModelNum, int nMotionNum,D3DXVECTOR3 pos = D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f));//モーションモデルの移動
+	static void MoveMotionModel(int nModelNum, int nMotionNum, D3DXVECTOR3 *pos = nullptr, D3DXVECTOR3 *rot = nullptr);//モーションモデルの移動
 	static void SetBoolDraw(bool bDraw, int nMotionNum);//モーションモデルの描画の有無
 	static void SetLight(D3DXVECTOR3 vec, int nMotionNum);//モーションモデルのライトベクトル
 	static void AllSetShadowPos(D3DXVECTOR3 pos, int nMotionNum);//影の設定

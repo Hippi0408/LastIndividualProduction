@@ -98,7 +98,7 @@ void CEnemy::Update()
 	}
 
 
-	CMotionParts::MoveMotionModel(GetMotionNum(), 0, GetPos(), GetRot());
+	CMotionParts::MoveMotionModel(GetMotionNum(), 0, &GetPos(), &GetRot());
 
 	CPlayer* pPlayer = pGame->GetPlayer();
 

@@ -304,7 +304,7 @@ void CMotionParts::NextMotionPosition()
 	rotMove = rot / nFrameRatio;
 
 	//³‹K‰»
-	rot = CConvenience_Function::NormalizationRot(rotMove);
+	rotMove = CConvenience_Function::NormalizationRot(rotMove);
 
 	m_RotMove = rotMove;
 
@@ -479,7 +479,7 @@ CMotionParts * CMotionParts::GetMotionPartsPointer(int nMotionNum, int nPartsNum
 //*****************************************************************************
 //ƒ‚[ƒVƒ‡ƒ“ƒ‚ƒfƒ‹‚ÌˆÚ“®
 //*****************************************************************************
-void CMotionParts::MoveMotionModel(int nModelNum, int nMotionNum, D3DXVECTOR3 pos, D3DXVECTOR3 rot)
+void CMotionParts::MoveMotionModel(int nModelNum, int nMotionNum, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot)
 {
 	if (m_nMotionPlayMotonNum[nModelNum] != nMotionNum)
 	{
@@ -493,8 +493,15 @@ void CMotionParts::MoveMotionModel(int nModelNum, int nMotionNum, D3DXVECTOR3 po
 		return;
 	}
 
-	GetMotionPartsPointer(nModelNum, 0)->SetParentPos(pos);
-	GetMotionPartsPointer(nModelNum, 0)->SetParentRot(rot);
+	if (pos != nullptr)
+	{
+		GetMotionPartsPointer(nModelNum, 0)->SetParentPos(*pos);
+	}
+
+	if (rot != nullptr)
+	{
+		GetMotionPartsPointer(nModelNum, 0)->SetParentRot(*rot);
+	}
 }
 
 //*****************************************************************************

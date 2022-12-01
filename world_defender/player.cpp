@@ -16,6 +16,7 @@
 #include "camera.h"
 #include "meshfield.h"
 #include "motion_parts.h"
+#include "convenience_function.h"
 
 const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f,0.0f,0.0f);
 //*****************************************************************************
@@ -47,6 +48,10 @@ HRESULT CPlayer::Init()
 
 	SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
+	m_RotLowerBody = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	m_DestRotLowerBody = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
 	CRead cRead;
 
 	SetMotionNum(cRead.ReadMotion("data/MOTION/motionplayer1.txt"));
@@ -72,84 +77,86 @@ void CPlayer::Uninit()
 //*****************************************************************************
 void CPlayer::Update()
 {
-	CInput *pInput = CInput::GetKey();
-	CManager *pManager = GetManager();
+	//親クラスの更新
+	CMovable_Obj::Update();
 
+	//入力デバイスの取得
+	CInput *pInput = CInput::GetKey();
+
+	//マネージャーからゲームオブジェクトの取得
+	CManager *pManager = GetManager();
 	CGame* pGame = (CGame*)pManager->GetGameObject();
 
+	//カメラの向き（Y軸のみ）
 	float rotY = pGame->GetCamera()->GetRot();
 
-	D3DXVECTOR3 add = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	//移動量の一時保管
+	D3DXVECTOR3 move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	//視点移動
 	if (pInput->Press(DIK_W))
 	{//上キーが押された
 		if (pInput->Press(DIK_A))
 		{
-			add.x -= sinf(rotY + D3DX_PI * 0.75f) * 5.0f;
-			add.z -= cosf(rotY + D3DX_PI * 0.75f) * 5.0f;
+			move.x -= sinf(rotY + D3DX_PI * 0.75f) * 5.0f;
+			move.z -= cosf(rotY + D3DX_PI * 0.75f) * 5.0f;
 		}
 		else if (pInput->Press(DIK_D))
 		{
-			add.x -= sinf(rotY + D3DX_PI * -0.75f) * 5.0f;
-			add.z -= cosf(rotY + D3DX_PI * -0.75f) * 5.0f;
+			move.x -= sinf(rotY + D3DX_PI * -0.75f) * 5.0f;
+			move.z -= cosf(rotY + D3DX_PI * -0.75f) * 5.0f;
 		}
 		else
 		{
-			add.x += sinf(rotY) * 5.0f;
-			add.z += cosf(rotY) * 5.0f;
+			move.x += sinf(rotY) * 5.0f;
+			move.z += cosf(rotY) * 5.0f;
 		}
 	}
 	else if (pInput->Press(DIK_S))
 	{//下キーが押された
 		if (pInput->Press(DIK_A))
 		{
-			add.x -= sinf(rotY + D3DX_PI * 0.25f) * 5.0f;
-			add.z -= cosf(rotY + D3DX_PI * 0.25f) * 5.0f;
+			move.x -= sinf(rotY + D3DX_PI * 0.25f) * 5.0f;
+			move.z -= cosf(rotY + D3DX_PI * 0.25f) * 5.0f;
 		}
 		else if (pInput->Press(DIK_D))
 		{
-			add.x -= sinf(rotY + D3DX_PI * -0.25f) * 5.0f;
-			add.z -= cosf(rotY + D3DX_PI * -0.25f) * 5.0f;
+			move.x -= sinf(rotY + D3DX_PI * -0.25f) * 5.0f;
+			move.z -= cosf(rotY + D3DX_PI * -0.25f) * 5.0f;
 		}
 		else
 		{
-			add.x += sinf(rotY + D3DX_PI) * 5.0f;
-			add.z += cosf(rotY + D3DX_PI) * 5.0f;
+			move.x += sinf(rotY + D3DX_PI) * 5.0f;
+			move.z += cosf(rotY + D3DX_PI) * 5.0f;
 		}
 	}
 	else if (pInput->Press(DIK_A))
 	{//左キーが押された
-		add.x += sinf(rotY + D3DX_PI * -0.5f) * 5.0f;
-		add.z += cosf(rotY + D3DX_PI * -0.5f) * 5.0f;
+		move.x += sinf(rotY + D3DX_PI * -0.5f) * 5.0f;
+		move.z += cosf(rotY + D3DX_PI * -0.5f) * 5.0f;
 	}
 	else if (pInput->Press(DIK_D))
 	{//右キーが押された
-		add.x += sinf(rotY + D3DX_PI * 0.5f) * 5.0f;
-		add.z += cosf(rotY + D3DX_PI * 0.5f) * 5.0f;
+		move.x += sinf(rotY + D3DX_PI * 0.5f) * 5.0f;
+		move.z += cosf(rotY + D3DX_PI * 0.5f) * 5.0f;
 	}
 
-	
-	if (pInput->Press(DIK_Z))
+	//移動量に変更があった場合移動を保管
+	if (move != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
 	{
-		AddRot(D3DXVECTOR3(0.0f, D3DXToRadian(-10), 0.0f));
-	}
-	else if (pInput->Press(DIK_X))
-	{
-		AddRot(D3DXVECTOR3(0.0f, D3DXToRadian(10), 0.0f));
+		SetMove(move);
 	}
 
-	//add.y -= 4.0f;
-
-	AddPos(add);
-
-
+	//床との当たり判定用変数
 	D3DXVECTOR3 pos, groundpos;
 
+	//現在のプレイヤーの位置
 	pos = GetPos();
 
+	//プレイヤーがいる床の高さ
 	groundpos = pGame->GetMeshfield()->Collision(pos);
 
+	//プレイヤーがいる床の高さがプレイヤーより上だったら
 	if (pos.y < groundpos.y)
 	{
 		if (groundpos != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
@@ -159,37 +166,46 @@ void CPlayer::Update()
 		}
 	}
 
+	//プレイヤーが既定の高さより下だったら
 	if (pos.y < -100.0f)
 	{
 		pos.y = 0.0f;
 		SetPos(pos);
 	}
 
-
+	//プレイヤーをカメラの見てる方向にする
 	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, rotY + D3DX_PI, 0.0f);
 
-
+	//Rotの保管
 	SetRot(rot);
-	
 
-	if (groundpos != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
+	//現在は使われていない（影の判定）
+	/*if (groundpos != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
 	{
 		CMotionParts::AllSetShadowPos(groundpos, GetMotionNum());
-	}
+	}*/
 
+	//現在のプレイヤーの位置
+	D3DXVECTOR3 PLpos = GetPos();
+
+	//再生するモーション番号
+	int nMotionNum = 0;
+
+	//プレイヤーが動いていたら
 	if (pInput->Press(KEY_MOVE) || pInput->Press(DIK_0))
 	{
-		CMotionParts::MoveMotionModel(GetMotionNum(), 1,GetPos(), rot);
-		CMotionParts::MoveMotionModel(m_nMotionNum1, 1);
-	}
-	else
-	{
-		CMotionParts::MoveMotionModel(GetMotionNum(), 0, GetPos(), rot);
-		CMotionParts::MoveMotionModel(m_nMotionNum1, 0);
+		//走る用のモーション番号
+		nMotionNum = 1;
 	}
 
+	//下半身のモーション設定
+	CMotionParts::MoveMotionModel(GetMotionNum(), nMotionNum, &PLpos, &rot);
+	//上半身のモーション設定
+	CMotionParts::MoveMotionModel(m_nMotionNum1, nMotionNum);
 
-	
+
+
+
 
 }
 

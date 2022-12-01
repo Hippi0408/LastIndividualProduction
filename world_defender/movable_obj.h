@@ -42,6 +42,9 @@ public:
 	D3DXVECTOR3 GetOldRot() { return m_OldRot; }
 	void SetMove(D3DXVECTOR3 move) { m_Move = move; }
 	D3DXVECTOR3 GetMove() { return m_Move; }
+	void SetMoveVec(D3DXVECTOR3 movevec) { m_MoveVec = movevec; }
+	D3DXVECTOR3 GetMoveVec() { return m_MoveVec; }
+
 
 	//使用しているモーションモデル番号のGet、Set
 	int GetMotionNum() { return m_nMotionNum; }
@@ -58,11 +61,13 @@ public:
 	bool CheckLife(int nLife = 0, bool b = false);
 
 private:
+	
 	D3DXVECTOR3 m_Pos;			//位置
 	D3DXVECTOR3 m_OldPos;		//前回の位置
 	D3DXVECTOR3 m_Rot;			//向き
 	D3DXVECTOR3 m_OldRot;		//前回の向き
 	D3DXVECTOR3 m_Move;			//移動量
+	D3DXVECTOR3 m_MoveVec;		//移動方向
 
 	int m_nLife;				//ライフ
 	int m_nMotionNum;			//使用するモーションモデル番号

@@ -38,6 +38,8 @@ public:
 
 private:
 	int m_nMotionNum1;
+	D3DXVECTOR3 m_RotLowerBody;
+	D3DXVECTOR3 m_DestRotLowerBody;
 };
 
 #endif
