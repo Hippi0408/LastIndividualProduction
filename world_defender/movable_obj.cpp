@@ -52,6 +52,10 @@ void CMovable_Obj::Update()
 	m_OldPos = m_Pos;
 	m_OldRot = m_Rot;
 
+	m_Pos += m_Move;
+
+	m_Move += (D3DXVECTOR3(0.0f, 0.0f, 0.0f) - m_Move) * 0.1f;
+
 	m_MoveVec = m_Pos - m_OldPos;
 
 	D3DXVec3Normalize(&m_MoveVec,&m_MoveVec);
