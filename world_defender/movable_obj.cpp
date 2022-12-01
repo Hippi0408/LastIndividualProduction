@@ -49,15 +49,17 @@ void CMovable_Obj::Uninit()
 //*****************************************************************************
 void CMovable_Obj::Update()
 {
+	//各オールドの更新
 	m_OldPos = m_Pos;
 	m_OldRot = m_Rot;
 
+	//Posの更新
 	m_Pos += m_Move;
-
-	m_Move += (D3DXVECTOR3(0.0f, 0.0f, 0.0f) - m_Move) * 0.1f;
-
+	//移動量に完成の追加
+	m_Move += (D3DXVECTOR3(0.0f, 0.0f, 0.0f) - m_Move) * GetMoveInertia();
+	//移動ベクトルの更新
 	m_MoveVec = m_Pos - m_OldPos;
-
+	//ベクトルのノーマライズ
 	D3DXVec3Normalize(&m_MoveVec,&m_MoveVec);
 }
 

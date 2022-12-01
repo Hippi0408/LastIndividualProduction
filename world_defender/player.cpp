@@ -18,7 +18,8 @@
 #include "motion_parts.h"
 #include "convenience_function.h"
 
-const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f,0.0f,0.0f);
+const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+const float CPlayer::MOVE_INERTIA = 0.1f;
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
@@ -144,6 +145,15 @@ void CPlayer::Update()
 	//移動量に変更があった場合移動を保管
 	if (move != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
 	{
+		if (pInput->Press(DIK_S))
+		{
+			move *= 0.6f;
+		}
+		else if (pInput->Press(DIK_LSHIFT))
+		{
+			move *= 2.0f;
+		}
+
 		SetMove(move);
 	}
 
@@ -192,11 +202,26 @@ void CPlayer::Update()
 	int nMotionNum = 0;
 
 	//プレイヤーが動いていたら
-	if (pInput->Press(KEY_MOVE) || pInput->Press(DIK_0))
+	if (pInput->Press(KEY_MOVE))
 	{
-		//走る用のモーション番号
-		nMotionNum = 1;
+		if (pInput->Press(KEY_DOWN))
+		{
+			//後ろ歩き用のモーション番号
+			nMotionNum = 3;
+		}
+		else if (pInput->Press(DIK_LSHIFT))
+		{
+			//ダッシュ用のモーション番号
+			nMotionNum = 2;
+		}
+		else
+		{
+			//走る用のモーション番号
+			nMotionNum = 1;
+		}
 	}
+	
+	
 
 	//下半身のモーション設定
 	CMotionParts::MoveMotionModel(GetMotionNum(), nMotionNum, &PLpos, &rot);

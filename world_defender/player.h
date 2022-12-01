@@ -25,6 +25,7 @@ class CPlayer : public CMovable_Obj
 private:
 	static const int INIT_LIFE = 100;
 	static const D3DXVECTOR3 INIT_POS;
+	static const float MOVE_INERTIA;
 public:
 	CPlayer();
 	~CPlayer() override;
@@ -35,6 +36,10 @@ public:
 	void Draw() override;
 
 	int GetMotionNum1() { return m_nMotionNum1; }
+
+	//äµê´ÇÃGet
+	float GetMoveInertia() override { return MOVE_INERTIA; }
+
 
 private:
 	int m_nMotionNum1;

@@ -59,7 +59,8 @@ public:
 	void AddLife(int nAdd) { m_nLife += nAdd; }
 	//ライフが指定数以下(false)、以上（true）の場合,trueを返す
 	bool CheckLife(int nLife = 0, bool b = false);
-
+	//慣性のGet
+	virtual float GetMoveInertia() = 0;
 private:
 	
 	D3DXVECTOR3 m_Pos;			//位置

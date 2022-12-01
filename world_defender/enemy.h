@@ -24,6 +24,7 @@ class CEnemy : public CMovable_Obj
 private:
 	static const int INIT_LIFE = 1;
 	static const D3DXVECTOR3 INIT_POS;
+	static const float MOVE_INERTIA;
 public:
 	CEnemy();
 	~CEnemy() override;
@@ -32,6 +33,9 @@ public:
 	void Uninit() override;
 	void Update() override;
 	void Draw() override;
+
+	//äµê´ÇÃGet
+	float GetMoveInertia() override { return MOVE_INERTIA; }
 
 private:
 
