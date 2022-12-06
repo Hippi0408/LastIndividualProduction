@@ -44,6 +44,7 @@ struct MotionMoveData
 	MotionKeyData* pMotionKeyData;//キー分必要
 	int nKeyMax;
 	bool bLoop;
+	int nNextMotionNum;		//次の再生するモーション番号
 };
 
 //*****************************************************************************
@@ -53,9 +54,9 @@ class CMotionParts : public C3DObject
 {
 private:
 	static const D3DXVECTOR3 INIT_POS;
-	static const int MAX_MOTION = 8;
+	static const int MAX_MOTION = 16;
 	static const int MAX_KEY = 12;
-	static const int MAX_MOTION_ALL = 4;
+	static const int MAX_MOTION_ALL = 120;
 public:
 
 	// 構造体
@@ -71,6 +72,7 @@ public:
 		KEY* pKey;//キーの最大値分必要
 		int nKeyMax;//キーの最大
 		bool bLoop;//現在のモーションをループ再生するか
+		int nNextMotionNum;		//次の再生するモーション番号
 	};
 
 	CMotionParts();
@@ -88,7 +90,9 @@ public:
 	void SetNextMotionParts(CMotionParts* pNextMotionParts) { m_pNextMotionParts = pNextMotionParts; }
 	void SetLastTimeMotionParts(CMotionParts* pLastTimeMotionParts) { m_pLastTimeMotionParts = pLastTimeMotionParts; }
 	void SetMotion(int nMotionNum);
+	void ClearMotionMove();
 	void SetMotionData(KEY_SET KeyData);//実際の動きの登録
+	KEY_SET GetMotionData() { return m_MotionKey[m_nMotionPlayMotonNum[m_nModelObjNum]]; }
 	void KeyFrameReset() { m_nKey = 0; m_nFrame = 0; }
 
 	int GetModelObjNum() { return m_nModelObjNum; }
@@ -103,6 +107,9 @@ public:
 	bool GetMotionParts(int nMotionNum);//引数との一致があるかどうか
 	void SetBoolDraw(bool bDraw) { m_bDraw = bDraw; }
 	bool GetBoolDraw() { return m_bDraw; }
+
+	void SetPosMove(D3DXVECTOR3 pos) { m_PosMove = pos; }
+	void SetRotMove(D3DXVECTOR3 rot) { m_RotMove = rot; }
 
 	static void ALLUninit();//すべての終了処理
 	static void ALLUpdate();//すべての更新処理
@@ -140,6 +147,7 @@ private:
 	D3DXVECTOR3 m_PosMove;			//1フレームあたりの動く量(pos)
 	int m_nModelObjNum;				//モーションオブジェクトの番号
 	int m_nFrame;					//現在のフレーム
+	int m_nDestFrame;
 	int m_nKey;						//現在のキー
 	int m_nPartsNum;				//動く物体の中の番号
 	bool m_bDraw;					//描画をするかしないか

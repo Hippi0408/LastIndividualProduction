@@ -199,7 +199,8 @@ void CPlayer::Update()
 	D3DXVECTOR3 PLpos = GetPos();
 
 	//再生するモーション番号
-	int nMotionNum = 0;
+	int nMotionNumUp = 0;
+	int nMotionNumDown = 0;
 
 	//プレイヤーが動いていたら
 	if (pInput->Press(KEY_MOVE))
@@ -207,29 +208,60 @@ void CPlayer::Update()
 		if (pInput->Press(KEY_DOWN))
 		{
 			//後ろ歩き用のモーション番号
-			nMotionNum = 3;
+			nMotionNumUp = 3;
 		}
 		else if (pInput->Press(DIK_LSHIFT))
 		{
 			//ダッシュ用のモーション番号
-			nMotionNum = 2;
+			nMotionNumUp = 2;
 		}
 		else
 		{
 			//走る用のモーション番号
-			nMotionNum = 1;
+			nMotionNumUp = 1;
+		}
+
+		nMotionNumDown = nMotionNumUp;
+	}
+
+	if (pInput->Press(MOUSE_INPUT_LEFT))
+	{
+		//攻撃モーション
+		nMotionNumDown = 7;
+		if (!pInput->Press(KEY_MOVE))
+		{
+			//攻撃モーション
+			nMotionNumUp = 7;
 		}
 	}
-	
-	
+
+
+
 
 	//下半身のモーション設定
-	CMotionParts::MoveMotionModel(GetMotionNum(), nMotionNum, &PLpos, &rot);
+	CMotionParts::MoveMotionModel(GetMotionNum(), nMotionNumUp, &PLpos, &rot);
 	//上半身のモーション設定
-	CMotionParts::MoveMotionModel(m_nMotionNum1, nMotionNum);
+	CMotionParts::MoveMotionModel(m_nMotionNum1, nMotionNumDown);
 
 
 
+
+
+
+	if (pInput->Press(DIK_0))
+	{
+		nMotionNumUp = 4;
+		nMotionNumDown = 4;
+		//下半身のモーション設定
+		CMotionParts::MoveMotionModel(GetMotionNum(), nMotionNumUp, &PLpos, &rot);
+		//上半身のモーション設定
+		CMotionParts::MoveMotionModel(m_nMotionNum1, nMotionNumDown);
+	}
+
+	
+
+
+	
 
 
 }

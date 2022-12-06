@@ -43,6 +43,7 @@ END_CHARACTERSET
 MOTIONSET
 	LOOP = 1		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 3		# キー数
+	NEXT_MOTION = 0	# 次に再生するモーション番号
 
 	KEYSET			# --- << KEY : 0 / 3 >> ---
 		FRAME = 120

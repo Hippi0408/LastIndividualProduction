@@ -268,6 +268,9 @@ int CRead::ReadMotion(char * sXFilePath)
 		{//モーション用のデータ読み取り
 			MotionMoveData MotionMoveData;
 			MotionMoveData.pMotionKeyData = nullptr;
+			MotionMoveData.bLoop = false;
+			MotionMoveData.nKeyMax = 0;
+			MotionMoveData.nNextMotionNum = 0;
 
 			int nMotionKeyMax = 0;
 			int nMotionKey = 0;//使ったキーの数のカウント
@@ -282,7 +285,7 @@ int CRead::ReadMotion(char * sXFilePath)
 				 //文字列の分析
 					int nLoop;
 					sscanf(cBff, "%s = %d", &cBffHead, &nLoop);
-
+					MotionMoveData.bLoop = false;
 					if (nLoop != 0)
 					{
 						MotionMoveData.bLoop = true;
@@ -305,6 +308,13 @@ int CRead::ReadMotion(char * sXFilePath)
 						//初期化
 						MotionMoveData.pMotionKeyData[nKey].pMotionPartsData = nullptr;
 					}
+				}
+				else if (strcmp(&cBffHead[0], "NEXT_MOTION") == 0)
+				{
+					int nNext = 0;
+					sscanf(cBff, "%s = %d", &cBffHead, &nNext);
+
+					MotionMoveData.nNextMotionNum = nNext;
 				}
 				else if (strcmp(&cBffHead[0], "KEYSET") == 0)
 				{//モデルパーツのモーション設定
