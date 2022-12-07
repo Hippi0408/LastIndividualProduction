@@ -14,8 +14,9 @@
 #include "meshfield.h"
 #include "motion_parts.h"
 #include "player.h"
+#include "input.h"
 
-const D3DXVECTOR3 CEnemy::INIT_POS = D3DXVECTOR3(400.0f, 0.0f, -200.0f);
+const D3DXVECTOR3 CEnemy::INIT_POS = D3DXVECTOR3(1000.0f, 0.0f, -200.0f);
 const float CEnemy::MOVE_INERTIA = 0.1f;
 //*****************************************************************************
 // コンストラクタ
@@ -48,7 +49,7 @@ HRESULT CEnemy::Init()
 
 	CRead cRead;
 
-	SetMotionNum(cRead.ReadMotion("data/MOTION/motionenemy.txt"));
+	SetMotionNum(cRead.ReadMotion("data/MOTION/motionboss.txt"));
 
 	return S_OK;
 }
@@ -98,10 +99,32 @@ void CEnemy::Update()
 		SetPos(pos);
 	}
 
+	int nMotion = 0;
 
-	CMotionParts::MoveMotionModel(GetMotionNum(), 0, &GetPos(), &GetRot());
+	//入力デバイスの取得
+	CInput *pInput = CInput::GetKey();
 
-	CPlayer* pPlayer = pGame->GetPlayer();
+	if (pInput->Press(DIK_UP))
+	{
+		nMotion = 1;
+	}
+	else if (pInput->Press(DIK_DOWN))
+	{
+		nMotion = 2;
+	}
+	else if (pInput->Press(DIK_RIGHT))
+	{
+		nMotion = 3;
+	}
+	else if (pInput->Press(DIK_LEFT))
+	{
+		nMotion = 4;
+	}
+
+
+	CMotionParts::MoveMotionModel(GetMotionNum(), nMotion, &GetPos(), &GetRot());
+
+	/*CPlayer* pPlayer = pGame->GetPlayer();
 
 	pos = CMotionParts::AllCollision(pPlayer->GetPos(), GetOldPos(), pPlayer->GetMotionNum(), pPlayer->GetMotionNum1());
 
@@ -109,7 +132,7 @@ void CEnemy::Update()
 	{
 		SetLife(0);
 		CMotionParts::SetBoolDraw(true, GetMotionNum());
-	}
+	}*/
 
 	int n = GetLife();
 

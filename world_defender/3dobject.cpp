@@ -185,13 +185,14 @@ void C3DObject::Draw()
 //*****************************************************************************
 // ３Dオブジェクトの配置
 //*****************************************************************************
-void C3DObject::Set3DObject(int nPattn, D3DXVECTOR3 pos)
+void C3DObject::Set3DObject(int nPattn, D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 {
 	int nNumVix;		//頂点数
 	DWORD sizeFVF;		//頂点フォーマットのサイズ
 	BYTE *pVtxBuff;		//頂点バッファへのポインタ
 
 	m_Model.pos = pos;
+	m_Model.rot = rot;
 	m_Model.nPattn = nPattn;
 
 	//モデルのサイズの比較用初期値

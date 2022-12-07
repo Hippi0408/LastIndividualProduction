@@ -61,7 +61,7 @@ public:
 	virtual void Uninit() override;
 	virtual void Update() override;
 	virtual void Draw() override;
-	void Set3DObject(int nPattn, D3DXVECTOR3 pos);
+	void Set3DObject(int nPattn, D3DXVECTOR3 pos, D3DXVECTOR3 rot);
 	D3DXVECTOR3 GetPos() { return m_Model.pos; }
 	D3DXVECTOR3 GetRot() { return m_Model.rot; }
 	void SetPos(D3DXVECTOR3 pos) { m_Model.pos = pos; }

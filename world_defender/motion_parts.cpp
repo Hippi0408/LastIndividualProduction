@@ -264,7 +264,7 @@ void CMotionParts::KeyCheck()
 			//現在のパーツがパーツ番号が０かどうか
 			if (m_nPartsNum == 0)
 			{
-				m_nMotionPlayMotonNum[m_nModelObjNum] = nNextMotionNum;
+				m_nMotionPlayMotonNum[m_nModelObjNum] = 0;
 
 				ClearMotionMove();
 
@@ -479,9 +479,9 @@ int CMotionParts::CreateMotionObj(MotionData* pMotionData, int nPartsMax)
 		pMotionParts->SetPartsNum(nCnt);//一つのモーションの中の番号
 		//pMotionParts->SetModelPattnNum(pMotionData[nCnt].nModelPattern);//使用するモデルのインデックス
 		//pMotionParts->SetPos(pMotionData[nCnt].pos);//モデルの位置
-		pMotionParts->SetRot(pMotionData[nCnt].rot);//モデルの向き
+		//pMotionParts->SetRot(pMotionData[nCnt].rot);//モデルの向き
 
-		pMotionParts->Set3DObject(pMotionData[nCnt].nModelPattern, pMotionData[nCnt].pos);
+		pMotionParts->Set3DObject(pMotionData[nCnt].nModelPattern, pMotionData[nCnt].pos, pMotionData[nCnt].rot);
 		
 		if (pMotionData[nCnt].nParentNum >= 0)
 		{
