@@ -49,7 +49,13 @@ public:
 	virtual void Draw() override;//描画処理
 	virtual void SetMeshfield(MeshfieldStructure meshfieldStructure);
 	virtual void SetPolygon();//更新処理以外でのポリゴンのセット
-	void SetNormal();			//法線設定
+	virtual void SetMeshTopPos();//各頂点の位置の設定
+	virtual void SetNormal();			//法線設定
+	void SetMeshfieldData(MeshfieldStructure meshfieldStructure);
+	void SetIdxBuff();
+
+	LPDIRECT3DINDEXBUFFER9 GetIdxBuff() { return m_pIdxBuff; }//インデックスバッファへのポインタの取得
+	MeshfieldStructure GetMeshfieldData() { return m_MeshfieldData; }
 
 	D3DXVECTOR3 Collision(D3DXVECTOR3 pos);
 private:

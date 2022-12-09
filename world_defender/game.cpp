@@ -264,4 +264,6 @@ void CGame::Draw()
 
 	m_pBillcoard->Draw();
 
+	m_pPlayer->Draw();
+
 }

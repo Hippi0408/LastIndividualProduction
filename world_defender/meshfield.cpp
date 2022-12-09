@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// ビルボード処理 [billcoard.cpp]
+// メッシュフィールド処理 [meshfield.cpp]
 // Author : KOZUNA HIROHITO
 //
 //=============================================================================
@@ -171,72 +171,48 @@ void CMeshfield::Draw()
 //*****************************************************************************
 void CMeshfield::SetMeshfield(MeshfieldStructure meshfieldStructure)
 {
-	if (meshfieldStructure.nMeshX <= 0
-		|| meshfieldStructure.nMeshZ <= 0)
-	{
-		assert(false);
-	}
+	//データの設定
+	SetMeshfieldData(meshfieldStructure);
 
-	SetPos(meshfieldStructure.pos);
-	SetRot(meshfieldStructure.rot);
-	SetColor(meshfieldStructure.col);
-	m_MeshfieldData.fRadiusX = meshfieldStructure.fRadiusX;
-	m_MeshfieldData.fRadiusZ = meshfieldStructure.fRadiusZ;
+	//各頂点の位置の設定
+	SetMeshTopPos();
 
-	int nMeshX = meshfieldStructure.nMeshX;
-	int nMeshZ = meshfieldStructure.nMeshZ;
+	//インデックスバッファの設定
+	SetIdxBuff();
+	
 
-	m_MeshfieldData.nMeshX = nMeshX;
-	m_MeshfieldData.nMeshZ = nMeshZ;
-	m_nTextIndex = meshfieldStructure.nTextIndex;
+	//法線設定
+	SetNormal();
+}
 
-	m_MeshfieldData.nTop = (nMeshX + 1) * (nMeshZ + 1);
-	m_MeshfieldData.nIdx = (nMeshX + 1) * 2 * nMeshZ + (nMeshZ - 1) * 2;
-	m_MeshfieldData.nPolygon = nMeshX * nMeshZ * 2 + (nMeshZ - 1) * 4;
+//セットポリゴン（中身無し）
+void CMeshfield::SetPolygon()
+{
+	
+}
 
-	m_MeshfieldData.pNormalTop = new D3DXVECTOR3[m_MeshfieldData.nTop];
-
-	ZeroMemory(m_MeshfieldData.pNormalTop,sizeof(D3DXVECTOR3) * m_MeshfieldData.nTop);
-	m_MeshfieldData.pNormalPolygon = new D3DXVECTOR3[m_MeshfieldData.nPolygon];
-
-	CManager *pManager = GetManager();
-
-	LPDIRECT3DDEVICE9 pD3DDevice = nullptr;
-
-	pD3DDevice = pManager->GetDeviceManager();
-
-	// 頂点バッファの生成
-	pD3DDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * m_MeshfieldData.nTop,
-		D3DUSAGE_WRITEONLY,
-		FVF_VERTEX_3D,
-		D3DPOOL_MANAGED,
-		&m_pVtxBuff,
-		NULL);
-
-	//頂点のインデックスバッファの生成
-	pD3DDevice->CreateIndexBuffer(sizeof(WORD) * m_MeshfieldData.nIdx,//確保する頂点の数
-		D3DUSAGE_WRITEONLY,
-		D3DFMT_INDEX16,//頂点フォーマット
-		D3DPOOL_MANAGED,
-		&m_pIdxBuff,
-		NULL);
-
+//各頂点の位置の設定
+void CMeshfield::SetMeshTopPos()
+{
+	int nMeshX = m_MeshfieldData.nMeshX;
+	int nMeshZ = m_MeshfieldData.nMeshZ;
 	VERTEX_3D *pVtx = NULL;		//頂点情報へのポインタ
 
-	// 頂点バッファをロックし、頂点情報へのポインタを取得
+								// 頂点バッファをロックし、頂点情報へのポインタを取得
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	for (int nCntZ = 0; nCntZ <= nMeshZ; nCntZ++)
 	{
+		float fY = 0.0f;
 		for (int nCntX = 0; nCntX <= nMeshX; nCntX++)
 		{
 
 			//float fY = sinf(D3DXToRadian(0.5f) * (nCntX + m_nCntMeshfield)) * 10.0f;
 			//float fY = rand() % 50;
-			float fY = 0.0f;
+
 
 			//頂点座標の設定//ローカル座標で
-			pVtx[0].pos = D3DXVECTOR3(meshfieldStructure.fRadiusX * nCntX, fY, -meshfieldStructure.fRadiusZ * nCntZ);
+			pVtx[0].pos = D3DXVECTOR3(m_MeshfieldData.fRadiusX * nCntX, fY, -m_MeshfieldData.fRadiusZ * nCntZ);
 
 			//各頂点の法線の設定（ベクトルの大きさは１にする必要がある）
 			pVtx[0].nor = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -250,42 +226,8 @@ void CMeshfield::SetMeshfield(MeshfieldStructure meshfieldStructure)
 			pVtx++; //データを1つ分進める
 		}
 	}
-
-	//インデックスバッファをロック
-	WORD* pIdx;
-	m_pIdxBuff->Lock(0, 0, (void**)&pIdx, 0);
-	for (int nCntZ = 0; nCntZ < nMeshZ; nCntZ++)
-	{
-		for (int nCntX = 0; nCntX <= nMeshX; nCntX++)
-		{
-			//インデックスの設定
-			pIdx[0] = (WORD)(nCntX + (nMeshX + 1) * (nCntZ + 1));
-			pIdx[1] = (WORD)(nCntX + (nMeshX + 1) * nCntZ);
-			pIdx += 2;//インデックスのデータを２すすめる
-		}
-
-		if (nCntZ < nMeshZ - 1)
-		{
-			//インデックスの設定
-			pIdx[0] = pIdx[-1];//ひとつ前のpIdxの中身を入れる（ひとつ前は必ずある）
-			pIdx[1] = (WORD)((nMeshX + 1) * (nCntZ + 2));
-			pIdx += 2;//インデックスのデータを２すすめる
-		}
-	}
-	
-	//インデックスバッファをアンロック
-	m_pIdxBuff->Unlock();
 	//頂点バッファをアンロック
 	m_pVtxBuff->Unlock();
-
-	//法線設定
-	SetNormal();
-}
-
-//セットポリゴン（中身無し）
-void CMeshfield::SetPolygon()
-{
-	
 }
 
 //法線設定
@@ -358,6 +300,90 @@ void CMeshfield::SetNormal()
 
 	//頂点バッファをアンロック
 	m_pVtxBuff->Unlock();
+}
+
+//データの設定
+void CMeshfield::SetMeshfieldData(MeshfieldStructure meshfieldStructure)
+{
+	if (meshfieldStructure.nMeshX <= 0
+		|| meshfieldStructure.nMeshZ <= 0)
+	{
+		assert(false);
+	}
+
+	SetPos(meshfieldStructure.pos);
+	SetRot(meshfieldStructure.rot);
+	SetColor(meshfieldStructure.col);
+	m_MeshfieldData.fRadiusX = meshfieldStructure.fRadiusX;
+	m_MeshfieldData.fRadiusZ = meshfieldStructure.fRadiusZ;
+
+	int nMeshX = meshfieldStructure.nMeshX;
+	int nMeshZ = meshfieldStructure.nMeshZ;
+
+	m_MeshfieldData.nMeshX = nMeshX;
+	m_MeshfieldData.nMeshZ = nMeshZ;
+	m_nTextIndex = meshfieldStructure.nTextIndex;
+
+	m_MeshfieldData.nTop = (nMeshX + 1) * (nMeshZ + 1);
+	m_MeshfieldData.nIdx = (nMeshX + 1) * 2 * nMeshZ + (nMeshZ - 1) * 2;
+	m_MeshfieldData.nPolygon = nMeshX * nMeshZ * 2 + (nMeshZ - 1) * 4;
+
+	m_MeshfieldData.pNormalTop = new D3DXVECTOR3[m_MeshfieldData.nTop];
+
+	ZeroMemory(m_MeshfieldData.pNormalTop, sizeof(D3DXVECTOR3) * m_MeshfieldData.nTop);
+	m_MeshfieldData.pNormalPolygon = new D3DXVECTOR3[m_MeshfieldData.nPolygon];
+
+	CManager *pManager = GetManager();
+
+	LPDIRECT3DDEVICE9 pD3DDevice = nullptr;
+
+	pD3DDevice = pManager->GetDeviceManager();
+
+	// 頂点バッファの生成
+	pD3DDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * m_MeshfieldData.nTop,
+		D3DUSAGE_WRITEONLY,
+		FVF_VERTEX_3D,
+		D3DPOOL_MANAGED,
+		&m_pVtxBuff,
+		NULL);
+
+	//頂点のインデックスバッファの生成
+	pD3DDevice->CreateIndexBuffer(sizeof(WORD) * m_MeshfieldData.nIdx,//確保する頂点の数
+		D3DUSAGE_WRITEONLY,
+		D3DFMT_INDEX16,//頂点フォーマット
+		D3DPOOL_MANAGED,
+		&m_pIdxBuff,
+		NULL);
+
+}
+
+//インデックスバッファの設定
+void CMeshfield::SetIdxBuff()
+{
+	//インデックスバッファをロック
+	WORD* pIdx;
+	m_pIdxBuff->Lock(0, 0, (void**)&pIdx, 0);
+	for (int nCntZ = 0; nCntZ < m_MeshfieldData.nMeshZ; nCntZ++)
+	{
+		for (int nCntX = 0; nCntX <= m_MeshfieldData.nMeshX; nCntX++)
+		{
+			//インデックスの設定
+			pIdx[0] = (WORD)(nCntX + (m_MeshfieldData.nMeshX + 1) * (nCntZ + 1));
+			pIdx[1] = (WORD)(nCntX + (m_MeshfieldData.nMeshX + 1) * nCntZ);
+			pIdx += 2;//インデックスのデータを２すすめる
+		}
+
+		if (nCntZ < m_MeshfieldData.nMeshZ - 1)
+		{
+			//インデックスの設定
+			pIdx[0] = pIdx[-1];//ひとつ前のpIdxの中身を入れる（ひとつ前は必ずある）
+			pIdx[1] = (WORD)((m_MeshfieldData.nMeshX + 1) * (nCntZ + 2));
+			pIdx += 2;//インデックスのデータを２すすめる
+		}
+	}
+	//インデックスバッファをアンロック
+	m_pIdxBuff->Unlock();
+
 }
 
 D3DXVECTOR3 CMeshfield::Collision(D3DXVECTOR3 pos)

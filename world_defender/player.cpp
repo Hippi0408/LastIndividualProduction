@@ -17,6 +17,7 @@
 #include "meshfield.h"
 #include "motion_parts.h"
 #include "convenience_function.h"
+#include "locus.h"
 
 const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 const float CPlayer::MOVE_INERTIA = 0.1f;
@@ -62,6 +63,32 @@ HRESULT CPlayer::Init()
 
 	CMotionParts::SettingParent(m_nMotionNum1, GetMotionNum());
 
+
+	m_pLocus = new CLocus;
+
+	if (FAILED(m_pLocus->Init()))
+	{
+		return -1;
+	}
+
+	LocusStructure locusstructure;
+	D3DXVECTOR3 PLpos = GetPos();
+
+	locusstructure.TopPos = PLpos + D3DXVECTOR3(0.0f, 50.0f, 0.0f);
+	locusstructure.DownPos = PLpos;
+
+	locusstructure.BeginningCol = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+	locusstructure.EndCol = D3DXCOLOR(0.0f, 1.0f, 1.0f, 0.0f);
+
+	locusstructure.nPolygon = 50;
+
+	locusstructure.nSaveInterval = 1;
+
+	locusstructure.nTextureNum = 0;
+
+	m_pLocus->SetLocus(locusstructure);
+
+
 	return S_OK;
 }
 
@@ -70,7 +97,12 @@ HRESULT CPlayer::Init()
 //*****************************************************************************
 void CPlayer::Uninit()
 {
-
+	if (m_pLocus != nullptr)
+	{
+		m_pLocus->Uninit();
+		delete m_pLocus;
+		m_pLocus = nullptr;
+	}
 }
 
 //*****************************************************************************
@@ -258,10 +290,12 @@ void CPlayer::Update()
 		CMotionParts::MoveMotionModel(m_nMotionNum1, nMotionNumDown);
 	}
 
+	PLpos = GetPos();
 	
+	D3DXVECTOR3 TopPos = PLpos + D3DXVECTOR3(0.0f, 50.0f, 0.0f);
+	D3DXVECTOR3 DownPos = PLpos;
 
-
-	
+	m_pLocus->Update(TopPos, DownPos);
 
 
 }
@@ -271,4 +305,5 @@ void CPlayer::Update()
 //*****************************************************************************
 void CPlayer::Draw()
 {
+	m_pLocus->Draw();
 }

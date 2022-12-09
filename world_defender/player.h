@@ -16,6 +16,7 @@
 // 前方宣言
 //*****************************************************************************
 class CShadow;
+class CLocus;
 
 //*****************************************************************************
 // クラス定義
@@ -45,6 +46,8 @@ private:
 	int m_nMotionNum1;
 	D3DXVECTOR3 m_RotLowerBody;
 	D3DXVECTOR3 m_DestRotLowerBody;
+	CLocus* m_pLocus;
+
 };
 
 #endif
