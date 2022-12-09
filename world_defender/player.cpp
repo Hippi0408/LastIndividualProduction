@@ -17,7 +17,7 @@
 #include "meshfield.h"
 #include "motion_parts.h"
 #include "convenience_function.h"
-#include "locus.h"
+#include "psychokinesis_area.h"
 
 const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 const float CPlayer::MOVE_INERTIA = 0.1f;
@@ -64,30 +64,14 @@ HRESULT CPlayer::Init()
 	CMotionParts::SettingParent(m_nMotionNum1, GetMotionNum());
 
 
-	m_pLocus = new CLocus;
+	//サイコキネシスエリアの情報の確保
+	m_pPsychokinesis_Area = new CPsychokinesis_Area;
 
-	if (FAILED(m_pLocus->Init()))
+	//初期化
+	if (FAILED(m_pPsychokinesis_Area->Init(INIT_POS)))
 	{
 		return -1;
 	}
-
-	LocusStructure locusstructure;
-	D3DXVECTOR3 PLpos = GetPos();
-
-	locusstructure.TopPos = PLpos + D3DXVECTOR3(0.0f, 50.0f, 0.0f);
-	locusstructure.DownPos = PLpos;
-
-	locusstructure.BeginningCol = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-	locusstructure.EndCol = D3DXCOLOR(0.0f, 1.0f, 1.0f, 0.0f);
-
-	locusstructure.nPolygon = 50;
-
-	locusstructure.nSaveInterval = 1;
-
-	locusstructure.nTextureNum = 0;
-
-	m_pLocus->SetLocus(locusstructure);
-
 
 	return S_OK;
 }
@@ -97,11 +81,13 @@ HRESULT CPlayer::Init()
 //*****************************************************************************
 void CPlayer::Uninit()
 {
-	if (m_pLocus != nullptr)
+	//サイコキネシスエリアの解放
+	if (m_pPsychokinesis_Area != nullptr)
 	{
-		m_pLocus->Uninit();
-		delete m_pLocus;
-		m_pLocus = nullptr;
+		//終了処理
+		m_pPsychokinesis_Area->Uninit();
+		delete m_pPsychokinesis_Area;
+		m_pPsychokinesis_Area = nullptr;
 	}
 }
 
@@ -290,12 +276,12 @@ void CPlayer::Update()
 		CMotionParts::MoveMotionModel(m_nMotionNum1, nMotionNumDown);
 	}
 
-	PLpos = GetPos();
-	
-	D3DXVECTOR3 TopPos = PLpos + D3DXVECTOR3(0.0f, 50.0f, 0.0f);
-	D3DXVECTOR3 DownPos = PLpos;
 
-	m_pLocus->Update(TopPos, DownPos);
+	//現在のプレイヤーの位置の取得
+	PLpos = GetPos();
+
+	//サイコキネシスエリアの更新（Posあり）
+	m_pPsychokinesis_Area->Update(PLpos);
 
 
 }
@@ -305,5 +291,6 @@ void CPlayer::Update()
 //*****************************************************************************
 void CPlayer::Draw()
 {
-	m_pLocus->Draw();
+	//サイコキネシスエリアの描画
+	m_pPsychokinesis_Area->Draw();
 }
