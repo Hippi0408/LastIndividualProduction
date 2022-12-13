@@ -15,8 +15,9 @@
 #include "motion_parts.h"
 #include "player.h"
 #include "input.h"
+#include "object_type_list.h"
 
-const D3DXVECTOR3 CEnemy::INIT_POS = D3DXVECTOR3(1000.0f, 0.0f, -200.0f);
+const D3DXVECTOR3 CEnemy::INIT_POS = D3DXVECTOR3(1000.0f, 50.0f, -0.0f);
 const float CEnemy::MOVE_INERTIA = 0.1f;
 //*****************************************************************************
 // コンストラクタ
@@ -51,6 +52,8 @@ HRESULT CEnemy::Init()
 
 	SetMotionNum(cRead.ReadMotion("data/MOTION/motionboss.txt"));
 
+	CMotionParts::AllSetObject_Type_List(GetMotionNum(), OBJ_ENEMY);
+
 	return S_OK;
 }
 
@@ -73,7 +76,7 @@ void CEnemy::Update()
 
 	D3DXVECTOR3 add = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
-	add.y -= 4.0f;
+	//add.y -= 4.0f;
 
 	AddPos(add);
 
@@ -84,14 +87,14 @@ void CEnemy::Update()
 
 	groundpos = pGame->GetMeshfield()->Collision(pos);
 
-	if (pos.y < groundpos.y)
+	/*if (pos.y < groundpos.y)
 	{
 		if (groundpos != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
 		{
 			pos = groundpos;
 			SetPos(groundpos);
 		}
-	}
+	}*/
 
 	if (pos.y < -100.0f)
 	{
@@ -124,15 +127,14 @@ void CEnemy::Update()
 
 	CMotionParts::MoveMotionModel(GetMotionNum(), nMotion, &GetPos(), &GetRot());
 
-	/*CPlayer* pPlayer = pGame->GetPlayer();
 
-	pos = CMotionParts::AllCollision(pPlayer->GetPos(), GetOldPos(), pPlayer->GetMotionNum(), pPlayer->GetMotionNum1());
+	bool bCollision = CMotionParts::AllCollision(GetPos(), GetOldPos(), OBJ_PLAYER);
 
-	if (pos != pGame->GetPlayer()->GetPos())
+	if (bCollision)
 	{
 		SetLife(0);
 		CMotionParts::SetBoolDraw(true, GetMotionNum());
-	}*/
+	}
 
 	int n = GetLife();
 

@@ -128,8 +128,9 @@ public:
 	static void SetLight(D3DXVECTOR3 vec, int nMotionNum);//モーションモデルのライトベクトル
 	static void AllSetShadowPos(D3DXVECTOR3 pos, int nMotionNum);//影の設定
 	static void SetMotionFileData(const MotionMoveData MotionMoveData, int nMotionNum);//モーションの登録
-	static D3DXVECTOR3 AllCollision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, int nMotionNum, int nIgnored1 = -1, int nIgnored2 = -1, int nIgnored3 = -1, int nIgnored4 = -1);//当たり判定（自分のモデル番号、自分の位置）
+	static bool AllCollision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, Object_Type_List myobject_type_list);//当たり判定（自分のモデル番号、自分の位置）
 	static void SettingParent(int nChildren, int nParent);//親を後天的に設定する（子供番号、親番号）
+	static void AllSetObject_Type_List(int nModelNum, Object_Type_List object_type_list);//モデルが何かを設定する
 
 private:
 	static CMotionParts* m_pMotionPartsTop;//リスト構造の初め

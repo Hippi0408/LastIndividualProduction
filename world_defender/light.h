@@ -20,7 +20,7 @@
 class CLight : public CObject
 {
 private:
-	static const int LIGHT_MAX = 3;
+	static const int LIGHT_MAX = 4;
 
 public:
 	CLight();

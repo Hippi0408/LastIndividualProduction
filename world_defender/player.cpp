@@ -17,7 +17,8 @@
 #include "meshfield.h"
 #include "motion_parts.h"
 #include "convenience_function.h"
-#include "psychokinesis_area.h"
+#include "mesh_cylinder.h"
+#include "object_type_list.h"
 
 const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 const float CPlayer::MOVE_INERTIA = 0.1f;
@@ -61,17 +62,36 @@ HRESULT CPlayer::Init()
 	m_nMotionNum1 = cRead.ReadMotion("data/MOTION/motionplayer2.txt");
 
 
+	CMotionParts::AllSetObject_Type_List(GetMotionNum(), OBJ_PLAYER);
+	CMotionParts::AllSetObject_Type_List(m_nMotionNum1, OBJ_PLAYER);
+
 	CMotionParts::SettingParent(m_nMotionNum1, GetMotionNum());
 
 
 	//サイコキネシスエリアの情報の確保
-	m_pPsychokinesis_Area = new CPsychokinesis_Area;
+	m_pPsychokinesis_Area = new CMesh_Cylinder;
 
 	//初期化
-	if (FAILED(m_pPsychokinesis_Area->Init(INIT_POS)))
+	if (FAILED(m_pPsychokinesis_Area->Init()))
 	{
 		return -1;
 	}
+
+	Mesh_Cylinder_Structure Mesh_Cylinder_Structure;
+
+	Mesh_Cylinder_Structure.fRadius = 400.0f;
+	Mesh_Cylinder_Structure.fSizeYTop = 30.0f;
+	Mesh_Cylinder_Structure.nPolygonX = 30;
+	Mesh_Cylinder_Structure.nPolygonY = 1;
+	Mesh_Cylinder_Structure.nTextureNum = CTexture::LoadTexture("data/TEXTURE/軌跡.png");
+	Mesh_Cylinder_Structure.ParentPos = GetPos();
+	Mesh_Cylinder_Structure.ColorMax = D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f);
+	Mesh_Cylinder_Structure.ColorLowest = D3DXCOLOR(0.0f, 1.0f, 1.0f, 0.5f);
+	Mesh_Cylinder_Structure.nAttenuationFrame = 120;
+	Mesh_Cylinder_Structure.bFade = true;
+	Mesh_Cylinder_Structure.fRotMove = D3DXToRadian(1);
+
+	m_pPsychokinesis_Area->SetMesh_Cylinder(Mesh_Cylinder_Structure);
 
 	return S_OK;
 }
@@ -279,6 +299,8 @@ void CPlayer::Update()
 
 	//現在のプレイヤーの位置の取得
 	PLpos = GetPos();
+
+	PLpos.y += 1.0f;
 
 	//サイコキネシスエリアの更新（Posあり）
 	m_pPsychokinesis_Area->Update(PLpos);

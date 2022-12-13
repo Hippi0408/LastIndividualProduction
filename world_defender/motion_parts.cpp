@@ -12,6 +12,7 @@
 #include "manager.h"
 #include <assert.h>
 #include "convenience_function.h"
+#include "object_type_list.h"
 
 const D3DXVECTOR3 CMotionParts::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 CMotionParts *CMotionParts::m_pMotionPartsTop = nullptr;
@@ -346,10 +347,10 @@ void CMotionParts::NextMotionPosition()
 
 	//割合計算
 	//位置
-	posMove = pos / nFrameRatio;
+	posMove = pos / (float)nFrameRatio;
 	m_PosMove = posMove;
 	//向き
-	rotMove = CConvenience_Function::NormalizationRot(rot / nFrameRatio) ;
+	rotMove = CConvenience_Function::NormalizationRot(rot / (float)nFrameRatio) ;
 
 	//正規化
 	rotMove = CConvenience_Function::NormalizationRot(rotMove);
@@ -653,19 +654,14 @@ void CMotionParts::SetMotionFileData(const MotionMoveData MotionMoveData, int nM
 //*****************************************************************************
 //当たり判定（自分のモデル番号、自分の位置）
 //*****************************************************************************
-D3DXVECTOR3 CMotionParts::AllCollision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, int nMotionNum, int nIgnored1, int nIgnored2, int nIgnored3, int nIgnored4)
+bool CMotionParts::AllCollision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, Object_Type_List myobject_type_list)
 {
 	CMotionParts* pMotionParts = m_pMotionPartsTop;
 
 	while (pMotionParts != nullptr)
 	{
-		int nNum = pMotionParts->GetModelObjNum();
-		if (nNum != nMotionNum 
-			&& nNum != nIgnored1
-			&& nNum != nIgnored2
-			&& nNum != nIgnored3
-			&& nNum != nIgnored4
-			)
+		Object_Type_List object_type_list = pMotionParts->GetObject_Type_List();
+		if (object_type_list == myobject_type_list)
 		{
 			//D3DXVECTOR3 Add = pMotionParts->Collision(pos, oldpos);
 			/*if (Add != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
@@ -675,14 +671,14 @@ D3DXVECTOR3 CMotionParts::AllCollision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, int 
 
 			if (pMotionParts->NormalCollision(pos))
 			{
-				return pos * -1.0f;
+				return true;
 			}
 			
 		}
 		pMotionParts = pMotionParts->GetNextMotionParts();
 	}
 
-	return pos;
+	return false;
 }
 
 //*****************************************************************************
@@ -725,5 +721,25 @@ void CMotionParts::SettingParent(int nChildren, int nParent)
 		pMotionPartsChildren->SetMotionRarent(pMotionPartsParent);
 	}
 
+
+}
+
+//*****************************************************************************
+//モデルが何かを設定する
+//*****************************************************************************
+void CMotionParts::AllSetObject_Type_List(int nModelNum, Object_Type_List object_type_list)
+{
+	CMotionParts* pMotionParts = m_pMotionPartsTop;
+
+	while (pMotionParts != nullptr)
+	{
+		int nNum = pMotionParts->GetModelObjNum();
+		if (nNum == nModelNum)
+		{
+			pMotionParts->SetObject_Type_List(object_type_list);
+
+		}
+		pMotionParts = pMotionParts->GetNextMotionParts();
+	}
 
 }

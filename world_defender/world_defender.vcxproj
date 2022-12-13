@@ -167,6 +167,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="manager.cpp" />
     <ClCompile Include="meshfield.cpp" />
+    <ClCompile Include="mesh_cylinder.cpp" />
     <ClCompile Include="motion_parts.cpp" />
     <ClCompile Include="movable_obj.cpp" />
     <ClCompile Include="object.cpp" />
@@ -201,9 +202,11 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="manager.h" />
     <ClInclude Include="meshfield.h" />
+    <ClInclude Include="mesh_cylinder.h" />
     <ClInclude Include="motion_parts.h" />
     <ClInclude Include="movable_obj.h" />
     <ClInclude Include="object.h" />
+    <ClInclude Include="object_type_list.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="psychokinesis_area.h" />
     <ClInclude Include="read.h" />

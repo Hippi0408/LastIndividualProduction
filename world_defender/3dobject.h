@@ -15,6 +15,7 @@
 //*****************************************************************************
 // 前方宣言
 //*****************************************************************************
+enum Object_Type_List;
 
 //*****************************************************************************
 // クラス定義
@@ -96,6 +97,9 @@ public:
 	D3DXVECTOR3 GetVtxMin() { return m_Model.vtxMin; }
 	D3DXVECTOR3 GetVtxMax() { return m_Model.vtxMax; }
 
+	void SetObject_Type_List(Object_Type_List object_type_list) { m_Object_Type_List = object_type_list; }
+	Object_Type_List GetObject_Type_List() { return m_Object_Type_List; }
+
 	static int SetModel(ModelPattern *pModel);
 	static void UninitAllModel();
 
@@ -105,6 +109,7 @@ private:
 	float m_fSize;//サイズ
 	D3DXVECTOR3 m_LightVec = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXVECTOR3 m_ShadowPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	Object_Type_List m_Object_Type_List;
 };
 
 #endif

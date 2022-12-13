@@ -10,6 +10,7 @@
 //*****************************************************************************
 #include "3dobject.h"
 #include "manager.h"
+#include "object_type_list.h"
 
 C3DObject::ModelPattern C3DObject::m_ModelPattern[MODEL_PATTERN_MAX] = {};
 //*****************************************************************************
@@ -19,6 +20,7 @@ C3DObject::C3DObject()
 {
 	ZeroMemory(&m_Model, sizeof(m_Model));
 	m_fSize = 1.0f;
+	m_Object_Type_List = OBJ_OTHER;
 }
 
 //*****************************************************************************
