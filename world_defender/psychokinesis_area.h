@@ -16,7 +16,7 @@
 //*****************************************************************************
 // 前方宣言
 //*****************************************************************************
-class CLocus;
+class CMesh_Cylinder;
 
 //*****************************************************************************
 // クラス定義
@@ -28,6 +28,7 @@ private:
 	static const float HEIGHT_LOCUS; 
 	static const float RADIUS_INIT;
 	static const float RADIUS_MOVE;
+	static const float SIZE_TOP;
 public:
 	CPsychokinesis_Area();
 	~CPsychokinesis_Area() override;
@@ -41,11 +42,9 @@ public:
 	
 private:
 	D3DXVECTOR3 m_PLPos;
-	D3DXVECTOR3 m_Rot;
-	D3DXVECTOR3 m_RotMove;
-	D3DXVECTOR3 m_LocusPos;
-	CLocus* m_pLocus;
+	CMesh_Cylinder* m_pMesh_Cylinder;
 	float m_fRadius;
+	float m_fSizeTop;
 };
 
 #endif

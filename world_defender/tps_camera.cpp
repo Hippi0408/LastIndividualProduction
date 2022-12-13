@@ -15,7 +15,7 @@
 #include "input.h"
 #include "convenience_function.h"
 
-const float CTpsCamera::DISTANCE = 400.0f;
+const float CTpsCamera::DISTANCE = 100.0f;
 const D3DXVECTOR3 CTpsCamera::RANGE_WITH_PLAYER_V = D3DXVECTOR3(100.0f, 0.0f, -300.0f);
 //const D3DXVECTOR3 CTpsCamera::RANGE_WITH_PLAYER_R = D3DXVECTOR3(0.0f, 0.0f, 300.0f);
 const D3DXVECTOR3 CTpsCamera::RANGE_WITH_PLAYER_R = D3DXVECTOR3(100.0f, 0.0f, 0.0f);
@@ -27,6 +27,7 @@ CTpsCamera::CTpsCamera()
 	m_CameraVec = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_fPlayerDistance = 0.0f;
 	m_DestPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_VPos = RANGE_WITH_PLAYER_V;
 }
 
 //*****************************************************************************
@@ -41,8 +42,11 @@ CTpsCamera::~CTpsCamera()
 //*****************************************************************************
 HRESULT CTpsCamera::Init()
 {
+	m_VPos = RANGE_WITH_PLAYER_V;
 	m_fPlayerDistance = D3DXVec3Length(&RANGE_WITH_PLAYER_V);
-	m_CameraVec = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
+	D3DXVECTOR3 vec = RANGE_WITH_PLAYER_V - RANGE_WITH_PLAYER_R;
+	D3DXVec3Normalize(&vec, &vec);
+	m_CameraVec = vec;
 	m_Rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_DestPos = RANGE_WITH_PLAYER_V;
 
@@ -72,6 +76,17 @@ void CTpsCamera::Update()
 
 	D3DXVECTOR3 MouseMove;
 	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f,0.0f,0.0f);
+
+	if (pInput->Trigger(DIK_P))
+	{
+		m_VPos += m_CameraVec * DISTANCE;
+	}
+	else if (pInput->Trigger(DIK_O))
+	{
+		m_VPos -= m_CameraVec * DISTANCE;
+	}
+
+
 
 	MouseMove = pInput->GetMouseMove();
 
@@ -125,7 +140,7 @@ void CTpsCamera::Update()
 
 	D3DXVECTOR3 posV, posR,add;
 
-	D3DXVec3TransformCoord(&posV, &RANGE_WITH_PLAYER_V, &mtxworld);
+	D3DXVec3TransformCoord(&posV, &m_VPos, &mtxworld);
 	D3DXVec3TransformCoord(&posR, &RANGE_WITH_PLAYER_R, &mtxworld);
 	
 	//íçéãì_ÇÃï€ë∂

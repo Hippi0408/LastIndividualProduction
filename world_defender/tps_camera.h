@@ -33,9 +33,10 @@ public:
 	void Uninit() override;
 	void Update() override;
 	void Draw() override;
+
 	
 private:
-
+	D3DXVECTOR3 m_VPos;
 	D3DXVECTOR3 m_Rot;
 	D3DXVECTOR3 m_CameraVec;
 	float m_fPlayerDistance;

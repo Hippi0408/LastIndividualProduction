@@ -53,6 +53,10 @@ public:
 	void SetMeshTopPos() override;//各頂点の位置の設定
 	void SetNormal() override;			//法線設定
 	void ChangeColor();
+	void SetRadius(float fRadius) { m_Mesh_Cylinder_Structure.fRadius = fRadius; }
+	float GetRadius() { return  m_Mesh_Cylinder_Structure.fRadius; }
+	void SetSizeTop(float fSizeTop) { m_Mesh_Cylinder_Structure.fSizeYTop = fSizeTop; }
+	float GetSizeTop() { return m_Mesh_Cylinder_Structure.fSizeYTop; }
 
 private:
 	Mesh_Cylinder_Structure m_Mesh_Cylinder_Structure;

@@ -70,11 +70,11 @@ HRESULT CGame::Init()
 	MeshData.pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	MeshData.rot = D3DXVECTOR3(D3DXToRadian(0), 0.0f, 0.0f);
 	MeshData.col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	MeshData.fRadiusX = 100.0f;
-	MeshData.fRadiusZ = 100.0f;
+	MeshData.fRadiusX = 1000.0f;
+	MeshData.fRadiusZ = 1000.0f;
 	MeshData.nMeshX = 20;
 	MeshData.nMeshZ = 20;
-	MeshData.nTextIndex = CTexture::LoadTexture("data/TEXTURE/ゲーム.png");
+	MeshData.nTextIndex = CTexture::LoadTexture("data/TEXTURE/マップ（仮）.png");
 	m_pMeshfieldBG->SetMeshfield(MeshData);
 
 

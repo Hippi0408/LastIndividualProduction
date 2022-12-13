@@ -16,7 +16,7 @@
 // 前方宣言
 //*****************************************************************************
 class CShadow;
-class CMesh_Cylinder;
+class CPsychokinesis_Area;
 
 //*****************************************************************************
 // クラス定義
@@ -46,7 +46,7 @@ private:
 	int m_nMotionNum1;
 	D3DXVECTOR3 m_RotLowerBody;
 	D3DXVECTOR3 m_DestRotLowerBody;
-	CMesh_Cylinder* m_pPsychokinesis_Area;
+	CPsychokinesis_Area* m_pPsychokinesis_Area;
 
 };
 

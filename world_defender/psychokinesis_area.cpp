@@ -9,14 +9,16 @@
 //インクルードファイル
 //-----------------------------------------------------------------------------
 #include "psychokinesis_area.h" 
-#include "locus.h"
 #include "texture.h"
 #include <assert.h>
 #include "convenience_function.h"
+#include "mesh_cylinder.h"
+#include "input.h"
 
 const D3DXVECTOR3 CPsychokinesis_Area::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 const float CPsychokinesis_Area::HEIGHT_LOCUS = 80.0f;
 const float CPsychokinesis_Area::RADIUS_INIT = 200.0f;
+const float CPsychokinesis_Area::SIZE_TOP = 50.0f;
 const float CPsychokinesis_Area::RADIUS_MOVE = D3DXToRadian(5);
 //*****************************************************************************
 // コンストラクタ
@@ -24,11 +26,9 @@ const float CPsychokinesis_Area::RADIUS_MOVE = D3DXToRadian(5);
 CPsychokinesis_Area::CPsychokinesis_Area()
 {
 	m_PLPos = INIT_POS;
-	m_LocusPos = INIT_POS;
-	m_Rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_RotMove = D3DXVECTOR3(0.0f, RADIUS_MOVE, 0.0f);
 	m_fRadius = RADIUS_INIT;
-	m_pLocus = nullptr;
+	m_fSizeTop = SIZE_TOP;
+	m_pMesh_Cylinder = nullptr;
 }
 
 //*****************************************************************************
@@ -44,48 +44,35 @@ CPsychokinesis_Area::~CPsychokinesis_Area()
 HRESULT CPsychokinesis_Area::Init()
 {
 	//Numチェック
-	if (m_pLocus != nullptr)
+	if (m_pMesh_Cylinder != nullptr)
 	{
 		assert(false);
 	}
 
-	//軌跡情報の確保
-	m_pLocus = new CLocus;
+	//情報の確保
+	m_pMesh_Cylinder = new CMesh_Cylinder;
 
 	//初期化
-	if (FAILED(m_pLocus->Init()))
+	if (FAILED(m_pMesh_Cylinder->Init()))
 	{
 		return -1;
 	}
 
-	//情報の一時保管用変数宣言
-	LocusStructure locusstructure;
-	D3DXVECTOR3 PLpos = m_PLPos;
-	
+	Mesh_Cylinder_Structure Mesh_Cylinder_Structure;
 
-	//出現する軌跡の上下のPosの設定
-	D3DXVECTOR3 pos;
-	pos.x = m_fRadius * cosf(m_Rot.y);
-	pos.z = m_fRadius * sinf(m_Rot.y);
-	pos.y = 0.0f;
-	locusstructure.TopPos = PLpos + D3DXVECTOR3(pos.x, HEIGHT_LOCUS, pos.z);
-	locusstructure.DownPos = PLpos + pos;
+	Mesh_Cylinder_Structure.fRadius = m_fRadius;
+	Mesh_Cylinder_Structure.fSizeYTop = m_fSizeTop;
+	Mesh_Cylinder_Structure.nPolygonX = 30;
+	Mesh_Cylinder_Structure.nPolygonY = 1;
+	Mesh_Cylinder_Structure.nTextureNum = CTexture::LoadTexture("data/TEXTURE/軌跡.png");
+	Mesh_Cylinder_Structure.ParentPos = m_PLPos;
+	Mesh_Cylinder_Structure.ColorMax = D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f);
+	Mesh_Cylinder_Structure.ColorLowest = D3DXCOLOR(0.0f, 1.0f, 1.0f, 0.5f);
+	Mesh_Cylinder_Structure.nAttenuationFrame = 120;
+	Mesh_Cylinder_Structure.bFade = true;
+	Mesh_Cylinder_Structure.fRotMove = D3DXToRadian(1);
 
-	//出現始めと終わりのカラー設定
-	locusstructure.BeginningCol = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	locusstructure.EndCol = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-
-	//何枚で表示するか
-	locusstructure.nPolygon = 24;
-
-	//Posの更新フレーム数
-	locusstructure.nSaveInterval = 3;
-
-	//テクスチャの読み込み
-	locusstructure.nTextureNum = CTexture::LoadTexture("data/TEXTURE/軌跡.png");
-
-	//一時保管した情報の設定
-	m_pLocus->SetLocus(locusstructure);
+	m_pMesh_Cylinder->SetMesh_Cylinder(Mesh_Cylinder_Structure);
 
 
 	return S_OK;
@@ -113,13 +100,13 @@ HRESULT CPsychokinesis_Area::Init(D3DXVECTOR3 Pos)
 //*****************************************************************************
 void CPsychokinesis_Area::Uninit()
 {
-	//軌跡の情報の解放
-	if (m_pLocus != nullptr)
+	//リングの情報の解放
+	if (m_pMesh_Cylinder != nullptr)
 	{
 		//終了処理
-		m_pLocus->Uninit();
-		delete m_pLocus;
-		m_pLocus = nullptr;
+		m_pMesh_Cylinder->Uninit();
+		delete m_pMesh_Cylinder;
+		m_pMesh_Cylinder = nullptr;
 	}
 }
 
@@ -128,22 +115,24 @@ void CPsychokinesis_Area::Uninit()
 //*****************************************************************************
 void CPsychokinesis_Area::Update()
 {
-	//Rotの更新
-	m_Rot += m_RotMove;
+	//入力デバイスの取得
+	CInput *pInput = CInput::GetKey();
 
-	//正規化
-	m_Rot = CConvenience_Function::NormalizationRot(m_Rot);
+	if (pInput->Trigger(DIK_P))
+	{
+		m_fRadius += 100.0f;
+		m_fSizeTop += 10.0f;
+	}
+	else if (pInput->Trigger(DIK_O))
+	{
+		m_fRadius -= 100.0f;
+		m_fSizeTop -= 10.0f;
+	}
 
-	//出現する軌跡の上下のPosの設定
-	D3DXVECTOR3 pos,posUp,posDown;
-	pos.x = m_fRadius * cosf(m_Rot.y);
-	pos.z = m_fRadius * sinf(m_Rot.y);
-	pos.y = 0.0f;
+	m_pMesh_Cylinder->SetRadius(m_fRadius);
+	m_pMesh_Cylinder->SetSizeTop(m_fSizeTop);
 
-	posUp = m_PLPos + D3DXVECTOR3(pos.x, HEIGHT_LOCUS, pos.z);
-	posDown = m_PLPos + pos;
-
-	m_pLocus->Update(posUp, posDown);
+	m_pMesh_Cylinder->Update(m_PLPos);
 }
 
 //*****************************************************************************
@@ -164,6 +153,6 @@ void CPsychokinesis_Area::Update(D3DXVECTOR3 Pos)
 void CPsychokinesis_Area::Draw()
 {
 	//描画処理
-	m_pLocus->Draw();
+	m_pMesh_Cylinder->Draw();
 }
 

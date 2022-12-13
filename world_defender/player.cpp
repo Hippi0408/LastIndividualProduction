@@ -17,7 +17,7 @@
 #include "meshfield.h"
 #include "motion_parts.h"
 #include "convenience_function.h"
-#include "mesh_cylinder.h"
+#include "psychokinesis_area.h"
 #include "object_type_list.h"
 
 const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -69,29 +69,13 @@ HRESULT CPlayer::Init()
 
 
 	//サイコキネシスエリアの情報の確保
-	m_pPsychokinesis_Area = new CMesh_Cylinder;
+	m_pPsychokinesis_Area = new CPsychokinesis_Area;
 
 	//初期化
 	if (FAILED(m_pPsychokinesis_Area->Init()))
 	{
 		return -1;
 	}
-
-	Mesh_Cylinder_Structure Mesh_Cylinder_Structure;
-
-	Mesh_Cylinder_Structure.fRadius = 400.0f;
-	Mesh_Cylinder_Structure.fSizeYTop = 30.0f;
-	Mesh_Cylinder_Structure.nPolygonX = 30;
-	Mesh_Cylinder_Structure.nPolygonY = 1;
-	Mesh_Cylinder_Structure.nTextureNum = CTexture::LoadTexture("data/TEXTURE/軌跡.png");
-	Mesh_Cylinder_Structure.ParentPos = GetPos();
-	Mesh_Cylinder_Structure.ColorMax = D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f);
-	Mesh_Cylinder_Structure.ColorLowest = D3DXCOLOR(0.0f, 1.0f, 1.0f, 0.5f);
-	Mesh_Cylinder_Structure.nAttenuationFrame = 120;
-	Mesh_Cylinder_Structure.bFade = true;
-	Mesh_Cylinder_Structure.fRotMove = D3DXToRadian(1);
-
-	m_pPsychokinesis_Area->SetMesh_Cylinder(Mesh_Cylinder_Structure);
 
 	return S_OK;
 }
