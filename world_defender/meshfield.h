@@ -53,6 +53,7 @@ public:
 	virtual void SetNormal();			//法線設定
 	void SetMeshfieldData(MeshfieldStructure meshfieldStructure);
 	void SetIdxBuff();
+	int CheckPosLocation(D3DXVECTOR3 pos); //引く数のPosがどのマスに居るかを返す
 
 	LPDIRECT3DINDEXBUFFER9 GetIdxBuff() { return m_pIdxBuff; }//インデックスバッファへのポインタの取得
 	MeshfieldStructure GetMeshfieldData() { return m_MeshfieldData; }

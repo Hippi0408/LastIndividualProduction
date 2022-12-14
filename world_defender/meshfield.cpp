@@ -210,7 +210,6 @@ void CMeshfield::SetMeshTopPos()
 			//float fY = sinf(D3DXToRadian(0.5f) * (nCntX + m_nCntMeshfield)) * 10.0f;
 			//float fY = rand() % 50;
 
-
 			//頂点座標の設定//ローカル座標で
 			pVtx[0].pos = D3DXVECTOR3(m_MeshfieldData.fRadiusX * nCntX, fY, -m_MeshfieldData.fRadiusZ * nCntZ);
 
@@ -384,6 +383,79 @@ void CMeshfield::SetIdxBuff()
 	//インデックスバッファをアンロック
 	m_pIdxBuff->Unlock();
 
+}
+
+//引く数のPosがどのマスに居るかを返す
+int CMeshfield::CheckPosLocation(D3DXVECTOR3 pos)
+{
+	VERTEX_3D *pVtx = nullptr;		//頂点情報へのポインタ
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	//インデックスバッファをロック
+	WORD* pIdx;
+	m_pIdxBuff->Lock(0, 0, (void**)&pIdx, 0);
+
+	int nLocation = 0;
+
+	for (int nPolygon = 0; nPolygon < m_MeshfieldData.nPolygon; nPolygon++)
+	{
+		if (pIdx[0] == pIdx[1]
+			|| pIdx[0] == pIdx[2]
+			|| pIdx[1] == pIdx[2])
+		{
+			pIdx++;
+			continue;
+		}
+
+		D3DXVECTOR3 vec1, vec2;
+		float fInnerProduct0, fInnerProduct1, fInnerProduct2;
+
+		vec1 = pVtx[pIdx[1]].pos - pVtx[pIdx[0]].pos;
+		vec2 = pos - pVtx[pIdx[0]].pos;
+
+		fInnerProduct0 = vec1.x * vec2.z - vec1.z * vec2.x;
+
+		vec1 = pVtx[pIdx[2]].pos - pVtx[pIdx[1]].pos;
+		vec2 = pos - pVtx[pIdx[1]].pos;
+
+		fInnerProduct1 = vec1.x * vec2.z - vec1.z * vec2.x;
+
+		vec1 = pVtx[pIdx[0]].pos - pVtx[pIdx[2]].pos;
+		vec2 = pos - pVtx[pIdx[2]].pos;
+
+		fInnerProduct2 = vec1.x * vec2.z - vec1.z * vec2.x;
+
+		if (
+			(fInnerProduct0 >= 0.0f && fInnerProduct1 >= 0.0f && fInnerProduct2 >= 0.0f)
+			|| (fInnerProduct0 <= 0.0f && fInnerProduct1 <= 0.0f && fInnerProduct2 <= 0.0f)
+			)
+		{
+			//インデックスバッファをアンロック
+			m_pIdxBuff->Unlock();
+			//頂点バッファをアンロック
+			m_pVtxBuff->Unlock();
+
+			return nLocation;
+		}
+
+		pIdx++;
+
+		//マスの数はポリゴン2枚で１ずつ進む
+		if ((nPolygon + 1) % 2 == 0)
+		{
+			nLocation++;
+		}
+
+	}
+
+	//インデックスバッファをアンロック
+	m_pIdxBuff->Unlock();
+	//頂点バッファをアンロック
+	m_pVtxBuff->Unlock();
+
+	return nLocation;
 }
 
 D3DXVECTOR3 CMeshfield::Collision(D3DXVECTOR3 pos)

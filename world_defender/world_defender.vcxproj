@@ -151,6 +151,8 @@
     <ClCompile Include="2dpolygon.cpp" />
     <ClCompile Include="3dobject.cpp" />
     <ClCompile Include="3dpolygon.cpp" />
+    <ClCompile Include="ballast.cpp" />
+    <ClCompile Include="ballast_manager.cpp" />
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="convenience_function.cpp" />
@@ -185,6 +187,8 @@
     <ClInclude Include="2dpolygon.h" />
     <ClInclude Include="3dobject.h" />
     <ClInclude Include="3dpolygon.h" />
+    <ClInclude Include="ballast.h" />
+    <ClInclude Include="ballast_manager.h" />
     <ClInclude Include="billboard.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="convenience_function.h" />
