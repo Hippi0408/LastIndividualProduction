@@ -53,8 +53,13 @@ void CBallast::Uninit()
 //*****************************************************************************
 void CBallast::Update()
 {
-	//親クラスの更新処理
-	C3DObject::Update();
+	D3DXVECTOR3 pos = GetPos();
+	D3DXVECTOR3 move = GetPosMove();
+
+	pos += move;
+
+	SetPos(pos);
+
 }
 
 //*****************************************************************************

@@ -13,6 +13,17 @@
 #include "object.h"
 
 //*****************************************************************************
+// 構造体宣言
+//*****************************************************************************
+//モデルの情報の構造体
+typedef struct
+{
+	int nPattn;							//モデル番号
+	D3DXVECTOR3 pos;					//位置
+	D3DXVECTOR3 rot;					//向き
+}Object_Data;
+
+//*****************************************************************************
 // 前方宣言
 //*****************************************************************************
 enum Object_Type_List;
@@ -39,19 +50,19 @@ public:
 	//モデル構造体
 	typedef struct
 	{
-		D3DXVECTOR3* pNormalPolygon;		//面法線
-		D3DXVECTOR3* pTopPos;				//頂点の位置
-		D3DXMATRIX mtxWorld;				//ワールドマトリックス
-		D3DXMATRIX mtxWorldRot;				//ワールドマトリックス(向きだけ)
-		D3DXVECTOR3 posParent;				//位置親
-		D3DXVECTOR3 rotParent;				//向き親
-		D3DXVECTOR3 rot;					//向き
-		D3DXVECTOR3 pos;					//位置
-		D3DXVECTOR3 move;					//移動
-		D3DXVECTOR3 vtxMin, vtxMax;			//モデルのサイズ(元)
-		D3DXVECTOR3 vtxMin2, vtxMax2;		//モデルのサイズ(ワールドマトリックスで変換したもの)
-		D3DXVECTOR3 posMove;				//位置動く時用
-		int nPattn;							//モデルのパターン
+		D3DXVECTOR3* pNormalPolygon;						//面法線
+		D3DXVECTOR3* pTopPos;								//頂点の位置
+		D3DXMATRIX mtxWorld;								//ワールドマトリックス
+		D3DXMATRIX mtxWorldRot;								//ワールドマトリックス(向きだけ)
+		D3DXVECTOR3 posParent;								//位置親
+		D3DXVECTOR3 rotParent;								//向き親
+		D3DXVECTOR3 rot;									//向き
+		D3DXVECTOR3 pos;									//位置
+		D3DXVECTOR3 move;									//移動
+		D3DXVECTOR3 vtxMin, vtxMax;							//モデルのサイズ(元)
+		D3DXVECTOR3 vtxMin2, vtxMax2;						//モデルのサイズ(ワールドマトリックスで変換したもの)
+		D3DXVECTOR3 posMove = D3DXVECTOR3(0.0f,0.0f,0.0f);	//位置動く時用
+		int nPattn;											//モデルのパターン
 	}Model;
 
 public:

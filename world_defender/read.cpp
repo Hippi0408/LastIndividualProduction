@@ -10,11 +10,13 @@
 //*****************************************************************************
 #include "read.h"
 #include <stdio.h>
-#include "game.h"
-#include "result.h"
 #include "manager.h"
 #include <assert.h>
 #include "motion_parts.h"
+#include "texture.h"
+#include "meshfield.h"
+#include "game.h"
+#include "ballast_manager.h"
 
 //*****************************************************************************
 // コンストラクタ
@@ -31,81 +33,307 @@ CRead::~CRead()
 }
 
 //*****************************************************************************
-// モデルの読み込み
+// マップTetの読み込み
 //*****************************************************************************
-void CRead::ReadModel(ModelTxt ModelTxt)
+CMeshfield *CRead::ReadMap(char * sFilePath)
 {
-	//FILE *pFile = nullptr;			//ファイルポインター宣言
-	//char cBff[LINE_MAX_READING_LENGTH];		//一行分読み取るための変数
-	//char cBffHead[LINE_MAX_READING_LENGTH];	//頭の文字を読み取るための変数
+	//マネージャーの取得
+	CManager* pManager = GetManager();
 
-	////ファイルを開く
-	//switch (ModelTxt)
-	//{
-	//case TitleModel:
-	//	pFile = fopen("data/TXT/SetModelDataTitle.txt", "r");
-	//	break;
-	//case StageSelectModel:
-	//	pFile = fopen("data/TXT/SetModelDataStageSelect.txt", "r");
-	//	break;
-	//case GameStage01:
-	//	pFile = fopen("data/TXT/SetModelDataGameStage01.txt", "r");
-	//	break;
-	//case GameStage02:
-	//	pFile = fopen("data/TXT/SetModelDataGameStage02.txt", "r");
-	//	break;
-	//case GameStage03:
-	//	pFile = fopen("data/TXT/SetModelDataGameStage03.txt", "r");
-	//	break;
-	//case GameStage04:
-	//	pFile = fopen("data/TXT/SetModelDataGameStage04.txt", "r");
-	//	break;
-	//case GameStage05:
-	//	pFile = fopen("data/TXT/SetModelDataGameStage05.txt", "r");
-	//	break;
-	//case GameStage06:
-	//	pFile = fopen("data/TXT/SetModelDataGameStage06.txt", "r");
-	//	break;
-	//case ResultModel:
-	//case ModelTxtMax:
-	//default:
-	//	assert(false);
-	//	break;
-	//}
+	//ゲームの取得
+	CGame* pGame = (CGame*)pManager->GetGameObject();
 
-	//if (pFile == nullptr)
-	//{//開けなかった時用
-	//	assert(false);
-	//}
 
-	////文字列の読み取りループ処理
-	//while (fgets(cBff, LINE_MAX_READING_LENGTH, pFile) != nullptr)
-	//{
-	//	//文字列の分析
-	//	sscanf(cBff, "%s", &cBffHead);
+	//メッシュフィールド用のポインタ宣言
+	CMeshfield *pMeshfield = nullptr;
 
-	//	if (strcmp(&cBffHead[0], "MODEL") == 0)
-	//	{//xファイルのパス
-	//		char XFilePath[LINE_MAX_READING_LENGTH];
+	//モデルインデックス
+	int *pModelIndex = nullptr;
 
-	//		//文字列の分析
-	//		sscanf(cBff, "%s = %s", &cBffHead, &XFilePath);
+	FILE *pFile = NULL;			//ファイルポインター宣言
 
-	//		ReadXFile(XFilePath);
-	//	}
-	//	else if (strcmp(&cBffHead[0], "END") == 0)
-	//	{//読み切った時
-	//		break;
-	//	}
+	char cBff[LINE_MAX_READING_LENGTH];		//一行分読み取るための変数
+	char cBffHead[LINE_MAX_READING_LENGTH];	//頭の文字を読み取るための変数
 
-	//	//保存中の文字列の初期化
-	//	ZeroMemory(&cBff, sizeof(cBff));
-	//	ZeroMemory(&cBffHead, sizeof(cBffHead));
-	//}
+	//メッシュフィールド
+	pMeshfield = new CMeshfield;
 
-	////ファイルを閉じる
-	//fclose(pFile);
+	//初期化
+	if (FAILED(pMeshfield->Init()))
+	{
+		assert(false);
+	}
+
+	//メッシュ情報の一時保存
+	MeshfieldStructure MeshData;
+	ZeroMemory(&MeshData, sizeof(MeshData));
+
+	//読み込み可能モデル数
+	int nModelNumber = 0;
+
+	//モデルの読み込む数の保存
+	int nModelNumberMax = 0;
+
+	//ファイルを開く
+	pFile = fopen(sFilePath, "r");
+
+	if (pFile == nullptr)
+	{//開けなかった時用
+		assert(false);
+	}
+
+	//文字列の読み取りループ処理
+	while (fgets(cBff, LINE_MAX_READING_LENGTH, pFile) != nullptr)
+	{
+		//文字列の分析
+		sscanf(cBff, "%s", &cBffHead);
+
+		if (strcmp(&cBffHead[0], "TEXTURE_FILENAME") == 0)
+		{//テクスチャの読み込み
+
+			//テクスチャパスを読み取るための変数
+			char cBffPath[LINE_MAX_READING_LENGTH];	
+			//文字列の分析
+			sscanf(cBff, "%s = %s", &cBffHead, &cBffPath);
+			//テクスチャの読み込み
+			MeshData.nTextIndex = CTexture::LoadTexture(cBffPath);
+		}
+		else if (strcmp(&cBffHead[0], "NUM_MODEL") == 0)
+		{//モデルの読み込み数
+
+			//モデル番号の配列ポインタのNULLチェック
+			if (pModelIndex != nullptr)
+			{
+				assert(false);
+			}
+
+			//文字列の分析
+			sscanf(cBff, "%s = %d", &cBffHead, &nModelNumberMax);
+			//モデル番号の配列で管理
+			pModelIndex = new int[nModelNumberMax];
+		}
+		else if (strcmp(&cBffHead[0], "MODEL_FILENAME") == 0)
+		{//モデルファイルの読み込み
+
+			//モデル番号の配列ポインタのNULLチェック
+			if (pModelIndex == nullptr)
+			{
+				assert(false);
+			}
+
+			//登録予定の数より多かった場合
+			if (nModelNumber >= nModelNumberMax)
+			{
+				assert(false);
+			}
+
+			//モデルパスを読み取るための変数
+			char cBffPath[LINE_MAX_READING_LENGTH];
+			//文字列の分析
+			sscanf(cBff, "%s = %s", &cBffHead, &cBffPath);
+
+			//モデルのロードとインデックスの保存
+			pModelIndex[nModelNumber] = ReadXFile(cBffPath);
+
+			//モデル番号配列の保存先を変更
+			nModelNumber++;
+
+		}
+		else if (strcmp(&cBffHead[0], "FIELDSET") == 0)
+		{//地面の設定
+
+			//文字列の読み取りループ処理
+			while (fgets(cBff, LINE_MAX_READING_LENGTH, pFile) != nullptr)
+			{
+				//文字列の分析
+				sscanf(cBff, "%s", &cBffHead);
+
+				if (strcmp(&cBffHead[0], "POS") == 0)
+				{//Posの設定
+
+					//Posの一時保存
+					D3DXVECTOR3 pos;
+
+					//文字列の分析
+					sscanf(cBff, "%s = %f %f %f", &cBffHead, &pos.x, &pos.y, &pos.z);
+
+					//メッシュフィールドのPosの設定
+					MeshData.pos = pos;
+				}
+				else if (strcmp(&cBffHead[0], "ROT") == 0)
+				{//Rotの設定
+
+					//Rotの一時保存
+					D3DXVECTOR3 rot;
+
+					//文字列の分析
+					sscanf(cBff, "%s = %f %f %f", &cBffHead, &rot.x, &rot.y, &rot.z);
+
+					//メッシュフィールドのRotの設定
+					MeshData.rot = rot;
+				}
+				else if (strcmp(&cBffHead[0], "COLOR") == 0)
+				{//Colorの設定
+
+					//Colorの一時保存
+					D3DXCOLOR Color;
+
+					//文字列の分析
+					sscanf(cBff, "%s = %f %f %f %f", &cBffHead, &Color.r, &Color.g, &Color.b, &Color.a);
+
+					//メッシュフィールドのColorの設定
+					MeshData.col = Color;
+				}
+				else if (strcmp(&cBffHead[0], "SIZE") == 0)
+				{//SIZEの設定
+
+					//SIZEの一時保存
+					float fSizeX ,fSizeZ;
+
+					//文字列の分析
+					sscanf(cBff, "%s = %f %f", &cBffHead, &fSizeX, &fSizeZ);
+
+					//メッシュフィールドのSizeの設定
+					MeshData.fRadiusX = fSizeX;
+					MeshData.fRadiusZ = fSizeZ;
+				}
+				else if (strcmp(&cBffHead[0], "DIVISION") == 0)
+				{//DIVISIONの設定
+
+					//DIVISIONの一時保存
+					int nMeshX, nMeshZ;
+
+					//文字列の分析
+					sscanf(cBff, "%s = %d %d", &cBffHead, &nMeshX, &nMeshZ);
+
+					//メッシュフィールドのDIVISIONの設定
+					MeshData.nMeshX = nMeshX;
+					MeshData.nMeshZ = nMeshZ;
+				}
+				else if (strcmp(&cBffHead[0], "END_FIELDSET") == 0)
+				{//メッシュ情報の終わりの設定
+
+					//メッシュ情報の設定
+					pMeshfield->SetMeshfield(MeshData);
+
+					//瓦礫マネージャーの生成
+					pGame->CreateBallastManager(pMeshfield);
+
+					break;
+				}
+
+				//保存中の文字列の初期化
+				ZeroMemory(&cBff, sizeof(cBff));
+				ZeroMemory(&cBffHead, sizeof(cBffHead));
+			}
+
+		}
+		else if (strcmp(&cBffHead[0], "MODELSET") == 0)
+		{//モデルの設定
+
+			//３DOBJ情報の一時保管場所
+			Object_Data Data;
+			ZeroMemory(&Data, sizeof(Data));
+
+			//瓦礫マネージャーの取得
+			CBallast_Manager* pBallast_Manager = pGame->GetBallast_Manager();
+
+			//文字列の読み取りループ処理
+			while (fgets(cBff, LINE_MAX_READING_LENGTH, pFile) != nullptr)
+			{
+				
+
+				//文字列の分析
+				sscanf(cBff, "%s", &cBffHead);
+
+				if (strcmp(&cBffHead[0], "TYPE") == 0)
+				{//TYPEの設定
+
+					int nPattn = 0;
+
+					//文字列の分析
+					sscanf(cBff, "%s = %d", &cBffHead,&nPattn);
+
+					Data.nPattn = pModelIndex[nPattn];
+
+				}
+				else if (strcmp(&cBffHead[0], "POS") == 0)
+				{//POSの設定
+
+					//Pos一時保管場所
+					D3DXVECTOR3 pos;
+
+					//文字列の分析
+					sscanf(cBff, "%s = %f %f %f", &cBffHead, &pos.x, &pos.y, &pos.z);
+
+					//Posの保存
+					Data.pos = pos;
+				}
+				else if (strcmp(&cBffHead[0], "ROT") == 0)
+				{//ROTの設定
+
+					//Rot一時保管場所
+					D3DXVECTOR3 rot;
+
+					//文字列の分析
+					sscanf(cBff, "%s = %f %f %f", &cBffHead, &rot.x, &rot.y, &rot.z);
+
+					//Rotの保存
+					Data.rot = rot;
+				}
+				else if (strcmp(&cBffHead[0], "END_MODELSET") == 0)
+				{//モデルの設定の終わり
+
+					//このオブジェクトがメッシュのどこに居るかを調べる用
+					int nPosLocationm = 0;
+
+					//引く数のPosがどのマスに居るかを返す
+					nPosLocationm = pMeshfield->CheckPosLocation(Data.pos);
+
+					//エラー検知用
+					if (nPosLocationm < 0)
+					{
+						assert(false);
+					}
+
+					//瓦礫マネージャーがNULLだったら
+					if (pBallast_Manager == nullptr)
+					{
+						assert(false);
+					}
+
+					//瓦礫の設置
+					pBallast_Manager->SetBallast(nPosLocationm, Data);
+
+					break;
+				}
+
+				//保存中の文字列の初期化
+				ZeroMemory(&cBff, sizeof(cBff));
+				ZeroMemory(&cBffHead, sizeof(cBffHead));
+			}
+		}
+		else if (strcmp(&cBffHead[0], "END_SCRIPT") == 0)
+		{//スクリプトの終わり
+			break;
+		}
+
+		//保存中の文字列の初期化
+		ZeroMemory(&cBff, sizeof(cBff));
+		ZeroMemory(&cBffHead, sizeof(cBffHead));
+	}
+
+	//モデルインデックス
+	if (pModelIndex != nullptr)
+	{
+		delete[] pModelIndex;
+		pModelIndex = nullptr;
+	}
+
+	//メッシュポインタ宣言のリターン
+	return pMeshfield;
 }
+
 
 //*****************************************************************************
 // モーションファイルの読み込み

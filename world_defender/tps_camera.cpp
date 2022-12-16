@@ -80,10 +80,13 @@ void CTpsCamera::Update()
 	if (pInput->Trigger(DIK_P))
 	{
 		m_VPos += m_CameraVec * DISTANCE;
+
+		m_VPos.y += 50.0f;
 	}
 	else if (pInput->Trigger(DIK_O))
 	{
 		m_VPos -= m_CameraVec * DISTANCE;
+		m_VPos.y -= 50.0f;
 	}
 
 

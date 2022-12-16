@@ -33,10 +33,12 @@ public:
 	void Update() override;//更新処理
 	void Draw() override;//描画処理
 
+	//瓦礫の位置のSet、Get
 	void SetListNumber(int nNumber) { m_nListNumber = nNumber; }
 	int GetListNumber() { return m_nListNumber; }
 
 private:
+	D3DXVECTOR3 m_DestPos;
 	int m_nListNumber;
 };
 

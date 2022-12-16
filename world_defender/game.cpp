@@ -20,6 +20,9 @@
 #include "billboard.h"
 #include "motion_parts.h"
 #include "tps_camera.h"
+#include "read.h"
+#include "ballast_manager.h"
+#include <assert.h>
 
 //*****************************************************************************
 // コンストラクタ
@@ -47,10 +50,6 @@ HRESULT CGame::Init()
 		return -1;
 	}
 
-	//m_pCamera->SetPosV(D3DXVECTOR3(0.0f, 200.0f, -1000.0f));
-	//m_pCamera->SetPosR(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	//m_pCamera->SetVecU(D3DXVECTOR3(0.0f, 1.0f, 0.0f));
-
 	//ライト
 	m_pLight = new CLight;
 	if (FAILED(m_pLight->Init()))
@@ -58,28 +57,9 @@ HRESULT CGame::Init()
 		return -1;
 	}
 
-	//BG3D
-	m_pMeshfieldBG = new CMeshfield;
-	if (FAILED(m_pMeshfieldBG->Init()))
-	{
-		return -1;
-	}
+	
+	CRead cRead;
 
-	MeshfieldStructure MeshData;
-	ZeroMemory(&MeshData, sizeof(MeshData));
-	MeshData.pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	MeshData.rot = D3DXVECTOR3(D3DXToRadian(0), 0.0f, 0.0f);
-	MeshData.col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	MeshData.fRadiusX = 1000.0f;
-	MeshData.fRadiusZ = 1000.0f;
-	MeshData.nMeshX = 20;
-	MeshData.nMeshZ = 20;
-	MeshData.nTextIndex = CTexture::LoadTexture("data/TEXTURE/マップ（仮）.png");
-	m_pMeshfieldBG->SetMeshfield(MeshData);
-
-
-
-	//Player
 	m_pPlayer = new CPlayer;
 	if (FAILED(m_pPlayer->Init()))
 	{
@@ -92,19 +72,9 @@ HRESULT CGame::Init()
 	{
 		return -1;
 	}
-	
 
-	m_pBillcoard = new CBillcoard;
-	if (FAILED(m_pBillcoard->Init()))
-	{
-		return -1;
-	}
-	int nIndex = CTexture::LoadTexture("data/TEXTURE/ゲーム.png");
-	m_pBillcoard->SetPos(D3DXVECTOR3(0.0f, 100.0f, 0.0f));
-	m_pBillcoard->SetRot(D3DXVECTOR3(D3DXToRadian(0), D3DXToRadian(0), D3DXToRadian(0)));
-	m_pBillcoard->SetTextIndex(nIndex);
-	m_pBillcoard->SetDiagonalLine(50.0f, 50.0f);
-	m_pBillcoard->SetPolygon();
+	//BG3D
+	m_pMeshfieldBG = cRead.ReadMap("data/MAPTXT/map.txt");
 	return S_OK;
 }
 
@@ -128,6 +98,13 @@ void CGame::Uninit()
 		m_pLight = nullptr;
 	}
 
+	//瓦礫マネージャー
+	if (m_pBallastManager != nullptr)
+	{
+		m_pBallastManager->Uninit();
+		delete m_pBallastManager;
+		m_pBallastManager = nullptr;
+	}
 
 	//メッシュフィールド
 	if (m_pMeshfieldBG != nullptr)
@@ -135,14 +112,6 @@ void CGame::Uninit()
 		m_pMeshfieldBG->Uninit();
 		delete m_pMeshfieldBG;
 		m_pMeshfieldBG = nullptr;
-	}
-
-	//ビルボード
-	if (m_pBillcoard != nullptr)
-	{
-		m_pBillcoard->Uninit();
-		delete m_pBillcoard;
-		m_pBillcoard = nullptr;
 	}
 
 	//Player
@@ -173,6 +142,7 @@ void CGame::Update()
 	m_pCamera->Update();
 	m_pEnmey->Update();
 	m_pPlayer->Update();
+	m_pBallastManager->Update();
 	CInput *pInput = CInput::GetKey();
 
 	if (pInput->Press(DIK_UP))
@@ -262,8 +232,27 @@ void CGame::Draw()
 
 	CMotionParts::ALLDraw();
 
-	m_pBillcoard->Draw();
+	m_pBallastManager->Draw();
 
 	m_pPlayer->Draw();
+
+}
+
+//*****************************************************************************
+// 瓦礫マネージャーの生成処理
+//*****************************************************************************
+void CGame::CreateBallastManager(CMeshfield * pMeshfield)
+{
+	//瓦礫マネージャーの生成処理
+	m_pBallastManager = new CBallast_Manager;
+
+	//初期化
+	if (FAILED(m_pBallastManager->Init()))
+	{
+		assert(false);
+	}
+
+	//メッシュフィールドの情報から必要な数値の取得
+	m_pBallastManager->MeshfieldSet(pMeshfield);
 
 }

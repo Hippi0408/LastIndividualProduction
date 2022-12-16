@@ -15,21 +15,9 @@
 #include "manager.h"
 
 //*****************************************************************************
-// 列挙型定義
+// 前方宣言
 //*****************************************************************************
-enum ModelTxt
-{
-	TitleModel = 0,
-	StageSelectModel,
-	GameStage01,
-	GameStage02,
-	GameStage03,
-	GameStage04,
-	GameStage05,
-	GameStage06,
-	ResultModel,
-	ModelTxtMax
-};
+class CMeshfield;
 
 //*****************************************************************************
 // クラス定義
@@ -41,9 +29,8 @@ public:
 
 	CRead();
 	~CRead();
-	void ReadAnchorPoint();
+	CMeshfield *ReadMap(char *sFilePath);
 	int ReadXFile(char *sXFilePath);
-	void ReadModel(ModelTxt ModelTxt);
 	int ReadMotion(char *sXFilePath);
 private:
 	

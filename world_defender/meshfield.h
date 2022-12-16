@@ -59,11 +59,15 @@ public:
 	MeshfieldStructure GetMeshfieldData() { return m_MeshfieldData; }
 
 	D3DXVECTOR3 Collision(D3DXVECTOR3 pos);
+
+	int GetMeshfieldNumMax() { return m_nMeshfieldNumMax; }
+
 private:
 	LPDIRECT3DINDEXBUFFER9 m_pIdxBuff;	//インデックスバッファへのポインタ
 	MeshfieldStructure m_MeshfieldData;
 	int m_nCntMeshfield;
 	int m_nCoolTimeMeshfield;
+	int m_nMeshfieldNumMax;
 
 };
 

@@ -19,6 +19,7 @@ const D3DXVECTOR3 CMeshfield::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 //*****************************************************************************
 CMeshfield::CMeshfield()
 {
+	m_nMeshfieldNumMax = 0;
 	m_nCntMeshfield = 0;
 	m_nCoolTimeMeshfield = 0;
 }
@@ -321,6 +322,9 @@ void CMeshfield::SetMeshfieldData(MeshfieldStructure meshfieldStructure)
 
 	m_MeshfieldData.nMeshX = nMeshX;
 	m_MeshfieldData.nMeshZ = nMeshZ;
+
+	m_nMeshfieldNumMax = nMeshX * nMeshZ;
+
 	m_nTextIndex = meshfieldStructure.nTextIndex;
 
 	m_MeshfieldData.nTop = (nMeshX + 1) * (nMeshZ + 1);
@@ -454,6 +458,9 @@ int CMeshfield::CheckPosLocation(D3DXVECTOR3 pos)
 	m_pIdxBuff->Unlock();
 	//頂点バッファをアンロック
 	m_pVtxBuff->Unlock();
+
+	//エラー検知用
+	nLocation = -1;
 
 	return nLocation;
 }
