@@ -13,12 +13,13 @@
 #include "read.h"
 #include "texture.h"
 #include "game.h"
-#include "camera.h"
+#include "tps_camera.h"
 #include "meshfield.h"
 #include "motion_parts.h"
 #include "convenience_function.h"
 #include "psychokinesis_area.h"
 #include "object_type_list.h"
+#include "psychokinesis.h"
 
 const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 const float CPlayer::MOVE_INERTIA = 0.1f;
@@ -77,6 +78,15 @@ HRESULT CPlayer::Init()
 		return -1;
 	}
 
+	//サイコキネシスの情報の確保
+	m_pPsychokinesis = new CPsychokinesis;
+
+	//初期化
+	if (FAILED(m_pPsychokinesis->Init()))
+	{
+		return -1;
+	}
+
 	return S_OK;
 }
 
@@ -92,6 +102,15 @@ void CPlayer::Uninit()
 		m_pPsychokinesis_Area->Uninit();
 		delete m_pPsychokinesis_Area;
 		m_pPsychokinesis_Area = nullptr;
+	}
+
+	//サイコキネシスの解放
+	if (m_pPsychokinesis != nullptr)
+	{
+		//終了処理
+		m_pPsychokinesis->Uninit();
+		delete m_pPsychokinesis;
+		m_pPsychokinesis = nullptr;
 	}
 }
 
@@ -110,8 +129,10 @@ void CPlayer::Update()
 	CManager *pManager = GetManager();
 	CGame* pGame = (CGame*)pManager->GetGameObject();
 
+	CTpsCamera* pTpsCamera = (CTpsCamera*)pGame->GetCamera();
+
 	//カメラの向き（Y軸のみ）
-	float rotY = pGame->GetCamera()->GetRot();
+	float rotY = pTpsCamera->GetRot();
 
 	//移動量の一時保管
 	D3DXVECTOR3 move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -284,12 +305,13 @@ void CPlayer::Update()
 	//現在のプレイヤーの位置の取得
 	PLpos = GetPos();
 
-	PLpos.y += 1.0f;
+	//PLpos.y += 1.0f;
 
 	//サイコキネシスエリアの更新（Posあり）
 	m_pPsychokinesis_Area->Update(PLpos);
 
-
+	//サイコキネシスの更新
+	m_pPsychokinesis->Update(PLpos, rot, pTpsCamera->GetCameraVec(), m_pPsychokinesis_Area->GetRadius(), m_pPsychokinesis_Area->GetSizeTop());
 }
 
 //*****************************************************************************

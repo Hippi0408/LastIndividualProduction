@@ -34,11 +34,13 @@ public:
 	void Update() override;
 	void Draw() override;
 
+	D3DXVECTOR3 GetCameraVec();
 	
 private:
 	D3DXVECTOR3 m_VPos;
 	D3DXVECTOR3 m_Rot;
 	D3DXVECTOR3 m_CameraVec;
+	D3DXVECTOR3 m_CameraVectorConversion;
 	float m_fPlayerDistance;
 	D3DXVECTOR3 m_DestPos;
 };

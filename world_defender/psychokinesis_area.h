@@ -39,6 +39,9 @@ public:
 	void Update() override;//更新処理
 	void Update(D3DXVECTOR3 Pos);//Pos更新処理
 	void Draw() override;//描画処理
+
+	float GetRadius() { return m_fRadius; }
+	float GetSizeTop() { return m_fSizeTop; }
 	
 private:
 	D3DXVECTOR3 m_PLPos;

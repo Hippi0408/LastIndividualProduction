@@ -14,7 +14,9 @@
 #include "game.h"
 #include "manager.h"
 #include "meshfield.h"
+#include "convenience_function.h"
 
+const float CBallast_Manager::MAP_MAX = 10000.0f;
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
@@ -82,17 +84,44 @@ void CBallast_Manager::Update()
 	for (int nCnt = 0; nCnt < m_nMeshfieldNumMax; nCnt++)
 	{
 		//イテレーターループ
-		for (auto itr = m_BallastMapData[nCnt].begin(); itr != m_BallastMapData[nCnt].end(); itr++)
+		for (auto itr = m_BallastMapData[nCnt].begin(); itr != m_BallastMapData[nCnt].end(); )
 		{
 			//イテレーターから瓦礫のポインタの代入
 			CBallast* pBallast = *itr;
 
-			//瓦礫ポインタの解放
-			if (pBallast != nullptr)
+			//瓦礫ポインタの更新処理
+			if (pBallast == nullptr)
 			{
-				//更新処理
-				pBallast->Update();
+				assert(false);
 			}
+
+			//使用状態かどうか
+			if (pBallast->GetUse())
+			{
+				D3DXVECTOR3 pos = pBallast->GetWorldPos();
+				//エリア外にあるかどうか
+				if (CConvenience_Function::CircleCollision(D3DXVECTOR3(0.0f,0.0f,0.0f), MAP_MAX, pos, 0.0f))
+				{
+					//更新処理
+					pBallast->Update();
+
+					//イテレーターを進める
+					itr++;
+
+					continue;
+				}
+			}
+			
+			
+			//終了処理
+			pBallast->Uninit();
+
+			//破棄
+			delete pBallast;
+			pBallast = nullptr;
+
+			//次のイテレーターの代入、現在のイテレーターを破棄
+			itr = m_BallastMapData[nCnt].erase(itr);
 		}
 	}
 }
@@ -115,7 +144,6 @@ void CBallast_Manager::Draw()
 			if (pBallast != nullptr)
 			{
 				//描画処理
-				pBallast->CalculationMatrix();
 				pBallast->Draw();
 			}
 		}
@@ -173,5 +201,43 @@ void CBallast_Manager::MeshfieldSet(CMeshfield* pMeshfield)
 	//メッシュのマスの数の最大の設定
 	m_nMeshfieldNumMax = m_pMeshfieldCopy->GetMeshfieldNumMax();
 
+}
+
+//*****************************************************************************
+//サイコキネシスエリアにあったらそのオブジェクトのポインタを返す
+//*****************************************************************************
+CBallast * CBallast_Manager::CheckCircleCollision(D3DXVECTOR3 pos, float fRadius)
+{
+	//リストの更新
+	for (int nCnt = 0; nCnt < m_nMeshfieldNumMax; nCnt++)
+	{
+		//イテレーターループ
+		for (auto itr = m_BallastMapData[nCnt].begin(); itr != m_BallastMapData[nCnt].end(); itr++)
+		{
+			//イテレーターから瓦礫のポインタの代入
+			CBallast* pBallast = *itr;
+
+			//瓦礫NULLチェック
+			if (pBallast == nullptr)
+			{
+				assert(false);
+			}
+
+			//浮遊状態かどうか
+			if (pBallast->GetFloating())
+			{
+				continue;
+			}
+
+			//サイコキネシスエリアにあるかどうかpBallast->GetVtxMax().x
+			if (CConvenience_Function::CircleCollision(pos,fRadius, pBallast->GetPos(), 0.0f))
+			{
+				return pBallast;
+			}
+
+		}
+	}
+
+	return nullptr;
 }
 

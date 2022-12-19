@@ -28,7 +28,7 @@ class CMeshfield;
 class CBallast_Manager : public CObject
 {
 private:
-	
+	static const float MAP_MAX;
 public:
 	CBallast_Manager();
 	~CBallast_Manager() override;
@@ -47,6 +47,9 @@ public:
 
 	//メッシュフィールドの設定
 	void MeshfieldSet(CMeshfield* pMeshfield);
+
+	//サイコキネシスエリアにあったらそのオブジェクトのポインタを返す
+	CBallast* CheckCircleCollision(D3DXVECTOR3 pos, float fRadius);
 
 private:
 	std::map<int, std::list<CBallast*>> m_BallastMapData;		//マップ上のオブジェクトをリストで管理する変数

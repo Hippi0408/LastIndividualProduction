@@ -17,6 +17,7 @@
 //*****************************************************************************
 class CShadow;
 class CPsychokinesis_Area;
+class CPsychokinesis;
 
 //*****************************************************************************
 // ƒNƒ‰ƒX’è‹`
@@ -47,6 +48,7 @@ private:
 	D3DXVECTOR3 m_RotLowerBody;
 	D3DXVECTOR3 m_DestRotLowerBody;
 	CPsychokinesis_Area* m_pPsychokinesis_Area;
+	CPsychokinesis* m_pPsychokinesis;
 
 };
 

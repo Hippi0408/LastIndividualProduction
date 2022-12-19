@@ -15,8 +15,8 @@
 #include "input.h"
 #include "convenience_function.h"
 
-const float CTpsCamera::DISTANCE = 100.0f;
-const D3DXVECTOR3 CTpsCamera::RANGE_WITH_PLAYER_V = D3DXVECTOR3(100.0f, 0.0f, -300.0f);
+const float CTpsCamera::DISTANCE = 150.0f;
+const D3DXVECTOR3 CTpsCamera::RANGE_WITH_PLAYER_V = D3DXVECTOR3(100.0f, 0.0f, -500.0f);
 //const D3DXVECTOR3 CTpsCamera::RANGE_WITH_PLAYER_R = D3DXVECTOR3(0.0f, 0.0f, 300.0f);
 const D3DXVECTOR3 CTpsCamera::RANGE_WITH_PLAYER_R = D3DXVECTOR3(100.0f, 0.0f, 0.0f);
 //*****************************************************************************
@@ -24,6 +24,7 @@ const D3DXVECTOR3 CTpsCamera::RANGE_WITH_PLAYER_R = D3DXVECTOR3(100.0f, 0.0f, 0.
 //*****************************************************************************
 CTpsCamera::CTpsCamera()
 {
+	m_CameraVectorConversion = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_CameraVec = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_fPlayerDistance = 0.0f;
 	m_DestPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -81,12 +82,12 @@ void CTpsCamera::Update()
 	{
 		m_VPos += m_CameraVec * DISTANCE;
 
-		m_VPos.y += 50.0f;
+		//m_VPos.y += 50.0f;
 	}
 	else if (pInput->Trigger(DIK_O))
 	{
 		m_VPos -= m_CameraVec * DISTANCE;
-		m_VPos.y -= 50.0f;
+		//m_VPos.y -= 50.0f;
 	}
 
 
@@ -145,7 +146,9 @@ void CTpsCamera::Update()
 
 	D3DXVec3TransformCoord(&posV, &m_VPos, &mtxworld);
 	D3DXVec3TransformCoord(&posR, &RANGE_WITH_PLAYER_R, &mtxworld);
-	
+	D3DXVec3TransformCoord(&m_CameraVectorConversion, &m_CameraVec, &mtxworld);
+	D3DXVec3Normalize(&m_CameraVectorConversion, &m_CameraVectorConversion);
+
 	//注視点の保存
 	SetPosR(posR);
 
@@ -155,9 +158,6 @@ void CTpsCamera::Update()
 
 	//視点の保存
 	AddPosV(add);
-
-	
-
 }
 
 //*****************************************************************************
@@ -165,4 +165,13 @@ void CTpsCamera::Update()
 //*****************************************************************************
 void CTpsCamera::Draw()
 {
+}
+
+//*****************************************************************************
+// カメラのベクトルの取得
+//*****************************************************************************
+D3DXVECTOR3 CTpsCamera::GetCameraVec()
+{
+	//return D3DXVECTOR3(m_CameraVectorConversion.x, -m_CameraVectorConversion.y, m_CameraVectorConversion.z);
+	return m_Rot;
 }

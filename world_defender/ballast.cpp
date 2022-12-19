@@ -10,12 +10,16 @@
 //-----------------------------------------------------------------------------
 #include "ballast.h"
 
+
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
 CBallast::CBallast()
 {
 	m_nListNumber = 0;
+	m_MoveRot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_bFloating = false;
+	m_ParentPosMove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 }
 
 //*****************************************************************************
@@ -30,6 +34,9 @@ CBallast::~CBallast()
 //*****************************************************************************
 HRESULT CBallast::Init()
 {
+	//使用する
+	m_bUse = true;
+
 	//初期化
 	if (FAILED(C3DObject::Init()))
 	{
@@ -53,12 +60,21 @@ void CBallast::Uninit()
 //*****************************************************************************
 void CBallast::Update()
 {
+	//各情報の取得
 	D3DXVECTOR3 pos = GetPos();
 	D3DXVECTOR3 move = GetPosMove();
+	D3DXVECTOR3 rot = GetRot();
 
+	//子の位置の更新
 	pos += move;
-
 	SetPos(pos);
+
+	//向きの更新
+	rot += m_MoveRot;
+	SetRot(rot);
+
+	//親位置の更新
+	AddParentPos(m_ParentPosMove);
 
 }
 
@@ -67,6 +83,8 @@ void CBallast::Update()
 //*****************************************************************************
 void CBallast::Draw()
 {
+	//マトリックスの計算
+	CalculationMatrix();
 	//親クラスの描画処理
 	C3DObject::Draw();
 }
