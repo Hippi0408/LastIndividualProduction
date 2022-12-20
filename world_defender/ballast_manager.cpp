@@ -167,17 +167,10 @@ void CBallast_Manager::SetBallast(int nNumber, Object_Data Data)
 	//メッシュ内の位置（番号）
 	pBallast->SetListNumber(nNumber);
 
-	//使用するモデル番号
-	//pBallast->SetModelPattnNum(Data.nPattn);
-
-	////瓦礫の位置
-	//pBallast->SetPos(Data.pos);
-
-	////瓦礫の向き
-	//pBallast->SetRot(Data.rot);
-
+	//使用するモデル番号、瓦礫の位置、瓦礫の向き
 	pBallast->Set3DObject(Data.nPattn, Data.pos, Data.rot);
 
+	//法線設定
 	pBallast->SetNormal();
 
 	//リストに瓦礫情報を追加

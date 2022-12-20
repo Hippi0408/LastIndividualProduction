@@ -76,8 +76,26 @@ void CPsychokinesis::Update()
 		// サイコキネシス処理
 		Psychokinesis();
 	}
-	else/* if(pInput->Release(MOUSE_INPUT_LEFT))*/
+	else
 	{//辞めたら
+
+		if (pInput->Press(MOUSE_INPUT_RIGHT))
+		{//クールタイムあり
+
+			//クールタイム計算
+			m_nCoolTime--;
+
+			//クールタイムが０より多かったら
+			if (m_nCoolTime > 0)
+			{
+				//クールタイム中
+				return;
+			}
+
+			//クールタイムの発生
+			m_nCoolTime = COOL_TIME;
+		}
+
 		// サイコキネシス攻撃処理
 		PsychokinesisAttack();
 	}
@@ -260,15 +278,6 @@ void CPsychokinesis::Psychokinesis()
 //*****************************************************************************
 void CPsychokinesis::PsychokinesisAttack()
 {
-	m_nCoolTime--;
-
-	if (m_nCoolTime > 0)
-	{
-		return;
-	}
-
-	m_nCoolTime = 15;
-
 	//Moveの設定
 	for (auto itr = m_BallastCopyList.begin(); itr != m_BallastCopyList.end();)
 	{
@@ -301,7 +310,7 @@ void CPsychokinesis::PsychokinesisAttack()
 
 			Move = Move * 50.0f;
 
-		/*	Move.x = sinf(m_CameraRot.y) * -50.0f;
+		  /*Move.x = sinf(m_CameraRot.y) * -50.0f;
 			Move.z = cosf(m_CameraRot.y) * -50.0f;*/
 
 			//移動量の設定

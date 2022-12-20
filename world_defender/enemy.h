@@ -27,18 +27,23 @@ private:
 	static const float MOVE_INERTIA;
 public:
 	CEnemy();
-	~CEnemy() override;
+	virtual ~CEnemy() override;
 
-	HRESULT Init() override;
-	void Uninit() override;
-	void Update() override;
-	void Draw() override;
+	virtual HRESULT Init() override;
+	virtual void Uninit() override;
+	virtual void Update() override;
+	virtual void Draw() override;
+
+	virtual bool IsUnused();
+	virtual void SetMotionModel();
+
+	void SetMovingDistance(float fMovingDistance) { m_fMovingDistance = fMovingDistance; }
 
 	//äµê´ÇÃGet
 	float GetMoveInertia() override { return MOVE_INERTIA; }
 
 private:
-
+	float m_fMovingDistance;
 };
 
 #endif

@@ -28,6 +28,7 @@ private:
 	static const float BALLAST_Y_POS;
 	static const float SIN_CURVE;
 	static const int TIME = 100;
+	static const int COOL_TIME = 30;
 
 public:
 	CPsychokinesis();

@@ -38,21 +38,23 @@ CEnemy::~CEnemy()
 //*****************************************************************************
 HRESULT CEnemy::Init()
 {
+	//ライフの設定
 	SetLife(INIT_LIFE);
 
+	//初期の位置
 	SetPos(INIT_POS);
 
+	//１フレーム前の位置
 	SetOldPos(INIT_POS);
 
+	//移動量の初期化
 	SetMove(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
+	//向きの初期化
 	SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
-	CRead cRead;
-
-	SetMotionNum(cRead.ReadMotion("data/MOTION/motionboss.txt"));
-
-	CMotionParts::AllSetObject_Type_List(GetMotionNum(), OBJ_ENEMY);
+	// モーションモデルの設定処理
+	SetMotionModel();
 
 	return S_OK;
 }
@@ -76,8 +78,6 @@ void CEnemy::Update()
 
 	D3DXVECTOR3 add = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
-	//add.y -= 4.0f;
-
 	AddPos(add);
 
 
@@ -86,15 +86,6 @@ void CEnemy::Update()
 	pos = GetPos();
 
 	groundpos = pGame->GetMeshfield()->Collision(pos);
-
-	/*if (pos.y < groundpos.y)
-	{
-		if (groundpos != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
-		{
-			pos = groundpos;
-			SetPos(groundpos);
-		}
-	}*/
 
 	if (pos.y < -100.0f)
 	{
@@ -145,4 +136,24 @@ void CEnemy::Update()
 //*****************************************************************************
 void CEnemy::Draw()
 {
+}
+
+//*****************************************************************************
+// 終了条件処理
+//*****************************************************************************
+bool CEnemy::IsUnused()
+{
+	return false;
+}
+
+//*****************************************************************************
+// モーションモデルの設定処理
+//*****************************************************************************
+void CEnemy::SetMotionModel()
+{
+	CRead cRead;
+
+	SetMotionNum(cRead.ReadMotion("data/MOTION/motionboss.txt"));
+
+	CMotionParts::AllSetObject_Type_List(GetMotionNum(), OBJ_ENEMY);
 }
