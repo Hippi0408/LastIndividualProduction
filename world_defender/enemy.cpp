@@ -16,8 +16,9 @@
 #include "player.h"
 #include "input.h"
 #include "object_type_list.h"
+#include "convenience_function.h"
 
-const D3DXVECTOR3 CEnemy::INIT_POS = D3DXVECTOR3(1000.0f, 50.0f, -0.0f);
+const D3DXVECTOR3 CEnemy::INIT_POS = D3DXVECTOR3(1000.0f, 0.0f, -0.0f);
 const float CEnemy::MOVE_INERTIA = 0.1f;
 //*****************************************************************************
 // コンストラクタ
@@ -118,8 +119,14 @@ void CEnemy::Update()
 
 	CMotionParts::MoveMotionModel(GetMotionNum(), nMotion, &GetPos(), &GetRot());
 
+	D3DXVECTOR3 Plpos;
 
-	bool bCollision = CMotionParts::AllCollision(GetPos(), GetOldPos(), OBJ_PLAYER);
+	Plpos = pGame->GetPlayer()->GetPos();
+	pos = GetPos();
+
+	Plpos.y += 0.0f;
+
+	bool bCollision = CConvenience_Function::SphereCollision(pos,0.0f, Plpos,100.0f);
 
 	if (bCollision)
 	{

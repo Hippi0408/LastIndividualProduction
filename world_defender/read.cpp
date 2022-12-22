@@ -285,13 +285,13 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 				{//モデルの設定の終わり
 
 					//このオブジェクトがメッシュのどこに居るかを調べる用
-					int nPosLocationm = 0;
+					int nPosLocation = 0;
 
 					//引く数のPosがどのマスに居るかを返す
-					nPosLocationm = pMeshfield->CheckPosLocation(Data.pos);
+					nPosLocation = pMeshfield->CheckPosLocation(Data.pos);
 
 					//エラー検知用
-					if (nPosLocationm < 0)
+					if (nPosLocation < 0)
 					{
 						assert(false);
 					}
@@ -303,7 +303,7 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 					}
 
 					//瓦礫の設置
-					pBallast_Manager->SetBallast(nPosLocationm, Data);
+					pBallast_Manager->SetBallast(nPosLocation, Data);
 
 					break;
 				}
@@ -329,6 +329,9 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 		delete[] pModelIndex;
 		pModelIndex = nullptr;
 	}
+
+	//ファイルを閉じる
+	fclose(pFile);
 
 	//メッシュポインタ宣言のリターン
 	return pMeshfield;

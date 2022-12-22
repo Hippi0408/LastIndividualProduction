@@ -402,6 +402,12 @@ int CMeshfield::CheckPosLocation(D3DXVECTOR3 pos)
 	m_pIdxBuff->Lock(0, 0, (void**)&pIdx, 0);
 
 	int nLocation = 0;
+	int retval = -1;
+	D3DXVECTOR3 vec1, vec2,top0,top1,top2, MeshfieldPos;
+	float fInnerProduct0, fInnerProduct1, fInnerProduct2;
+
+	//メッシュの位置
+	MeshfieldPos = GetPos();
 
 	for (int nPolygon = 0; nPolygon < m_MeshfieldData.nPolygon; nPolygon++)
 	{
@@ -413,35 +419,32 @@ int CMeshfield::CheckPosLocation(D3DXVECTOR3 pos)
 			continue;
 		}
 
-		D3DXVECTOR3 vec1, vec2;
-		float fInnerProduct0, fInnerProduct1, fInnerProduct2;
+		top0 = pVtx[pIdx[0]].pos + MeshfieldPos;
+		top1 = pVtx[pIdx[1]].pos + MeshfieldPos;
+		top2 = pVtx[pIdx[2]].pos + MeshfieldPos;
 
-		vec1 = pVtx[pIdx[1]].pos - pVtx[pIdx[0]].pos;
-		vec2 = pos - pVtx[pIdx[0]].pos;
+		vec1 = top1 - top0;
+		vec2 = pos - top0;
 
 		fInnerProduct0 = vec1.x * vec2.z - vec1.z * vec2.x;
 
-		vec1 = pVtx[pIdx[2]].pos - pVtx[pIdx[1]].pos;
-		vec2 = pos - pVtx[pIdx[1]].pos;
+		vec1 = top2 - top1;
+		vec2 = pos - top1;
 
 		fInnerProduct1 = vec1.x * vec2.z - vec1.z * vec2.x;
 
-		vec1 = pVtx[pIdx[0]].pos - pVtx[pIdx[2]].pos;
-		vec2 = pos - pVtx[pIdx[2]].pos;
+		vec1 = top0 - top2;
+		vec2 = pos - top2;
 
 		fInnerProduct2 = vec1.x * vec2.z - vec1.z * vec2.x;
 
 		if (
-			(fInnerProduct0 >= 0.0f && fInnerProduct1 >= 0.0f && fInnerProduct2 >= 0.0f)
-			|| (fInnerProduct0 <= 0.0f && fInnerProduct1 <= 0.0f && fInnerProduct2 <= 0.0f)
+			(fInnerProduct0 >= 0.0f && fInnerProduct1 >= 0.0f && fInnerProduct2 >= 0.0f) ||
+			(fInnerProduct0 <= 0.0f && fInnerProduct1 <= 0.0f && fInnerProduct2 <= 0.0f)
 			)
 		{
-			//インデックスバッファをアンロック
-			m_pIdxBuff->Unlock();
-			//頂点バッファをアンロック
-			m_pVtxBuff->Unlock();
-
-			return nLocation;
+			retval = nLocation;
+			break;
 		}
 
 		pIdx++;
@@ -451,7 +454,6 @@ int CMeshfield::CheckPosLocation(D3DXVECTOR3 pos)
 		{
 			nLocation++;
 		}
-
 	}
 
 	//インデックスバッファをアンロック
@@ -459,10 +461,8 @@ int CMeshfield::CheckPosLocation(D3DXVECTOR3 pos)
 	//頂点バッファをアンロック
 	m_pVtxBuff->Unlock();
 
-	//エラー検知用
-	nLocation = -1;
-
-	return nLocation;
+	//エラー時は -1
+	return retval;
 }
 
 D3DXVECTOR3 CMeshfield::Collision(D3DXVECTOR3 pos)

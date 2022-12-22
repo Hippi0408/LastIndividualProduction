@@ -292,7 +292,7 @@ void CPsychokinesis::PsychokinesisAttack()
 			pBallast->SetParentPos(WorldPos);
 			pBallast->SetPos(D3DXVECTOR3(0.0f,0.0f,0.0f));
 			pBallast->SetPosMove(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-			pBallast->SetMoveRot(D3DXVECTOR3(D3DXToRadian(-10), 0.0f, 0.0f));
+			//pBallast->SetMoveRot(D3DXVECTOR3(D3DXToRadian(-10), 0.0f, 0.0f));
 
 			//“Š‚°‚½•ûŒü‚Ö‚ÌˆÚ“®—Ê‚ÌŽZo
 			D3DXVECTOR3 Move = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
