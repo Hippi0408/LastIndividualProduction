@@ -16,7 +16,7 @@
 #include "meshfield.h"
 #include "convenience_function.h"
 
-const float CBallast_Manager::MAP_MAX = 10000.0f;
+const float CBallast_Manager::MAP_MAX = 15000.0f;
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************

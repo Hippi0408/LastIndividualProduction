@@ -27,6 +27,9 @@ typedef struct
 // 前方宣言
 //*****************************************************************************
 enum Object_Type_List;
+#ifdef _DEBUG
+class CLine;
+#endif // _DEBUG
 
 //*****************************************************************************
 // クラス定義
@@ -121,6 +124,10 @@ private:
 	D3DXVECTOR3 m_LightVec = D3DXVECTOR3(0.0f, 0.0f, 0.0f); 
 	D3DXVECTOR3 m_ShadowPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	Object_Type_List m_Object_Type_List;
+
+#ifdef _DEBUG
+	CLine* m_pLine;
+#endif // _DEBUG
 };
 
 #endif

@@ -12,7 +12,7 @@
 //***************************************************************************
 #include <assert.h>
 #include <stdio.h>
-
+#include "main.h"
 #include "inputmouse.h"
 
 //=============================================================================
@@ -25,6 +25,10 @@ CInputMouse::CInputMouse()
 	memset(&m_aKeyState, 0, sizeof(m_aKeyState));
 	memset(&m_aKeyStateTrigger, 0, sizeof(m_aKeyStateTrigger));
 	memset(&m_aKeyStateRelease, 0, sizeof(m_aKeyStateRelease));
+
+	m_fHeightWnd = 0.0f;
+	m_fWidthWnd = 0.0f;
+	m_bCursorErase = false;
 }
 
 //=============================================================================
@@ -70,6 +74,10 @@ HRESULT CInputMouse::Init(HINSTANCE hInstance, HWND hWnd)
 
 	// Deviceへのアクセス権を獲得
 	m_pDevMouse->Acquire();
+
+	//ウィンドウの横幅と高さの取得
+	m_fWidthWnd = SCREEN_WIDTH;
+	m_fHeightWnd = SCREEN_HEIGHT;
 
 	return S_OK;
 }
@@ -122,6 +130,9 @@ void CInputMouse::Update(void)
 		// マウスへのアクセス権を獲得
 		m_pDevMouse->Acquire();
 	}
+
+	// マウスが指定のスクリーン内にする場合カーソルを消す
+	MouseCursorErase();
 }
 
 //=============================================================================
@@ -243,4 +254,30 @@ int CInputMouse::GetMouseWheel(void)
 D3DXVECTOR3 CInputMouse::GetMouseMove(void)
 {
 	return D3DXVECTOR3((float)(m_aKeyState.lX), (float)(m_aKeyState.lY), (float)(m_aKeyState.lZ));
+}
+
+
+//=============================================================================
+// マウスが指定のスクリーン内にする場合カーソルを消す
+// Author : 小綱啓仁
+//=============================================================================
+void CInputMouse::MouseCursorErase()
+{
+	//画面内時にカーソルを消すかどうか
+	if (!m_bCursorErase)
+	{
+		return;
+	}
+
+	//カーソルの位置
+	D3DXVECTOR3 pos = GetMouseCursor();
+
+	//画面内
+	if (pos.x > 0.0f && pos.x < m_fWidthWnd && pos.y > 0.0f && pos.y < m_fHeightWnd)
+	{
+		ShowCursor(false);
+	}
+
+	//画面外
+	ShowCursor(true);
 }

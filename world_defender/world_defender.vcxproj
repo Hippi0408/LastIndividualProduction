@@ -166,6 +166,7 @@
     <ClCompile Include="inputkeyboard.cpp" />
     <ClCompile Include="inputmouse.cpp" />
     <ClCompile Include="light.cpp" />
+    <ClCompile Include="line.cpp" />
     <ClCompile Include="locus.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="manager.cpp" />
@@ -205,6 +206,7 @@
     <ClInclude Include="inputkeydata.h" />
     <ClInclude Include="inputmouse.h" />
     <ClInclude Include="light.h" />
+    <ClInclude Include="line.h" />
     <ClInclude Include="locus.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="manager.h" />

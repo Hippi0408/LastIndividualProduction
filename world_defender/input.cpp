@@ -610,3 +610,12 @@ D3DXVECTOR3 CInput::GetMouseMove(void)
 {
 	return m_pMouse->GetMouseMove();
 }
+
+//*************************************************************************************
+// 画面内のカーソルを消すかどうか
+//*************************************************************************************
+void CInput::SetCursorErase(bool bUse)
+{
+	// 画面内のカーソルを消すかどうか
+	m_pMouse->SetCursorErase(bUse);
+}

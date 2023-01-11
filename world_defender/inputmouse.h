@@ -41,6 +41,8 @@ public:
 	D3DXVECTOR3 GetMouseCursor(void);		// マウスカーソルのスクリーン座標の取得
 	int GetMouseWheel(void);				// マウスのホイールの動き処理
 	D3DXVECTOR3 GetMouseMove(void);			// マウスの移動量を出力処理
+	void MouseCursorErase();				// マウスが指定のスクリーン内にする場合カーソルを消す
+	void SetCursorErase(bool bUse) { m_bCursorErase = bUse; } //画面内の時カーソルを消すかどうか
 
 private:
 	LPDIRECTINPUTDEVICE8 m_pDevMouse;				//入力でパスへのポインタ
@@ -49,6 +51,9 @@ private:
 	DIMOUSESTATE2 m_aKeyStateRelease;				//マウスのトリガー処理
 	POINT m_Pos;									//マウスのカーソル用
 	HWND m_hWnd;									//ウィンドウハンドル
+	bool m_bCursorErase;							//カーソルを消すかどうか
+	float m_fWidthWnd;								//ウィンドウの横幅
+	float m_fHeightWnd;								//ウィンドウの高さ
 
 };
 #endif

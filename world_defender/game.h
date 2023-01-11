@@ -22,6 +22,7 @@ class CMeshfield;
 class CPlayer;
 class CEnemy;
 class CBallast_Manager;
+class CMesh_Cylinder;
 
 //*****************************************************************************
 // ƒNƒ‰ƒX’è‹`
@@ -54,6 +55,7 @@ private:
 	CPlayer* m_pPlayer;
 	CEnemy* m_pEnmey;
 	CBallast_Manager* m_pBallastManager;
+	CMesh_Cylinder* m_pMesh_Cylinder;
 };
 
 #endif

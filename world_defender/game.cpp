@@ -23,6 +23,7 @@
 #include "read.h"
 #include "ballast_manager.h"
 #include <assert.h>
+#include "mesh_cylinder.h"
 
 //*****************************************************************************
 // コンストラクタ
@@ -75,6 +76,35 @@ HRESULT CGame::Init()
 
 	//BG3D
 	m_pMeshfieldBG = cRead.ReadMap("data/MAPTXT/map.txt");
+
+	m_pMesh_Cylinder = new CMesh_Cylinder;
+	if (FAILED(m_pMesh_Cylinder->Init()))
+	{
+		return -1;
+	}
+
+	Mesh_Cylinder_Structure Mesh_Cylinder_Structure;
+
+	Mesh_Cylinder_Structure.fRadius = 30000.0f;
+	Mesh_Cylinder_Structure.fSizeYTop = 100000.0f;
+	Mesh_Cylinder_Structure.nPolygonX = 30;
+	Mesh_Cylinder_Structure.nPolygonY = 1;
+	Mesh_Cylinder_Structure.nTextureNum = 0;
+	Mesh_Cylinder_Structure.ParentPos = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	Mesh_Cylinder_Structure.ColorMax = D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f);
+	Mesh_Cylinder_Structure.ColorLowest = D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f);
+
+	m_pMesh_Cylinder->SetMesh_Cylinder(Mesh_Cylinder_Structure);
+
+
+
+	//入力デバイスの取得
+	CInput *pInput = CInput::GetKey();
+
+	//画面内のカーソルを消す
+	pInput->SetCursorErase(true);
+
+
 	return S_OK;
 }
 
@@ -129,6 +159,13 @@ void CGame::Uninit()
 		m_pEnmey = nullptr;
 	}
 
+	if (m_pMesh_Cylinder != nullptr)
+	{
+		m_pMesh_Cylinder->Uninit();
+		delete m_pMesh_Cylinder;
+		m_pMesh_Cylinder = nullptr;
+	}
+
 	C3DObject::UninitAllModel();
 
 	CMotionParts::ALLUninit();
@@ -139,6 +176,7 @@ void CGame::Uninit()
 //*****************************************************************************
 void CGame::Update()
 {
+	m_pMesh_Cylinder->Update(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	m_pCamera->Update();
 	m_pEnmey->Update();
 	m_pPlayer->Update();
@@ -215,6 +253,8 @@ void CGame::Update()
 
 	if (pInput->Trigger(KEY_DECISION) || m_pEnmey->CheckLife())
 	{
+		//画面内のカーソルの復活
+		pInput->SetCursorErase(false);
 		CManager * pManager = GetManager();
 		pManager->NextMode(TYPE_RESULT);
 	}
@@ -228,6 +268,8 @@ void CGame::Draw()
 	//カメラ
 	m_pCamera->SetCamera();
 
+	m_pMesh_Cylinder->Draw();
+
 	m_pMeshfieldBG->Draw();
 
 	CMotionParts::ALLDraw();
@@ -235,6 +277,8 @@ void CGame::Draw()
 	m_pBallastManager->Draw();
 
 	m_pPlayer->Draw();
+
+	
 
 }
 

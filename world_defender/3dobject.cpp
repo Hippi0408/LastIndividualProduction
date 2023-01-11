@@ -11,6 +11,11 @@
 #include "3dobject.h"
 #include "manager.h"
 #include "object_type_list.h"
+#include <assert.h>
+
+#ifdef _DEBUG
+#include "line.h"
+#endif // _DEBUG
 
 C3DObject::ModelPattern C3DObject::m_ModelPattern[MODEL_PATTERN_MAX] = {};
 //*****************************************************************************
@@ -38,6 +43,10 @@ HRESULT C3DObject::Init()
 	ZeroMemory(&m_Model, sizeof(m_Model));
 	m_fSize = 1.0f;
 
+#ifdef _DEBUG
+	m_pLine = nullptr;
+#endif // _DEBUG
+
 	return S_OK;
 }
 
@@ -57,6 +66,14 @@ void C3DObject::Uninit()
 		delete[] m_Model.pNormalPolygon;
 		m_Model.pNormalPolygon = nullptr;
 	}
+
+#ifdef _DEBUG
+	if (m_pLine != nullptr)
+	{
+		delete m_pLine;
+		m_pLine = nullptr;
+	}
+#endif // _DEBUG
 
 }
 
@@ -181,6 +198,15 @@ void C3DObject::Draw()
 		UpdateNormal();
 	}
 	
+#ifdef _DEBUG
+
+	//ラインのワールドマトリックスの設定
+	m_pLine->SetMtxWorld(m_Model.mtxWorld);
+
+	//ラインの描画
+	m_pLine->Draw();
+
+#endif // _DEBUG]
 
 }
 
@@ -250,8 +276,22 @@ void C3DObject::Set3DObject(int nPattn, D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	//頂点アンロック
 	m_ModelPattern[m_Model.nPattn].pMeshModel->UnlockVertexBuffer();
 
-	//法線の設定
-	//SetNormal();
+#ifdef _DEBUG
+
+	//ラインを生成
+	m_pLine = new CLine;
+
+	//初期化
+	if (m_pLine->Init())
+	{
+		assert(false);
+	}
+
+	//ラインの情報の設定
+	m_pLine->SetLine(m_Model.posParent, m_Model.vtxMax, m_Model.vtxMin, D3DXCOLOR(1.0f,0.0f,0.0f,1.0f));
+
+#endif // _DEBUG]
+
 }
 
 //*****************************************************************************
@@ -401,7 +441,6 @@ void C3DObject::SetNormal()
 
 	//インデックスバッファのアンロック
 	m_ModelPattern[m_Model.nPattn].pMeshModel->UnlockIndexBuffer();
-
 }
 
 //*****************************************************************************

@@ -49,7 +49,7 @@ private:
 	D3DXVECTOR3 m_DestRotLowerBody;
 	CPsychokinesis_Area* m_pPsychokinesis_Area;
 	CPsychokinesis* m_pPsychokinesis;
-
+	int m_nMapGrid;//マップ上の位置
 };
 
 #endif

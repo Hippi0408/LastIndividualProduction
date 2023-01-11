@@ -93,7 +93,7 @@ void CCamera::SetCamera()
 		D3DXToRadian(45.0f),//視野角
 		(float)SCREEN_WIDTH / (float)SCREEN_HEIGHT,//アスペクト比
 		10.0f,//どこからどこまでカメラで表示するか
-		50000.0f);
+		60000.0f);
 
 	//プロジェクションマトリックスの設定
 	pD3DDevice->SetTransform(D3DTS_PROJECTION, &m_mtxProjection);

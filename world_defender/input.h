@@ -60,9 +60,11 @@ public:
 	D3DXVECTOR3 GetMouseCursor(void);		// マウスカーソルのスクリーン座標の取得
 	int GetMouseWheel(void);				// マウスのホイールの動き処理
 	D3DXVECTOR3 GetMouseMove(void);			// マウスの移動量を出力処理
+	void SetCursorErase(bool bUse);			// 画面内のカーソルを消すかどうか
 
 	InputType GetOldInputType() { return m_nOldInputType; }		//最後に触ったデバイス
-																//*
+																
+
 
 private:
 

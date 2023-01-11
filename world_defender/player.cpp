@@ -42,6 +42,8 @@ CPlayer::~CPlayer()
 //*****************************************************************************
 HRESULT CPlayer::Init()
 {
+	m_nMapGrid = 0;
+
 	SetLife(INIT_LIFE);
 
 	SetPos(INIT_POS);
@@ -205,6 +207,9 @@ void CPlayer::Update()
 
 	//現在のプレイヤーの位置
 	pos = GetPos();
+
+	//マップ上のどこに居るか
+	m_nMapGrid = pGame->GetMeshfield()->CheckPosLocation(pos);
 
 	//プレイヤーがいる床の高さ
 	groundpos = pGame->GetMeshfield()->Collision(pos);
