@@ -60,6 +60,9 @@ public:
 
 	D3DXVECTOR3 Collision(D3DXVECTOR3 pos);
 
+	int GetMeshX() { return m_MeshfieldData.nMeshX; }
+	int GetMeshZ() { return m_MeshfieldData.nMeshZ; }
+
 	int GetMeshfieldNumMax() { return m_nMeshfieldNumMax; }
 
 private:

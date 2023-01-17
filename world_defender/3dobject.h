@@ -98,6 +98,7 @@ public:
 	D3DXVECTOR3 GetWorlMatrixRot();
 	D3DXVECTOR3 GetWorldRot();
 	D3DXMATRIX GetMatrix() { return m_Model.mtxWorld; }
+	D3DXMATRIX GetMatrixRot() { return m_Model.mtxWorldRot; }
 	void SetMatrix(D3DXMATRIX mtx) { m_Model.mtxWorld = mtx; }
 	D3DXVECTOR3 GetSize();
 	void SetModelPattnNum(int nPattnNum) { m_Model.nPattn = nPattnNum; }

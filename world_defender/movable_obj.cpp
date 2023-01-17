@@ -56,7 +56,11 @@ void CMovable_Obj::Update()
 	//Posの更新
 	m_Pos += m_Move;
 	//移動量に完成の追加
-	m_Move += (D3DXVECTOR3(0.0f, 0.0f, 0.0f) - m_Move) * GetMoveInertia();
+	m_Move.x += (0.0f - m_Move.x) * GetMoveInertia();
+	m_Move.z += (0.0f - m_Move.z) * GetMoveInertia();
+	m_Move.y += (0.0f - m_Move.y) * GetJumpMoveInertia();
+
+
 	//移動ベクトルの更新
 	m_MoveVec = m_Pos - m_OldPos;
 	//ベクトルのノーマライズ

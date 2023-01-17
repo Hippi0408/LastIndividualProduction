@@ -61,6 +61,9 @@ public:
 	bool CheckLife(int nLife = 0, bool b = false);
 	//Šµ«‚ÌGet
 	virtual float GetMoveInertia() = 0;
+
+	//ƒWƒƒƒ“ƒvŠµ«‚ÌGet
+	virtual float GetJumpMoveInertia() = 0;
 private:
 	
 	D3DXVECTOR3 m_Pos;			//ˆÊ’u

@@ -20,9 +20,19 @@
 #include "psychokinesis_area.h"
 #include "object_type_list.h"
 #include "psychokinesis.h"
+#include "ballast_manager.h"
 
-const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f); 
+const float CPlayer::PLAYER_GRAVITY = 2.0f;
+const float CPlayer::MOVE_NORMAL = 5.0f;
+const float CPlayer::MOVE_BACK = MOVE_NORMAL * 0.6;
+const float CPlayer::MOVE_DASH = MOVE_NORMAL * 2.0f;
 const float CPlayer::MOVE_INERTIA = 0.1f;
+const float CPlayer::JUMP_INERTIA = 0.01f;
+const float CPlayer::JUMP_POWER = 60.0f;
+const D3DXVECTOR3 CPlayer::PLAYER_SIZE_MAX = D3DXVECTOR3(15.0f, 100.0f, 15.0f);
+const D3DXVECTOR3 CPlayer::PLAYER_SIZE_MIN = D3DXVECTOR3(-15.0f, 0.0f, -15.0f);
+
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
@@ -54,9 +64,13 @@ HRESULT CPlayer::Init()
 
 	SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
+	m_CameraVec = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
 	m_RotLowerBody = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	m_DestRotLowerBody = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	m_bJump = false;
 
 	CRead cRead;
 
@@ -121,9 +135,60 @@ void CPlayer::Uninit()
 //*****************************************************************************
 void CPlayer::Update()
 {
+	//入力デバイスの取得
+	CInput *pInput = CInput::GetKey();
+
 	//親クラスの更新
 	CMovable_Obj::Update();
 
+	
+	//移動の処理の更新
+	Move();
+	
+
+	// 当たり判定系処理
+	Collision();
+
+	
+	// モーション処理
+	Motion();
+	
+
+
+	
+
+
+	
+	//現在のプレイヤーの位置の取得
+	D3DXVECTOR3 pos = GetPos();
+
+	//サイコキネシスエリアの更新（Posあり）
+	m_pPsychokinesis_Area->Update(pos);
+
+	//サイコキネシスの更新
+	m_pPsychokinesis->Update(pos, GetRot(), m_CameraVec, m_pPsychokinesis_Area->GetRadius(), m_pPsychokinesis_Area->GetSizeTop());
+
+	//現在は使われていない（影の判定）
+	/*if (groundpos != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
+	{
+	CMotionParts::AllSetShadowPos(groundpos, GetMotionNum());
+	}*/
+}
+
+//*****************************************************************************
+// 描画処理
+//*****************************************************************************
+void CPlayer::Draw()
+{
+	//サイコキネシスエリアの描画
+	m_pPsychokinesis_Area->Draw();
+}
+
+//*****************************************************************************
+// 移動処理
+//*****************************************************************************
+void CPlayer::Move()
+{
 	//入力デバイスの取得
 	CInput *pInput = CInput::GetKey();
 
@@ -131,85 +196,115 @@ void CPlayer::Update()
 	CManager *pManager = GetManager();
 	CGame* pGame = (CGame*)pManager->GetGameObject();
 
+	//カメラの情報
 	CTpsCamera* pTpsCamera = (CTpsCamera*)pGame->GetCamera();
+
+	//カメラのベクトルの保存
+	m_CameraVec = pTpsCamera->GetCameraVec();
 
 	//カメラの向き（Y軸のみ）
 	float rotY = pTpsCamera->GetRot();
 
 	//移動量の一時保管
-	D3DXVECTOR3 move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	D3DXVECTOR3 move = GetMove();
+
+	//Move倍率
+	float fMove = MOVE_NORMAL;
+
+	if (pInput->Press(DIK_S))
+	{
+		fMove = MOVE_BACK;
+	}
+	else if (pInput->Press(DIK_LSHIFT))
+	{
+		fMove = MOVE_DASH;
+	}
+
 
 	//視点移動
 	if (pInput->Press(DIK_W))
 	{//上キーが押された
 		if (pInput->Press(DIK_A))
 		{
-			move.x -= sinf(rotY + D3DX_PI * 0.75f) * 5.0f;
-			move.z -= cosf(rotY + D3DX_PI * 0.75f) * 5.0f;
+			move.x = -sinf(rotY + D3DX_PI * 0.75f) * fMove;
+			move.z = -cosf(rotY + D3DX_PI * 0.75f) * fMove;
 		}
 		else if (pInput->Press(DIK_D))
 		{
-			move.x -= sinf(rotY + D3DX_PI * -0.75f) * 5.0f;
-			move.z -= cosf(rotY + D3DX_PI * -0.75f) * 5.0f;
+			move.x = -sinf(rotY + D3DX_PI * -0.75f) * fMove;
+			move.z = -cosf(rotY + D3DX_PI * -0.75f) * fMove;
 		}
 		else
 		{
-			move.x += sinf(rotY) * 5.0f;
-			move.z += cosf(rotY) * 5.0f;
+			move.x = sinf(rotY) * fMove;
+			move.z = cosf(rotY) * fMove;
 		}
 	}
 	else if (pInput->Press(DIK_S))
 	{//下キーが押された
 		if (pInput->Press(DIK_A))
 		{
-			move.x -= sinf(rotY + D3DX_PI * 0.25f) * 5.0f;
-			move.z -= cosf(rotY + D3DX_PI * 0.25f) * 5.0f;
+			move.x = -sinf(rotY + D3DX_PI * 0.25f) * fMove;
+			move.z = -cosf(rotY + D3DX_PI * 0.25f) * fMove;
 		}
 		else if (pInput->Press(DIK_D))
 		{
-			move.x -= sinf(rotY + D3DX_PI * -0.25f) * 5.0f;
-			move.z -= cosf(rotY + D3DX_PI * -0.25f) * 5.0f;
+			move.x = -sinf(rotY + D3DX_PI * -0.25f) * fMove;
+			move.z = -cosf(rotY + D3DX_PI * -0.25f) * fMove;
 		}
 		else
 		{
-			move.x += sinf(rotY + D3DX_PI) * 5.0f;
-			move.z += cosf(rotY + D3DX_PI) * 5.0f;
+			move.x = sinf(rotY + D3DX_PI) * fMove;
+			move.z = cosf(rotY + D3DX_PI) * fMove;
 		}
 	}
 	else if (pInput->Press(DIK_A))
 	{//左キーが押された
-		move.x += sinf(rotY + D3DX_PI * -0.5f) * 5.0f;
-		move.z += cosf(rotY + D3DX_PI * -0.5f) * 5.0f;
+		move.x = sinf(rotY + D3DX_PI * -0.5f) * fMove;
+		move.z = cosf(rotY + D3DX_PI * -0.5f) * fMove;
 	}
 	else if (pInput->Press(DIK_D))
 	{//右キーが押された
-		move.x += sinf(rotY + D3DX_PI * 0.5f) * 5.0f;
-		move.z += cosf(rotY + D3DX_PI * 0.5f) * 5.0f;
+		move.x = sinf(rotY + D3DX_PI * 0.5f) * fMove;
+		move.z = cosf(rotY + D3DX_PI * 0.5f) * fMove;
 	}
 
-	//移動量に変更があった場合移動を保管
-	if (move != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
+	//ジャンプ
+	if (pInput->Trigger(DIK_SPACE) && !m_bJump)
 	{
-		if (pInput->Press(DIK_S))
-		{
-			move *= 0.6f;
-		}
-		else if (pInput->Press(DIK_LSHIFT))
-		{
-			move *= 2.0f;
-		}
-
-		SetMove(move);
+		m_bJump = true;
+		move.y += JUMP_POWER;
 	}
+	else if (m_bJump)
+	{
+		move.y -= PLAYER_GRAVITY;
+	}
+	
 
-	//床との当たり判定用変数
-	D3DXVECTOR3 pos, groundpos;
+	//移動量を保管
+	SetMove(move);
+
+	
+}
+
+//*****************************************************************************
+// 当たり判定系処理
+//*****************************************************************************
+void CPlayer::Collision()
+{
+	//マネージャーからゲームオブジェクトの取得
+	CManager *pManager = GetManager();
+	CGame* pGame = (CGame*)pManager->GetGameObject();
 
 	//現在のプレイヤーの位置
-	pos = GetPos();
+	D3DXVECTOR3 pos = GetPos();
+	
+	//-------------------------------------------------------
+	// 床当たり判定
+	//-------------------------------------------------------
 
-	//マップ上のどこに居るか
-	m_nMapGrid = pGame->GetMeshfield()->CheckPosLocation(pos);
+	//床との当たり判定用変数
+	D3DXVECTOR3 groundpos;
 
 	//プレイヤーがいる床の高さ
 	groundpos = pGame->GetMeshfield()->Collision(pos);
@@ -217,11 +312,13 @@ void CPlayer::Update()
 	//プレイヤーがいる床の高さがプレイヤーより上だったら
 	if (pos.y < groundpos.y)
 	{
-		if (groundpos != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
-		{
-			pos = groundpos;
-			SetPos(groundpos);
-		}
+		m_bJump = false;
+		pos = D3DXVECTOR3(pos.x, groundpos.y, pos.z);
+		SetPos(pos);
+
+		D3DXVECTOR3 move = GetMove();
+		SetMove(D3DXVECTOR3(move.x, 0.0f, move.z));
+
 	}
 
 	//プレイヤーが既定の高さより下だったら
@@ -231,17 +328,74 @@ void CPlayer::Update()
 		SetPos(pos);
 	}
 
+
+	//-------------------------------------------------------
+	// 瓦礫との当たり判定
+	//-------------------------------------------------------
+
+
+	//マップ上のどこに居るか
+	m_nMapGrid = pGame->GetMeshfield()->CheckPosLocation(pos);
+
+	//マップの奥行にメッシュ数
+	int nDepthGrid = pGame->GetMeshfield()->GetMeshZ();
+
+	//当たり判定をチェックするメッシュ
+	int aMapGrid[CHECK_RANGE];
+
+	//プレイヤーのいるメッシュ
+	int nPlMapGrid = m_nMapGrid - nDepthGrid;
+
+	//プレイヤーのいるメッシュから周り８箇所の割り出し
+	for (int nCnt = 0; nCnt < CHECK_RANGE_X; nCnt++)
+	{
+		aMapGrid[nCnt * CHECK_RANGE_X] = nPlMapGrid + nDepthGrid * nCnt - 1;
+		aMapGrid[nCnt * CHECK_RANGE_X + 1] = nPlMapGrid + nDepthGrid * nCnt;
+		aMapGrid[nCnt * CHECK_RANGE_X + 2] = nPlMapGrid + nDepthGrid * nCnt + 1;
+	}
+
+	//瓦礫との当たり判定
+	D3DXVECTOR3 Add = GetPos();
+
+	//指定範囲の瓦礫の当たり判定
+	for (int nCnt = 0; nCnt < CHECK_RANGE; nCnt++)
+	{
+		//瓦礫の当たり判定
+		Add = pGame->GetBallast_Manager()->CollisionBallast(aMapGrid[nCnt], GetPos(), GetOldPos(), PLAYER_SIZE_MAX, PLAYER_SIZE_MIN);
+
+		if (Add != GetPos())
+		{
+			break;
+		}
+
+	}
+
+	//瓦礫との当たり判定
+	SetPos(Add);
+
+}
+
+//*****************************************************************************
+// モーション処理
+//*****************************************************************************
+void CPlayer::Motion()
+{
+	//入力デバイスの取得
+	CInput *pInput = CInput::GetKey();
+
+	//マネージャーからカメラの取得
+	CManager *pManager = GetManager();
+	CGame* pGame = (CGame*)pManager->GetGameObject();
+	CTpsCamera* pTpsCamera = (CTpsCamera*)pGame->GetCamera();
+
+	//カメラの向き（Y軸のみ）
+	float rotY = pTpsCamera->GetRot();
+
 	//プレイヤーをカメラの見てる方向にする
 	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, rotY + D3DX_PI, 0.0f);
 
 	//Rotの保管
 	SetRot(rot);
-
-	//現在は使われていない（影の判定）
-	/*if (groundpos != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
-	{
-		CMotionParts::AllSetShadowPos(groundpos, GetMotionNum());
-	}*/
 
 	//現在のプレイヤーの位置
 	D3DXVECTOR3 PLpos = GetPos();
@@ -250,9 +404,15 @@ void CPlayer::Update()
 	int nMotionNumUp = 0;
 	int nMotionNumDown = 0;
 
-	//プレイヤーが動いていたら
-	if (pInput->Press(KEY_MOVE))
+	
+	if (m_bJump)
 	{
+		//ジャンプ中用のモーション番号
+		nMotionNumUp = 6;
+		nMotionNumDown = nMotionNumUp;
+	}
+	else if (pInput->Press(KEY_MOVE))
+	{//プレイヤーが動いていたら
 		if (pInput->Press(KEY_DOWN))
 		{
 			//後ろ歩き用のモーション番号
@@ -284,46 +444,8 @@ void CPlayer::Update()
 	}
 
 
-
-
 	//下半身のモーション設定
 	CMotionParts::MoveMotionModel(GetMotionNum(), nMotionNumUp, &PLpos, &rot);
 	//上半身のモーション設定
 	CMotionParts::MoveMotionModel(m_nMotionNum1, nMotionNumDown);
-
-
-
-
-
-
-	if (pInput->Press(DIK_0))
-	{
-		nMotionNumUp = 4;
-		nMotionNumDown = 4;
-		//下半身のモーション設定
-		CMotionParts::MoveMotionModel(GetMotionNum(), nMotionNumUp, &PLpos, &rot);
-		//上半身のモーション設定
-		CMotionParts::MoveMotionModel(m_nMotionNum1, nMotionNumDown);
-	}
-
-
-	//現在のプレイヤーの位置の取得
-	PLpos = GetPos();
-
-	//PLpos.y += 1.0f;
-
-	//サイコキネシスエリアの更新（Posあり）
-	m_pPsychokinesis_Area->Update(PLpos);
-
-	//サイコキネシスの更新
-	m_pPsychokinesis->Update(PLpos, rot, pTpsCamera->GetCameraVec(), m_pPsychokinesis_Area->GetRadius(), m_pPsychokinesis_Area->GetSizeTop());
-}
-
-//*****************************************************************************
-// 描画処理
-//*****************************************************************************
-void CPlayer::Draw()
-{
-	//サイコキネシスエリアの描画
-	m_pPsychokinesis_Area->Draw();
 }

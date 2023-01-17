@@ -17,6 +17,7 @@
 #include "convenience_function.h"
 
 const float CBallast_Manager::MAP_MAX = 15000.0f;
+const D3DXVECTOR3 CBallast_Manager::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
@@ -170,6 +171,9 @@ void CBallast_Manager::SetBallast(int nNumber, Object_Data Data)
 	//使用するモデル番号、瓦礫の位置、瓦礫の向き
 	pBallast->Set3DObject(Data.nPattn, Data.pos, Data.rot);
 
+	//親位置の変更
+	//pBallast->SetParentPos(Data.pos);
+
 	//法線設定
 	pBallast->SetNormal();
 
@@ -232,5 +236,52 @@ CBallast * CBallast_Manager::CheckCircleCollision(D3DXVECTOR3 pos, float fRadius
 	}
 
 	return nullptr;
+}
+
+//*****************************************************************************
+//障害物の当たり判定
+//*****************************************************************************
+D3DXVECTOR3 CBallast_Manager::CollisionBallast(int nMapGrid, D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, D3DXVECTOR3 max, D3DXVECTOR3 min)
+{
+	D3DXVECTOR3 Add = pos;
+
+	//イテレーターループ
+	for (auto itr = m_BallastMapData[nMapGrid].begin(); itr != m_BallastMapData[nMapGrid].end(); itr++)
+	{
+		//変数宣言
+		D3DXVECTOR3 Extrusion = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+		//イテレーターから瓦礫のポインタの代入
+		CBallast* pBallast = *itr;
+
+		//瓦礫NULLチェック
+		if (pBallast == nullptr)
+		{
+			assert(false);
+		}
+
+		//浮遊状態かどうか
+		if (pBallast->GetFloating())
+		{
+			continue;
+		}
+
+		//押し出し判定
+		Extrusion = pBallast->ConclusionCollision(pos, oldpos, max, min);
+
+		//押し出しがあったかどうか
+		if (Extrusion != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
+		{
+			//押し出し変数に入れる
+			Add = Extrusion;
+
+			//for文を抜ける
+			break;
+		}
+
+	}
+
+	//押し出す値を返す
+	return Add;
 }
 

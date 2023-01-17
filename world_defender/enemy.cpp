@@ -18,8 +18,9 @@
 #include "object_type_list.h"
 #include "convenience_function.h"
 
-const D3DXVECTOR3 CEnemy::INIT_POS = D3DXVECTOR3(1000.0f, 0.0f, -0.0f);
+const D3DXVECTOR3 CEnemy::INIT_POS = D3DXVECTOR3(1000.0f, 0.0f, -0.0f); 
 const float CEnemy::MOVE_INERTIA = 0.1f;
+const float CEnemy::JUMP_INERTIA = 0.1f;
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************

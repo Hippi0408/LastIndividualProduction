@@ -23,7 +23,8 @@
 class CBallast : public C3DObject
 {
 private:
-	
+	static const int SURFACE_MAX = 6;
+	static const int TOP_MAX = 4;
 	
 public:
 	CBallast();
@@ -61,6 +62,11 @@ public:
 
 	//å¸Ç´ÇÃMove
 	void SetMoveRot(D3DXVECTOR3 MoveRot) { m_MoveRot = MoveRot; }
+
+	//ìñÇΩÇËîªíË(Ç‹Ç∆Çﬂ)
+	D3DXVECTOR3 ConclusionCollision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, D3DXVECTOR3 max, D3DXVECTOR3 min);
+	//ìñÇΩÇËîªíË(âüÇµèoÇµîªíË)
+	D3DXVECTOR3 ExtrusionCollision(D3DXVECTOR3& rPos ,D3DXVECTOR3& rPosMax, D3DXVECTOR3& rPosMin, D3DXVECTOR3& rOldPosMax, D3DXVECTOR3& rOldPosMin);
 
 private:
 	D3DXVECTOR3 m_PositionWithPlayer;

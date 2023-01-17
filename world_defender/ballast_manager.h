@@ -29,6 +29,7 @@ class CBallast_Manager : public CObject
 {
 private:
 	static const float MAP_MAX;
+	static const D3DXVECTOR3 INIT_POS;
 public:
 	CBallast_Manager();
 	~CBallast_Manager() override;
@@ -50,6 +51,9 @@ public:
 
 	//サイコキネシスエリアにあったらそのオブジェクトのポインタを返す
 	CBallast* CheckCircleCollision(D3DXVECTOR3 pos, float fRadius);
+
+	//障害物の当たり判定
+	D3DXVECTOR3 CollisionBallast(int nMapGrid, D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, D3DXVECTOR3 max, D3DXVECTOR3 min);
 
 private:
 	std::map<int, std::list<CBallast*>> m_BallastMapData;		//マップ上のオブジェクトをリストで管理する変数
