@@ -142,12 +142,14 @@ void CPlayer::Update()
 	CMovable_Obj::Update();
 
 	
+	// 当たり判定系処理
+	Collision();
+
 	//移動の処理の更新
 	Move();
 	
 
-	// 当たり判定系処理
-	Collision();
+	
 
 	
 	// モーション処理
@@ -166,7 +168,7 @@ void CPlayer::Update()
 	m_pPsychokinesis_Area->Update(pos);
 
 	//サイコキネシスの更新
-	m_pPsychokinesis->Update(pos, GetRot(), m_CameraVec, m_pPsychokinesis_Area->GetRadius(), m_pPsychokinesis_Area->GetSizeTop());
+	m_pPsychokinesis->Update(m_nMapGrid,pos, GetRot(), m_CameraVec, m_pPsychokinesis_Area->GetRadius(), m_pPsychokinesis_Area->GetSizeTop());
 
 	//現在は使われていない（影の判定）
 	/*if (groundpos != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
@@ -277,7 +279,7 @@ void CPlayer::Move()
 	}
 	else if (m_bJump)
 	{
-		move.y -= PLAYER_GRAVITY;
+		
 	}
 	
 
@@ -310,7 +312,7 @@ void CPlayer::Collision()
 	groundpos = pGame->GetMeshfield()->Collision(pos);
 
 	//プレイヤーがいる床の高さがプレイヤーより上だったら
-	if (pos.y < groundpos.y)
+	if (pos.y <= groundpos.y)
 	{
 		m_bJump = false;
 		pos = D3DXVECTOR3(pos.x, groundpos.y, pos.z);
@@ -319,6 +321,12 @@ void CPlayer::Collision()
 		D3DXVECTOR3 move = GetMove();
 		SetMove(D3DXVECTOR3(move.x, 0.0f, move.z));
 
+	}
+	else
+	{
+		D3DXVECTOR3 move = GetMove();
+		move.y -= PLAYER_GRAVITY;
+		SetMove(move);
 	}
 
 	//プレイヤーが既定の高さより下だったら
@@ -365,6 +373,9 @@ void CPlayer::Collision()
 
 		if (Add != GetPos())
 		{
+			m_bJump = false;
+			D3DXVECTOR3 move = GetMove();
+			SetMove(D3DXVECTOR3(move.x, 0.0f, move.z));
 			break;
 		}
 

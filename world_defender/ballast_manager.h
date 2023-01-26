@@ -52,6 +52,9 @@ public:
 	//サイコキネシスエリアにあったらそのオブジェクトのポインタを返す
 	CBallast* CheckCircleCollision(D3DXVECTOR3 pos, float fRadius);
 
+	//サイコキネシスエリアにあったらそのオブジェクトの色を変える
+	void WithinRangeColor(int nMapGrid, D3DXVECTOR3 pos, float fRadius);
+
 	//障害物の当たり判定
 	D3DXVECTOR3 CollisionBallast(int nMapGrid, D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, D3DXVECTOR3 max, D3DXVECTOR3 min);
 

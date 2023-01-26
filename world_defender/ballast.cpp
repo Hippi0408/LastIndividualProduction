@@ -9,7 +9,7 @@
 //インクルードファイル
 //-----------------------------------------------------------------------------
 #include "ballast.h"
-
+#include "convenience_function.h"
 
 //*****************************************************************************
 // コンストラクタ
@@ -75,6 +75,9 @@ void CBallast::Update()
 
 	//親位置の更新
 	AddParentPos(m_ParentPosMove);
+	
+	//親クラスの更新
+	C3DObject::Update();
 
 }
 
@@ -90,180 +93,165 @@ void CBallast::Draw()
 }
 
 //*****************************************************************************
-//	当たり判定(まとめ)
+//	当たり判定
 //*****************************************************************************
 D3DXVECTOR3 CBallast::ConclusionCollision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, D3DXVECTOR3 max, D3DXVECTOR3 min)
 {
 	//最終的な押し出し値
 	D3DXVECTOR3 Add = pos;
 
-	//対象のPos
-	D3DXVECTOR3 TargetPos = pos;
 	
 	//接触確認用変数
 	D3DXVECTOR3 HittingTargetPosMax[SURFACE_MAX], HittingTargetPosMin[SURFACE_MAX], HittingTargetOldPosMax[SURFACE_MAX], HittingTargetOldPosMin[SURFACE_MAX];
 
 	//モデルの位置
-	D3DXVECTOR3 ModelPos = GetPos();
+	D3DXVECTOR3 ModelPos = GetParentPos();
+	D3DXVECTOR3 ModelRot = GetRot();
 	D3DXVECTOR3 ModelMax = GetVtxMax();
 	D3DXVECTOR3 ModelMin = GetVtxMin();
 
-	if (!(pos.x + max.x >= ModelPos.x + ModelMin.x &&
-		pos.x + min.x <= ModelPos.x + ModelMax.x &&
-		pos.z + max.z >= ModelPos.z + ModelMin.z &&
-		pos.z + min.z <= ModelPos.z + ModelMax.z &&
-		pos.y + min.y <= ModelPos.y + ModelMax.y))
+	//マトリックス変換を掛ける
+	D3DXVECTOR3 MatrixConversionMax, MatrixConversionMin;
+
+	//代入
+	MatrixConversionMax = ModelPos + ModelMax;
+	MatrixConversionMin = ModelPos + ModelMin;
+
+	//自身の回転のマトリックス
+	D3DXMATRIX ThisMatrixRot = GetMatrix();
+
+	//当たり判定用の面の４頂点
+	D3DXVECTOR3 aTop[4];
+	D3DXVECTOR3 Top,Down;
+
+
+	Top = D3DXVECTOR3(0.0f, MatrixConversionMax.y, 0.0f);
+	Down = D3DXVECTOR3(0.0f, MatrixConversionMin.y, 0.0f);
+	
+	D3DXVec3TransformCoord(&Top, &Top, &ThisMatrixRot);
+	D3DXVec3TransformCoord(&Down, &Down, &ThisMatrixRot);
+
+	//*****************************************************************************
+	//上面
+	//*****************************************************************************
+
+	aTop[0] = D3DXVECTOR3(MatrixConversionMin.x, MatrixConversionMax.y, MatrixConversionMin.z);
+	aTop[1] = D3DXVECTOR3(MatrixConversionMin.x, MatrixConversionMax.y, MatrixConversionMax.z);
+	aTop[2] = D3DXVECTOR3(MatrixConversionMax.x, MatrixConversionMax.y, MatrixConversionMax.z);
+	aTop[3] = D3DXVECTOR3(MatrixConversionMax.x, MatrixConversionMax.y, MatrixConversionMin.z);
+
+	D3DXVec3TransformCoord(&aTop[0], &aTop[0], &ThisMatrixRot);
+	D3DXVec3TransformCoord(&aTop[1], &aTop[1], &ThisMatrixRot);
+	D3DXVec3TransformCoord(&aTop[2], &aTop[2], &ThisMatrixRot);
+	D3DXVec3TransformCoord(&aTop[3], &aTop[3], &ThisMatrixRot);
+
+	if (!CConvenience_Function::InnerProductCollisionBase(aTop, D3DXVECTOR3(pos.x, pos.y, pos.z)))
 	{
 		//押し出す値を返す
-		return Add;
+		return D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	}
+
+	if (!(pos.y > Down.y
+		&& pos.y < Top.y))
+	{
+		//押し出す値を返す
+		return D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	}
 
 
+	D3DXVECTOR3 TopPos;
 
-	
-	//側面(9時方向からの侵入)
-	if (pos.x + max.x > ModelPos.x + ModelMin.x &&
-		oldpos.x + max.x <= ModelPos.x + ModelMin.x)
+	//瓦礫の上面用のPos
+	D3DXVECTOR3 BallstTop;
+
+
+	//側面
+
+	//移動ベクトル
+	D3DXVECTOR3 Vec = pos - oldpos;
+
+	D3DXVECTOR3 vec1, vec2;
+	float fInnerProductPos, fInnerProductOldPos;
+
+	for (int nCnt = 0; nCnt < 4; nCnt++)
 	{
-		Add.x = (ModelPos.x + ModelMin.x - max.x);
-	}
+		//指定の辺の中にいるかどうか
+		vec1 = aTop[(nCnt + 1) % 4] - aTop[nCnt];
+		vec2 = pos - aTop[nCnt];
 
-	//側面(3時方向からの侵入)
-	if (pos.x + min.x < ModelPos.x + ModelMax.x &&
-		oldpos.x + min.x >= ModelPos.x + ModelMax.x)
-	{
-		Add.x = (ModelPos.x + ModelMax.x - min.x);
-	}
+		fInnerProductPos = vec1.x * vec2.z - vec1.z * vec2.x;
 
-	//側面(6時方向からの侵入)
-	if (pos.z + max.z > ModelPos.z + ModelMin.z &&
-		oldpos.z + max.z <= ModelPos.z + ModelMin.z)
-	{
-		Add.z = (ModelPos.z + ModelMin.z - max.z);
-	}
+		vec1 = aTop[(nCnt + 1) % 4] - aTop[nCnt];
+		vec2 = oldpos - aTop[nCnt];
 
-	//側面(12時方向からの侵入)
-	if (pos.z + min.z < ModelPos.z + ModelMax.z &&
-		oldpos.z + min.z >= ModelPos.z + ModelMax.z)
-	{
-		Add.z = (ModelPos.z + ModelMax.z - min.z);
-	}
+		fInnerProductOldPos = vec1.x * vec2.z - vec1.z * vec2.x;
 
-
-	////下面
-	//if (pos.y + max.y > ModelPos.y + ModelMin.y &&
-	//	oldpos.y + max.y <= ModelPos.y + ModelMin.y)
-	//{
-	//	Add.y = (ModelPos.y + ModelMin.y) - (pos.y + max.y);
-	//}
-
-	//上面
-	if (pos.y + min.y < ModelPos.y + ModelMax.y &&
-		oldpos.y + min.y >= ModelPos.y + ModelMax.y)
-	{
-		Add.y = (ModelPos.y + ModelMax.y - min.y);
-	}
-
-	if (Add != D3DXVECTOR3(0.0f,0.0f,0.0f))
-	{
-		//D3DXVec3TransformCoord(&Add, &Add, &GetMatrixRot());
-	}
-
-	//押し出す値を返す
-	return Add;
-
-
-	//上面
-	HittingTargetPosMax[0] = D3DXVECTOR3(pos.x + max.x, pos.y + max.y, pos.z + max.z);
-	HittingTargetPosMin[0] = D3DXVECTOR3(pos.x + min.x, pos.y + max.y, pos.z + min.z);
-	HittingTargetOldPosMax[0] = D3DXVECTOR3(oldpos.x + max.x, oldpos.y + max.y, oldpos.z + max.z);
-	HittingTargetOldPosMin[0] = D3DXVECTOR3(oldpos.x + min.x, oldpos.y + max.y, oldpos.z + min.z);
-
-	//底面
-	HittingTargetPosMax[1] = D3DXVECTOR3(pos.x + max.x, pos.y + min.y, pos.z + max.z);
-	HittingTargetPosMin[1] = D3DXVECTOR3(pos.x + min.x, pos.y + min.y, pos.z + min.z);
-	HittingTargetOldPosMax[1] = D3DXVECTOR3(oldpos.x + max.x, oldpos.y + min.y, oldpos.z + max.z);
-	HittingTargetOldPosMin[1] = D3DXVECTOR3(oldpos.x + min.x, oldpos.y + min.y, oldpos.z + min.z);
-
-	//側面(４面)
-	HittingTargetPosMax[2] = D3DXVECTOR3(pos.x + max.x, pos.y + max.y, pos.z + max.z);
-	HittingTargetPosMin[2] = D3DXVECTOR3(pos.x + max.x, pos.y + min.y, pos.z + min.z);
-	HittingTargetOldPosMax[2] = D3DXVECTOR3(oldpos.x + max.x, oldpos.y + max.y, oldpos.z + max.z);
-	HittingTargetOldPosMin[2] = D3DXVECTOR3(oldpos.x + max.x, oldpos.y + min.y, oldpos.z + min.z);
-
-	HittingTargetPosMax[3] = D3DXVECTOR3(pos.x + min.x, pos.y + max.y, pos.z + min.z);
-	HittingTargetPosMin[3] = D3DXVECTOR3(pos.x + min.x, pos.y + min.y, pos.z + max.z);
-	HittingTargetOldPosMax[3] = D3DXVECTOR3(oldpos.x + min.x, oldpos.y + max.y, oldpos.z + min.z);
-	HittingTargetOldPosMin[3] = D3DXVECTOR3(oldpos.x + min.x, oldpos.y + min.y, oldpos.z + max.z);
-
-	HittingTargetPosMax[4] = D3DXVECTOR3(pos.x + max.x, pos.y + max.y, pos.z + max.z);
-	HittingTargetPosMin[4] = D3DXVECTOR3(pos.x + min.x, pos.y + min.y, pos.z + max.z);
-	HittingTargetOldPosMax[4] = D3DXVECTOR3(oldpos.x + max.x, oldpos.y + max.y, oldpos.z + max.z);
-	HittingTargetOldPosMin[4] = D3DXVECTOR3(oldpos.x + min.x, oldpos.y + min.y, oldpos.z + max.z);
-
-	HittingTargetPosMax[5] = D3DXVECTOR3(pos.x + max.x, pos.y + max.y, pos.z + min.z);
-	HittingTargetPosMin[5] = D3DXVECTOR3(pos.x + max.x, pos.y + max.y, pos.z + min.z);
-	HittingTargetOldPosMax[5] = D3DXVECTOR3(oldpos.x + max.x, oldpos.y + max.y, oldpos.z + min.z);
-	HittingTargetOldPosMin[5] = D3DXVECTOR3(oldpos.x + min.x, oldpos.y + min.y, oldpos.z + min.z);
-
-	for (int nCnt = 0; nCnt < SURFACE_MAX; nCnt++)
-	{
-		//変数宣言
-		D3DXVECTOR3 Extrusion = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-
-		//点と面の当たり判定
-		Extrusion = ExtrusionCollision(TargetPos,HittingTargetPosMax[nCnt], HittingTargetPosMin[nCnt] ,HittingTargetOldPosMax[nCnt], HittingTargetOldPosMin[nCnt]);
-
-		//押し出しが発生していたら
-		if (Extrusion != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
+		//いる場合
+		if (fInnerProductPos < 0.0f
+			&& fInnerProductOldPos >= 0.0f
+			&& oldpos.y > Down.y
+			&& oldpos.y < Top.y
+			)
 		{
-			//押し出す値を入れる
-			Add = Extrusion;
+			//計算用変数宣言
+			D3DXVECTOR3 V, V1, V2, Cross1, Cross2, Result;
+			float fT2;
 
-			//For文を抜ける
-			break;
+			//線分と線分の衝突
+			V = aTop[nCnt] - oldpos;
+			V1 = pos - oldpos;
+			V2 = aTop[(nCnt + 1) % 4] - aTop[nCnt];
+
+			V.y = 0.0f;
+			V1.y = 0.0f;
+			V2.y = 0.0f; 
+
+			fT2 = (V.x * V1.z - V.z * V1.x) / (V1.x * V2.z - V1.z * V2.x);
+
+			Result = aTop[nCnt] + fT2 * V2;
+
+			Result.y = pos.y;
+
+			V1 *= -1.0f;
+
+			D3DXVec3Normalize(&V1, &V1);
+
+			return Result + V1;
+
 		}
+
+	}
+		
+	//*****************************************************************************
+	//上面
+	//*****************************************************************************
+
+	//法線
+	D3DXVECTOR3 Normal = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+
+	//法線をRotマトリックスで変換
+	D3DXVec3TransformCoord(&Normal, &Normal, &GetMatrixRot());
+
+	//ベクトルの長さを１にする
+	D3DXVec3Normalize(&Normal,&Normal);
+
+	//上面の１頂点
+	 TopPos = GetPos() + D3DXVECTOR3(MatrixConversionMin.x, MatrixConversionMax.y, MatrixConversionMin.z);
+	
+	//瓦礫の上面用のPos
+	 BallstTop;
+
+	//上面用の当たり判定
+	BallstTop = CConvenience_Function::InnerProductCollisionBaseExtrusion(TopPos, Normal, D3DXVECTOR3(pos.x, pos.y + ModelMin.y, pos.z));
+
+	//上面の高さ判定
+	if (pos.y < BallstTop.y
+		&& oldpos.y >= BallstTop.y)
+	{
+		//押し出す値を返す
+		return BallstTop;
 	}
 
 	//押し出す値を返す
-	return Add;
+	return D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 }
-
-//*****************************************************************************
-//	当たり判定(押し出し判定)
-//*****************************************************************************
-D3DXVECTOR3 CBallast::ExtrusionCollision(D3DXVECTOR3& rPos, D3DXVECTOR3& rPosMax, D3DXVECTOR3& rPosMin, D3DXVECTOR3& rOldPosMax, D3DXVECTOR3& rOldPosMin)
-{
-	//自分のPos、サイズの情報
-	D3DXVECTOR3 ThisPos, ThisSizeMax, ThisSizeMin;
-
-	//Pos
-	ThisPos = GetParentPos();
-
-	//SizeMax
-	ThisSizeMax = GetVtxMax();
-
-	//SizeMin
-	ThisSizeMin = GetVtxMin();
-
-	//自分のPosとサイズの加算
-	D3DXVECTOR3 ThisTopPosMax, ThisTopPosMin;
-
-	//各頂点の情報を入れる
-	ThisTopPosMax = ThisPos + ThisSizeMax;
-	ThisTopPosMin = ThisPos + ThisSizeMin;
-
-	//押し出し値
-	D3DXVECTOR3 Add = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-
-	if (ThisTopPosMin.x < rPosMax.x &&
-		ThisTopPosMin.x >= rOldPosMax.x)
-	{
-
-	}
-
-
-	//押し出し値を返す
-	return Add;
-}
-

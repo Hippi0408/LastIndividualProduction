@@ -112,8 +112,18 @@ public:
 	D3DXVECTOR3 GetVtxMin() { return m_Model.vtxMin; }
 	D3DXVECTOR3 GetVtxMax() { return m_Model.vtxMax; }
 
+	void SetWithinRangeColor(bool bUes) { m_bColor = bUes; }
+	void SetColor(D3DXCOLOR colorMax, D3DXCOLOR colorMin, float fAttenuation);
+	
+
 	void SetObject_Type_List(Object_Type_List object_type_list) { m_Object_Type_List = object_type_list; }
 	Object_Type_List GetObject_Type_List() { return m_Object_Type_List; }
+
+	LPD3DXMESH GetMeshData() { return m_ModelPattern[m_Model.nPattn].pMeshModel; }
+
+	//ñ ñ@ê¸
+	D3DXVECTOR3* GetNormalPolygon() { return m_Model.pNormalPolygon; }
+	D3DXVECTOR3* GetTop() { return m_Model.pTopPos; }
 
 	static int SetModel(ModelPattern *pModel);
 	static void UninitAllModel();
@@ -125,6 +135,13 @@ private:
 	D3DXVECTOR3 m_LightVec = D3DXVECTOR3(0.0f, 0.0f, 0.0f); 
 	D3DXVECTOR3 m_ShadowPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	Object_Type_List m_Object_Type_List;
+	D3DXCOLOR m_Color;
+	D3DXCOLOR m_ColorChange;
+	D3DXCOLOR m_ColorMax;
+	D3DXCOLOR m_ColorMin;
+	float m_fAttenuationColor;
+	bool m_bColor;
+	D3DCOLORVALUE* m_pDefaultColor;
 
 #ifdef _DEBUG
 	CLine* m_pLine;

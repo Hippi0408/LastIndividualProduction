@@ -36,7 +36,7 @@ CHARACTERSET
 	PARTSSET
 		INDEX = 0					# 体
 		PARENT = -1					# (親)NULL
-		POS = 0.0 100.0 0.0
+		POS = 0.0 1000.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
@@ -50,77 +50,77 @@ CHARACTERSET
 	PARTSSET
 		INDEX = 2					# 尾
 		PARENT = 0					# 体
-		POS = 0.0 15.0 190.0
+		POS = 0.0 150.0 1900.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 	PARTSSET
 		INDEX = 3					# 右腕
 		PARENT = 1					# 頭
-		POS = -80.0 -20.0 -100.0
+		POS = -800.0 -200.0 -1000.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 	PARTSSET
 		INDEX = 4					# 右爪
 		PARENT = 3					# 右腕
-		POS = 0.0 0.0 -350.0
+		POS = 0.0 0.0 -3500.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 	PARTSSET
 		INDEX = 5					# 左腕
 		PARENT = 1					# 頭
-		POS = 80.0 -20.0 -100.0
+		POS = 800.0 -200.0 -1000.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 	PARTSSET
 		INDEX = 6					# 左爪
 		PARENT = 5					# 左腕
-		POS = 0.0 0.0 -350.0
+		POS = 0.0 0.0 -3500.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 	PARTSSET
 		INDEX = 7					# 右足1
 		PARENT = 0					# 体
-		POS = -50.0 -50 -40.0
+		POS = -500.0 -500 -400.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 	PARTSSET
 		INDEX = 7					# 右足2
 		PARENT = 0					# 体
-		POS = -50.0 -50 0.0
+		POS = -500.0 -500 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 	PARTSSET
 		INDEX = 7					# 右足3
 		PARENT = 0					# 体
-		POS = -50.0 -50 40.0
+		POS = -500.0 -500 400.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 	PARTSSET
 		INDEX = 8					# 左足1
 		PARENT = 0					# 体
-		POS = 50.0 -50 -40.0
+		POS = 500.0 -500 -400.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 	PARTSSET
 		INDEX = 8					# 左足2
 		PARENT = 0					# 体
-		POS = 50.0 -50 0.0
+		POS = 500.0 -500 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 	
 	PARTSSET
 		INDEX = 8					# 左足3
 		PARENT = 0					# 体
-		POS = 50.0 -50 40.0
+		POS = 500.0 -500 400.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 

@@ -26,6 +26,13 @@ C3DObject::C3DObject()
 	ZeroMemory(&m_Model, sizeof(m_Model));
 	m_fSize = 1.0f;
 	m_Object_Type_List = OBJ_OTHER;
+	m_Color = D3DXCOLOR(1.0f,1.0f,1.0f,1.0f);
+	m_ColorChange = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	m_ColorMax = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	m_ColorMin = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	m_fAttenuationColor = 0.0f;
+	m_bColor = false;
+	m_pDefaultColor = nullptr;
 }
 
 //*****************************************************************************
@@ -67,6 +74,12 @@ void C3DObject::Uninit()
 		m_Model.pNormalPolygon = nullptr;
 	}
 
+	if (m_pDefaultColor != nullptr)
+	{
+		delete[] m_pDefaultColor;
+		m_pDefaultColor = nullptr;
+	}
+
 #ifdef _DEBUG
 	if (m_pLine != nullptr)
 	{
@@ -82,7 +95,59 @@ void C3DObject::Uninit()
 //*****************************************************************************
 void C3DObject::Update()
 {
+	m_Color += m_ColorChange * m_fAttenuationColor;
 
+	//r
+	if (m_Color.r >= m_ColorMax.r)
+	{
+		m_Color.r = m_ColorMax.r;
+		m_ColorChange.r *= -1.0f;
+	}
+	else if (m_Color.r <= m_ColorMin.r)
+	{
+		m_Color.r = m_ColorMin.r;
+		m_ColorChange.r *= -1.0f;
+	}
+
+	//g
+	if (m_Color.g >= m_ColorMax.g)
+	{
+		m_Color.g = m_ColorMax.g;
+		m_ColorChange.g *= -1.0f;
+	}
+	else if (m_Color.g <= m_ColorMin.g)
+	{
+		m_Color.g = m_ColorMin.g;
+		m_ColorChange.g *= -1.0f;
+	}
+
+	//b
+	if (m_Color.b >= m_ColorMax.b)
+	{
+		m_Color.b = m_ColorMax.b;
+		m_ColorChange.b *= -1.0f;
+	}
+	else if (m_Color.b <= m_ColorMin.b)
+	{
+		m_Color.b = m_ColorMin.b;
+		m_ColorChange.b *= -1.0f;
+	}
+
+	//a
+	if (m_Color.a >= m_ColorMax.a)
+	{
+		m_Color.a = m_ColorMax.a;
+		m_ColorChange.a *= -1.0f;
+	}
+	else if (m_Color.a <= m_ColorMin.a)
+	{
+		m_Color.a = m_ColorMin.a;
+		m_ColorChange.a *= -1.0f;
+	}
+
+
+	
+	
 }
 
 //*****************************************************************************
@@ -168,9 +233,14 @@ void C3DObject::Draw()
 
 	for (int nCntMat = 0; nCntMat < (int)m_ModelPattern[m_Model.nPattn].nNumMatModel; nCntMat++)
 	{
-		if (bShadow)
+		
+		if (m_bColor)
 		{
-			pMat[nCntMat].MatD3D.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			pMat[nCntMat].MatD3D.Diffuse = m_Color;
+		}
+		else
+		{
+			pMat[nCntMat].MatD3D.Diffuse = m_pDefaultColor[nCntMat];
 		}
 
 		//マテリアルの設定
@@ -222,6 +292,20 @@ void C3DObject::Set3DObject(int nPattn, D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	m_Model.pos = pos;
 	m_Model.rot = rot;
 	m_Model.nPattn = nPattn;
+
+	//デフォルトカラーの保存
+	m_pDefaultColor = new D3DCOLORVALUE[m_ModelPattern[m_Model.nPattn].nNumMatModel];
+
+	//マテリアルデータへのポインタ
+	D3DXMATERIAL *pMat;				
+	//マテリアルデータへのポインタを取得
+	pMat = (D3DXMATERIAL*)m_ModelPattern[m_Model.nPattn].pBuffMatModel->GetBufferPointer();
+
+	for (int nCntMat = 0; nCntMat < (int)m_ModelPattern[m_Model.nPattn].nNumMatModel; nCntMat++)
+	{
+		m_pDefaultColor[nCntMat] = pMat[nCntMat].MatD3D.Diffuse;
+	}
+
 
 	//モデルのサイズの比較用初期値
 	m_Model.vtxMax = D3DXVECTOR3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
@@ -659,6 +743,24 @@ bool C3DObject::SquareInOut(D3DXVECTOR3 pos, D3DXVECTOR3 vtx0, D3DXVECTOR3 vtx1,
 
 
 	return false;
+}
+
+//*****************************************************************************
+// カラー設定
+//*****************************************************************************
+void C3DObject::SetColor(D3DXCOLOR colorMax, D3DXCOLOR colorMin, float fAttenuation)
+{
+	if (m_bColor)
+	{
+		return;
+	}
+
+	m_ColorMax = colorMax;
+	m_ColorMin = colorMin;
+	m_fAttenuationColor = fAttenuation;
+	m_ColorChange = colorMax - colorMin;
+
+
 }
 
 //*****************************************************************************

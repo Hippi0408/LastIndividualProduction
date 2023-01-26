@@ -17,6 +17,7 @@
 #include "manager.h"
 #include <time.h>
 #include "convenience_function.h"
+#include "meshfield.h"
 
 const float CPsychokinesis::BALLAST_MOVE = 0.01f;
 
@@ -104,12 +105,12 @@ void CPsychokinesis::Update()
 //*****************************************************************************
 // 更新処理(位置、向き、カメラのVec、半径更新、出現位置)
 //*****************************************************************************
-void CPsychokinesis::Update(D3DXVECTOR3 pos, D3DXVECTOR3 rot,  D3DXVECTOR3 CameraVec, float fRadius, float fFloatingHeight)
+void CPsychokinesis::Update(int nPlMap, D3DXVECTOR3 pos, D3DXVECTOR3 rot,  D3DXVECTOR3 CameraVec, float fRadius, float fFloatingHeight)
 {
 	//カメラのベクトル
 	m_CameraVec = CameraVec;
 
-	//プレイヤーの位置更新]
+	//プレイヤーの位置更新
 	m_PlPos = pos;
 
 	//カメラの向き更新
@@ -121,8 +122,42 @@ void CPsychokinesis::Update(D3DXVECTOR3 pos, D3DXVECTOR3 rot,  D3DXVECTOR3 Camer
 	//サイコキネシスで浮く高さの更新
 	m_fFloatingHeight = fFloatingHeight;
 
+	//範囲内の瓦礫の色変え
+	BallastWithinRangeColor();
+
 	//更新処理
 	Update();
+
+	//マネージャーからゲームオブジェクトの取得
+	CManager *pManager = GetManager();
+	CGame* pGame = (CGame*)pManager->GetGameObject();
+
+	//ゲームオブジェクトから瓦礫マネージャーの取得
+	CBallast_Manager* pBallast_Manager = pGame->GetBallast_Manager();
+
+	//マップの奥行にメッシュ数
+	int nDepthGrid = pGame->GetMeshfield()->GetMeshZ();
+
+	//当たり判定をチェックするメッシュ
+	int aMapGrid[9];
+
+	//プレイヤーのいるメッシュ
+	int nPlMapGrid = nPlMap - nDepthGrid;
+
+	//プレイヤーのいるメッシュから周り８箇所の割り出し
+	for (int nCnt = 0; nCnt < 3; nCnt++)
+	{
+		aMapGrid[nCnt * 3] = nPlMapGrid + nDepthGrid * nCnt - 1;
+		aMapGrid[nCnt * 3 + 1] = nPlMapGrid + nDepthGrid * nCnt;
+		aMapGrid[nCnt * 3 + 2] = nPlMapGrid + nDepthGrid * nCnt + 1;
+	}
+
+	//指定範囲の瓦礫の当たり判定
+	for (int nCnt = 0; nCnt < 9; nCnt++)
+	{
+
+		pBallast_Manager->WithinRangeColor(aMapGrid[nCnt], pos, fRadius);
+	}
 }
 
 //*****************************************************************************
@@ -324,4 +359,13 @@ void CPsychokinesis::PsychokinesisAttack()
 		break;
 
 	}
+}
+
+//*****************************************************************************
+// 範囲内の瓦礫の色変え
+//*****************************************************************************
+void CPsychokinesis::BallastWithinRangeColor()
+{
+
+
 }

@@ -239,6 +239,47 @@ CBallast * CBallast_Manager::CheckCircleCollision(D3DXVECTOR3 pos, float fRadius
 }
 
 //*****************************************************************************
+//サイコキネシスエリアにあったらそのオブジェクトの色を変える
+//*****************************************************************************
+void CBallast_Manager::WithinRangeColor(int nMapGrid, D3DXVECTOR3 pos, float fRadius)
+{
+	//イテレーターループ
+	for (auto itr = m_BallastMapData[nMapGrid].begin(); itr != m_BallastMapData[nMapGrid].end(); itr++)
+	{
+		//変数宣言
+		D3DXVECTOR3 Extrusion = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+		//イテレーターから瓦礫のポインタの代入
+		CBallast* pBallast = *itr;
+
+		//瓦礫NULLチェック
+		if (pBallast == nullptr)
+		{
+			assert(false);
+		}
+
+		//浮遊状態かどうか
+		if (pBallast->GetFloating())
+		{
+			pBallast->SetWithinRangeColor(false);
+			continue;
+		}
+
+		//サイコキネシスエリアにあるかどうかpBallast->GetVtxMax().x
+		if (CConvenience_Function::CircleCollision(pos, fRadius, pBallast->GetPos(), 0.0f))
+		{
+			pBallast->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.6f), D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.4f), 0.05f);
+			pBallast->SetWithinRangeColor(true);
+		}
+		else
+		{
+			pBallast->SetWithinRangeColor(false);
+		}
+
+	}
+}
+
+//*****************************************************************************
 //障害物の当たり判定
 //*****************************************************************************
 D3DXVECTOR3 CBallast_Manager::CollisionBallast(int nMapGrid, D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, D3DXVECTOR3 max, D3DXVECTOR3 min)

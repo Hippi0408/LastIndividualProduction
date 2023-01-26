@@ -127,3 +127,253 @@ bool CConvenience_Function::SphereCollision(D3DXVECTOR3 pos1, float fRadius1, D3
 	//当たってない
 	return false;
 }
+
+//*****************************************************************************
+// 内積の矩形当たり判定、中にいるかどうか
+//*****************************************************************************
+bool CConvenience_Function::InnerProductCollision(D3DXVECTOR3 * pTop1, D3DXVECTOR3 * pTop2, D3DXVECTOR3 TopTarget)
+{
+	//チェック用
+	D3DXVECTOR3 aPos[4];
+
+	if (!InnerProductCollisionBase(pTop1, TopTarget))
+	{
+		return false;
+	}
+	if (!InnerProductCollisionBase(pTop2, TopTarget))
+	{
+		return false;
+	}
+
+	aPos[0] = pTop1[0];
+	aPos[1] = pTop1[1];
+	aPos[2] = pTop2[1];
+	aPos[3] = pTop1[0];
+
+	if (!InnerProductCollisionSideX(aPos, TopTarget))
+	{
+		return false;
+	}
+
+	aPos[0] = pTop1[2];
+	aPos[1] = pTop1[3];
+	aPos[2] = pTop2[3];
+	aPos[3] = pTop1[2];
+
+	if (!InnerProductCollisionSideX(aPos, TopTarget))
+	{
+		return false;
+	}
+
+
+	aPos[0] = pTop1[0];
+	aPos[1] = pTop1[3];
+	aPos[2] = pTop2[3];
+	aPos[3] = pTop1[0];
+
+	if (!InnerProductCollisionSideZ(aPos, TopTarget))
+	{
+		return false;
+	}
+
+	aPos[0] = pTop1[1];
+	aPos[1] = pTop1[2];
+	aPos[2] = pTop2[2];
+	aPos[3] = pTop1[1];
+
+	if (!InnerProductCollisionSideX(aPos, TopTarget))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+//*****************************************************************************
+// 内積の矩形当たり判定、中にいるかどうか（底面）
+//*****************************************************************************
+bool CConvenience_Function::InnerProductCollisionBase(D3DXVECTOR3* pTop1, D3DXVECTOR3 Top2)
+{
+	D3DXVECTOR3 vec1, vec2;
+	float fInnerProduct0, fInnerProduct1, fInnerProduct2, fInnerProduct3;
+
+
+	vec1 = pTop1[1] - pTop1[0];
+	vec2 = Top2 - pTop1[0];
+
+	fInnerProduct0 = vec1.x * vec2.z - vec1.z * vec2.x;
+
+	vec1 = pTop1[2] - pTop1[1];
+	vec2 = Top2 - pTop1[1];
+
+	fInnerProduct1 = vec1.x * vec2.z - vec1.z * vec2.x;
+
+	vec1 = pTop1[3] - pTop1[2];
+	vec2 = Top2 - pTop1[2];
+
+	fInnerProduct2 = vec1.x * vec2.z - vec1.z * vec2.x;
+
+	vec1 = pTop1[0] - pTop1[3];
+	vec2 = Top2 - pTop1[3];
+
+	fInnerProduct3 = vec1.x * vec2.z - vec1.z * vec2.x;
+
+	if (
+		(fInnerProduct0 >= 0.0f && fInnerProduct1 >= 0.0f && fInnerProduct2 >= 0.0f && fInnerProduct3 >= 0.0f)
+		|| (fInnerProduct0 <= 0.0f && fInnerProduct1 <= 0.0f && fInnerProduct2 <= 0.0f && fInnerProduct3 <= 0.0f)
+		)
+	{
+		return true;
+	}
+
+
+	return false;
+}
+
+//*****************************************************************************
+// 内積の矩形当たり判定、中にいるかどうか（側面）
+//*****************************************************************************
+bool CConvenience_Function::InnerProductCollisionSideX(D3DXVECTOR3* pTop1, D3DXVECTOR3 Top2)
+{
+	D3DXVECTOR3 vec1, vec2;
+	float fInnerProduct0, fInnerProduct1, fInnerProduct2, fInnerProduct3;
+
+
+	vec1 = pTop1[1] - pTop1[0];
+	vec2 = Top2 - pTop1[0];
+
+	fInnerProduct0 = vec1.x * vec2.y - vec1.y * vec2.x;
+
+	vec1 = pTop1[2] - pTop1[1];
+	vec2 = Top2 - pTop1[1];
+
+	fInnerProduct1 = vec1.x * vec2.y - vec1.y * vec2.x;
+
+	vec1 = pTop1[3] - pTop1[2];
+	vec2 = Top2 - pTop1[2];
+
+	fInnerProduct2 = vec1.x * vec2.y - vec1.y * vec2.x;
+
+	vec1 = pTop1[0] - pTop1[3];
+	vec2 = Top2 - pTop1[3];
+
+	fInnerProduct3 = vec1.x * vec2.y - vec1.y * vec2.x;
+
+	if (
+		(fInnerProduct0 >= 0.0f && fInnerProduct1 >= 0.0f && fInnerProduct2 >= 0.0f && fInnerProduct3 >= 0.0f)
+		|| (fInnerProduct0 <= 0.0f && fInnerProduct1 <= 0.0f && fInnerProduct2 <= 0.0f && fInnerProduct3 <= 0.0f)
+		)
+	{
+		return true;
+	}
+
+
+	return false;
+}
+
+//*****************************************************************************
+// 内積の矩形当たり判定、中にいるかどうか（側面）
+//*****************************************************************************
+bool CConvenience_Function::InnerProductCollisionSideZ(D3DXVECTOR3* pTop1, D3DXVECTOR3 Top2)
+{
+	D3DXVECTOR3 vec1, vec2;
+	float fInnerProduct0, fInnerProduct1, fInnerProduct2, fInnerProduct3;
+
+
+	vec1 = pTop1[1] - pTop1[0];
+	vec2 = Top2 - pTop1[0];
+
+	fInnerProduct0 = vec1.z * vec2.y - vec1.y * vec2.z;
+
+	vec1 = pTop1[2] - pTop1[1];
+	vec2 = Top2 - pTop1[1];
+
+	fInnerProduct1 = vec1.z * vec2.y - vec1.y * vec2.z;
+
+	vec1 = pTop1[3] - pTop1[2];
+	vec2 = Top2 - pTop1[2];
+
+	fInnerProduct2 = vec1.z * vec2.y - vec1.y * vec2.z;
+
+	vec1 = pTop1[0] - pTop1[3];
+	vec2 = Top2 - pTop1[3];
+
+	fInnerProduct3 = vec1.z * vec2.y - vec1.y * vec2.z;
+
+	if (
+		(fInnerProduct0 >= 0.0f && fInnerProduct1 >= 0.0f && fInnerProduct2 >= 0.0f && fInnerProduct3 >= 0.0f)
+		|| (fInnerProduct0 <= 0.0f && fInnerProduct1 <= 0.0f && fInnerProduct2 <= 0.0f && fInnerProduct3 <= 0.0f)
+		)
+	{
+		return true;
+	}
+
+
+	return false;
+}
+
+//*****************************************************************************
+// 内積の矩形当たり判定、押し出し（上面）
+//*****************************************************************************
+D3DXVECTOR3 CConvenience_Function::InnerProductCollisionBaseExtrusion(D3DXVECTOR3 Top1, D3DXVECTOR3 Normal, D3DXVECTOR3 TopPos)
+{
+	//面の１頂点
+	D3DXVECTOR3 P1 = Top1;
+	//面の法線
+	D3DXVECTOR3 vec = Normal;
+	//対象の位置
+	D3DXVECTOR3 pos = D3DXVECTOR3(TopPos.x, TopPos.y, TopPos.z); 
+
+	//対象のPosの面内のY
+	float fPolygonY = P1.y - ((pos.x - P1.x) * vec.x + (pos.z - P1.z) * vec.z) / vec.y;
+
+	//Yの保存
+	pos.y = fPolygonY;
+
+	//Posを返す
+	return pos;
+}
+
+//*****************************************************************************
+// 内積の矩形当たり判定、押し出し（X側面）
+//*****************************************************************************
+D3DXVECTOR3 CConvenience_Function::InnerProductCollisionSideXExtrusion(D3DXVECTOR3 Top1, D3DXVECTOR3 Normal, D3DXVECTOR3 TopPos)
+{
+	//面の１頂点
+	D3DXVECTOR3 P1 = Top1;
+	//面の法線
+	D3DXVECTOR3 vec = Normal;
+	//対象の位置
+	D3DXVECTOR3 pos = D3DXVECTOR3(TopPos.x, TopPos.y, TopPos.z);
+
+	//対象のPosの面内のX
+	float fPolygonX = P1.x - ((pos.z - P1.z) * vec.z + (pos.y - P1.y) * vec.y) / vec.x;
+	
+	//Xの保存
+	pos.x = fPolygonX;
+
+	//Posを返す
+	return pos;
+}
+
+//*****************************************************************************
+// 内積の矩形当たり判定、押し出し（Z側面）
+//*****************************************************************************
+D3DXVECTOR3 CConvenience_Function::InnerProductCollisionSideZExtrusion(D3DXVECTOR3 Top1, D3DXVECTOR3 Normal, D3DXVECTOR3 TopPos)
+{
+	//面の１頂点
+	D3DXVECTOR3 P1 = Top1;
+	//面の法線
+	D3DXVECTOR3 vec = Normal;
+	//対象の位置
+	D3DXVECTOR3 pos = D3DXVECTOR3(TopPos.x, TopPos.y, TopPos.z);
+
+	//対象のPosの面内のZ
+	float fPolygonZ = P1.z - ((pos.x - P1.x) * vec.x + (pos.y - P1.y) * vec.y) / vec.z;
+
+	//Zの保存
+	pos.z = fPolygonZ;
+
+	//Posを返す
+	return pos;
+}

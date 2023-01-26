@@ -65,9 +65,7 @@ public:
 
 	//ìñÇΩÇËîªíË(Ç‹Ç∆Çﬂ)
 	D3DXVECTOR3 ConclusionCollision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, D3DXVECTOR3 max, D3DXVECTOR3 min);
-	//ìñÇΩÇËîªíË(âüÇµèoÇµîªíË)
-	D3DXVECTOR3 ExtrusionCollision(D3DXVECTOR3& rPos ,D3DXVECTOR3& rPosMax, D3DXVECTOR3& rPosMin, D3DXVECTOR3& rOldPosMax, D3DXVECTOR3& rOldPosMin);
-
+	
 private:
 	D3DXVECTOR3 m_PositionWithPlayer;
 	D3DXVECTOR3 m_FacingWithPlayer;

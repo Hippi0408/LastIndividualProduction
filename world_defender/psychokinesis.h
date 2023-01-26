@@ -37,7 +37,7 @@ public:
 	HRESULT Init() override;
 	void Uninit() override;
 	void Update() override;
-	void Update(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 CameraVec, float fRadius, float fFloatingHeight);
+	void Update(int nPlMap, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 CameraVec, float fRadius, float fFloatingHeight);
 	void Draw() override;
 
 	void SetFloating();
@@ -45,6 +45,8 @@ public:
 	void Psychokinesis();
 
 	void PsychokinesisAttack();
+
+	void BallastWithinRangeColor();
 
 private:
 	D3DXVECTOR3 m_CameraRot;
