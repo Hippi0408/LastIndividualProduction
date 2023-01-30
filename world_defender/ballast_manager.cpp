@@ -15,6 +15,7 @@
 #include "manager.h"
 #include "meshfield.h"
 #include "convenience_function.h"
+#include "enemy_manager.h"
 
 const float CBallast_Manager::MAP_MAX = 15000.0f;
 const D3DXVECTOR3 CBallast_Manager::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -81,6 +82,9 @@ void CBallast_Manager::Uninit()
 //*****************************************************************************
 void CBallast_Manager::Update()
 {
+	//エネミーとの当たり判定
+	CollisionEnemy();
+
 	//リストの更新
 	for (int nCnt = 0; nCnt < m_nMeshfieldNumMax; nCnt++)
 	{
@@ -171,11 +175,11 @@ void CBallast_Manager::SetBallast(int nNumber, Object_Data Data)
 	//使用するモデル番号、瓦礫の位置、瓦礫の向き
 	pBallast->Set3DObject(Data.nPattn, Data.pos, Data.rot);
 
-	//親位置の変更
-	//pBallast->SetParentPos(Data.pos);
-
 	//法線設定
 	pBallast->SetNormal();
+
+	//半径設定
+	pBallast->SetRadius();
 
 	//リストに瓦礫情報を追加
 	m_BallastMapData[nNumber].push_back(pBallast);
@@ -324,5 +328,64 @@ D3DXVECTOR3 CBallast_Manager::CollisionBallast(int nMapGrid, D3DXVECTOR3 pos, D3
 
 	//押し出す値を返す
 	return Add;
+}
+
+//*****************************************************************************
+//エネミーとの当たり判定
+//*****************************************************************************
+void CBallast_Manager::CollisionEnemy()
+{
+	//マネージャーからエネミーマネージャーの取得
+	CManager *pManager = GetManager();
+	CGame* pGame = (CGame*)pManager->GetGameObject();
+	CEnemy_Manager* pEnemy_Manager = pGame->GetEnemy_Manager();
+
+	//イテレーターループ
+	for (auto itr = m_FloatingBallstList.begin(); itr != m_FloatingBallstList.end();)
+	{
+		//イテレーターから瓦礫のポインタの代入
+		CBallast* pBallast = *itr;
+
+		//瓦礫NULLチェック
+		if (pBallast == nullptr)
+		{
+			assert(false);
+		}
+
+		//浮遊状態かどうか
+		if (!pBallast->GetFloating())
+		{
+			continue;
+		}
+
+		//判定
+		bool bHit = pEnemy_Manager->EnemyCollision(pBallast->GetWorldPos(), pBallast->GetRadius());
+
+		if (!bHit)
+		{
+			//イテレーターを進める
+			itr++;
+
+			//処理を無視する
+			continue;
+		}
+
+		//瓦礫の使用状態を変更
+		pBallast->SetUse(false);
+
+		//次のイテレーターの代入、現在のイテレーターを破棄
+		itr = m_FloatingBallstList.erase(itr);
+
+	}
+
+}
+
+//*****************************************************************************
+//浮遊状態のリスト追加
+//*****************************************************************************
+void CBallast_Manager::SetFloatingBallst(CBallast * pBallast)
+{
+	//リストに瓦礫情報を追加
+	m_FloatingBallstList.push_back(pBallast);
 }
 

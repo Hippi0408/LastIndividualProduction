@@ -224,14 +224,14 @@ void CPlayer::Move()
 
 
 	//視点移動
-	if (pInput->Press(DIK_W))
+	if (pInput->Press(KEY_UP))
 	{//上キーが押された
-		if (pInput->Press(DIK_A))
+		if (pInput->Press(KEY_LEFT))
 		{
 			move.x = -sinf(rotY + D3DX_PI * 0.75f) * fMove;
 			move.z = -cosf(rotY + D3DX_PI * 0.75f) * fMove;
 		}
-		else if (pInput->Press(DIK_D))
+		else if (pInput->Press(KEY_RIGHT))
 		{
 			move.x = -sinf(rotY + D3DX_PI * -0.75f) * fMove;
 			move.z = -cosf(rotY + D3DX_PI * -0.75f) * fMove;
@@ -242,14 +242,14 @@ void CPlayer::Move()
 			move.z = cosf(rotY) * fMove;
 		}
 	}
-	else if (pInput->Press(DIK_S))
+	else if (pInput->Press(KEY_DOWN))
 	{//下キーが押された
-		if (pInput->Press(DIK_A))
+		if (pInput->Press(KEY_LEFT))
 		{
 			move.x = -sinf(rotY + D3DX_PI * 0.25f) * fMove;
 			move.z = -cosf(rotY + D3DX_PI * 0.25f) * fMove;
 		}
-		else if (pInput->Press(DIK_D))
+		else if (pInput->Press(KEY_RIGHT))
 		{
 			move.x = -sinf(rotY + D3DX_PI * -0.25f) * fMove;
 			move.z = -cosf(rotY + D3DX_PI * -0.25f) * fMove;
@@ -260,12 +260,12 @@ void CPlayer::Move()
 			move.z = cosf(rotY + D3DX_PI) * fMove;
 		}
 	}
-	else if (pInput->Press(DIK_A))
+	else if (pInput->Press(KEY_LEFT))
 	{//左キーが押された
 		move.x = sinf(rotY + D3DX_PI * -0.5f) * fMove;
 		move.z = cosf(rotY + D3DX_PI * -0.5f) * fMove;
 	}
-	else if (pInput->Press(DIK_D))
+	else if (pInput->Press(KEY_RIGHT))
 	{//右キーが押された
 		move.x = sinf(rotY + D3DX_PI * 0.5f) * fMove;
 		move.z = cosf(rotY + D3DX_PI * 0.5f) * fMove;

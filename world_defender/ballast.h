@@ -63,6 +63,11 @@ public:
 	//Œü‚«‚ÌMove
 	void SetMoveRot(D3DXVECTOR3 MoveRot) { m_MoveRot = MoveRot; }
 
+	//”¼Œa‚Ìæ“¾
+	float GetRadius() { return m_fRadius; }
+	//”¼Œa‚Ìİ’è
+	void SetRadius();
+
 	//“–‚½‚è”»’è(‚Ü‚Æ‚ß)
 	D3DXVECTOR3 ConclusionCollision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, D3DXVECTOR3 max, D3DXVECTOR3 min);
 	
@@ -74,6 +79,7 @@ private:
 	int m_nListNumber;
 	bool m_bUse;
 	bool m_bFloating;
+	float m_fRadius;
 	
 };
 

@@ -100,7 +100,7 @@ public:
 	void SetPartsNum(int nPartsNum) { m_nPartsNum = nPartsNum; }
 	void KeyCheck();//キー数の確認
 	void NextMotionPosition();//次の位置までの計算
-	static void AllNextMotionPosition(int nMotionNum);//全部のパーツ次の位置までの計算
+	static void AllNextMotionPosition(int nMotionNum, bool bUnUpdate = false);//全部のパーツ次の位置までの計算
 	void SetMotionRarent(CMotionParts* pMotionRarent) { m_pRarent = pMotionRarent; }
 	CMotionParts* GetMotionRarent() { return m_pRarent; }
 	bool GetMotionParts(int nMotionNum, int nPartsNum);//引数との一致があるかどうか
@@ -110,6 +110,11 @@ public:
 
 	void SetPosMove(D3DXVECTOR3 pos) { m_PosMove = pos; }
 	void SetRotMove(D3DXVECTOR3 rot) { m_RotMove = rot; }
+
+	//現在のモーションが終わったら更新をしなくする
+	bool GetUnUpdate() { return m_bUnUpdate; }
+	void SetUnUpdate(bool bUnUpdate) { m_bUnUpdate = bUnUpdate; }
+	void SetTopUnUpdate(bool bUnUpdate) { m_bTopUnUpdate = bUnUpdate; }
 
 	static void ALLUninit();//すべての終了処理
 	static void ALLUpdate();//すべての更新処理
@@ -123,7 +128,7 @@ public:
 	static int CreateMotionObj(MotionData* pMotionData,int nPartsMax);//動くOBJの生成
 	static CMotionParts* GetMotionPartsPointer(int nMotionNum, int nPartsNum);
 
-	static void MoveMotionModel(int nModelNum, int nMotionNum, D3DXVECTOR3 *pos = nullptr, D3DXVECTOR3 *rot = nullptr);//モーションモデルの移動
+	static void MoveMotionModel(int nModelNum, int nMotionNum, D3DXVECTOR3 *pos = nullptr, D3DXVECTOR3 *rot = nullptr,  bool bUnUpdate = false);//モーションモデルの移動
 	static void SetBoolDraw(bool bDraw, int nMotionNum);//モーションモデルの描画の有無
 	static void SetLight(D3DXVECTOR3 vec, int nMotionNum);//モーションモデルのライトベクトル
 	static void AllSetShadowPos(D3DXVECTOR3 pos, int nMotionNum);//影の設定
@@ -152,6 +157,8 @@ private:
 	int m_nKey;						//現在のキー
 	int m_nPartsNum;				//動く物体の中の番号
 	bool m_bDraw;					//描画をするかしないか
+	bool m_bTopUnUpdate;			//現在のモーションが終わったら更新をしなくする(Top用)
+	bool m_bUnUpdate;				//現在のモーションが終わったら更新をしなくする
 
 };
 

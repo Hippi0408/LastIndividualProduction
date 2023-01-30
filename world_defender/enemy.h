@@ -26,6 +26,7 @@ private:
 	static const D3DXVECTOR3 INIT_POS;
 	static const float MOVE_INERTIA;
 	static const float JUMP_INERTIA;
+	static const float INIT_RADIUS;
 public:
 	CEnemy();
 	virtual ~CEnemy() override;
@@ -48,6 +49,7 @@ public:
 
 private:
 	float m_fMovingDistance;
+	
 };
 
 #endif

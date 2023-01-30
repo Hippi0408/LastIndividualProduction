@@ -17,6 +17,7 @@
 #include "meshfield.h"
 #include "player.h"
 #include "enemy.h"
+#include "enemy_manager.h"
 #include "billboard.h"
 #include "motion_parts.h"
 #include "tps_camera.h"
@@ -68,11 +69,18 @@ HRESULT CGame::Init()
 	}
 	m_pPlayer->SetLight(m_pLight->GetLightVec());
 
-	m_pEnmey = new CEnemy;
-	if (FAILED(m_pEnmey->Init()))
+	m_pEnmeyManager = new CEnemy_Manager;
+	if (FAILED(m_pEnmeyManager->Init()))
 	{
 		return -1;
 	}
+	EnemyInitData EnemyInitData;
+
+	EnemyInitData.fmove = 10.0f;
+	EnemyInitData.pos = D3DXVECTOR3(500.0f,0.0f, 500.0f);
+	EnemyInitData.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	EnemyInitData.type = ENEMY_00;
+	m_pEnmeyManager->CreateEnemy(EnemyInitData);
 
 	//BG3D
 	m_pMeshfieldBG = cRead.ReadMap("data/MAPTXT/map.txt");
@@ -152,11 +160,11 @@ void CGame::Uninit()
 		m_pPlayer = nullptr;
 	}
 
-	if (m_pEnmey != nullptr)
+	if (m_pEnmeyManager != nullptr)
 	{
-		m_pEnmey->Uninit();
-		delete m_pEnmey;
-		m_pEnmey = nullptr;
+		m_pEnmeyManager->Uninit();
+		delete m_pEnmeyManager;
+		m_pEnmeyManager = nullptr;
 	}
 
 	if (m_pMesh_Cylinder != nullptr)
@@ -178,7 +186,7 @@ void CGame::Update()
 {
 	m_pMesh_Cylinder->Update(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	m_pCamera->Update();
-	m_pEnmey->Update();
+	m_pEnmeyManager->Update();
 	m_pPlayer->Update();
 	m_pBallastManager->Update();
 	CInput *pInput = CInput::GetKey();
@@ -251,7 +259,7 @@ void CGame::Update()
 
 	CMotionParts::ALLUpdate();
 
-	if (pInput->Trigger(KEY_DECISION) || m_pEnmey->CheckLife())
+	if (pInput->Trigger(KEY_DECISION))
 	{
 		//‰æ–Ê“à‚ÌƒJ[ƒ\ƒ‹‚Ì•œŠˆ
 		pInput->SetCursorErase(false);

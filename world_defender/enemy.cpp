@@ -19,13 +19,16 @@
 #include "convenience_function.h"
 
 const D3DXVECTOR3 CEnemy::INIT_POS = D3DXVECTOR3(1000.0f, 0.0f, -0.0f); 
-const float CEnemy::MOVE_INERTIA = 0.1f;
+const float CEnemy::MOVE_INERTIA = 0.1f; 
 const float CEnemy::JUMP_INERTIA = 0.1f;
+const float CEnemy::INIT_RADIUS = 800.0f;
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
 CEnemy::CEnemy()
 {
+	CMovable_Obj::SetLife(INIT_LIFE);
+	CMovable_Obj::SetRadius(INIT_RADIUS);
 }
 
 //*****************************************************************************
@@ -102,19 +105,23 @@ void CEnemy::Update()
 
 	if (pInput->Press(DIK_UP))
 	{
-		nMotion = 1;
+		pos.z += 50.0f;
+		SetPos(pos);
 	}
 	else if (pInput->Press(DIK_DOWN))
 	{
-		nMotion = 2;
+		pos.z += -50.0f;
+		SetPos(pos);
 	}
 	else if (pInput->Press(DIK_RIGHT))
 	{
-		nMotion = 3;
+		pos.x += 50.0f;
+		SetPos(pos);
 	}
 	else if (pInput->Press(DIK_LEFT))
 	{
-		nMotion = 4;
+		pos.x += -50.0f;
+		SetPos(pos);
 	}
 
 
@@ -151,6 +158,15 @@ void CEnemy::Draw()
 //*****************************************************************************
 bool CEnemy::IsUnused()
 {
+
+	if (CMovable_Obj::CheckLife())
+	{
+		CMotionParts::MoveMotionModel(GetMotionNum(), 4, &GetPos(), &GetRot(),true);
+
+		return true;
+	}
+
+
 	return false;
 }
 

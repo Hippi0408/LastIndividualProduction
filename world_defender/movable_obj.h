@@ -59,6 +59,12 @@ public:
 	void AddLife(int nAdd) { m_nLife += nAdd; }
 	//ライフが指定数以下(false)、以上（true）の場合,trueを返す
 	bool CheckLife(int nLife = 0, bool b = false);
+
+	//半径の取得
+	float GetRadius() { return m_fRadius; }
+	//半径の設定
+	void SetRadius(float fRadius) { m_fRadius = fRadius; }
+
 	//慣性のGet
 	virtual float GetMoveInertia() = 0;
 
@@ -74,6 +80,7 @@ private:
 	D3DXVECTOR3 m_MoveVec;		//移動方向
 
 	int m_nLife;				//ライフ
+	float m_fRadius;			//半径
 	int m_nMotionNum;			//使用するモーションモデル番号
 	D3DXVECTOR3 m_Light;		//ライトの向き（必ず必要ではない）
 };

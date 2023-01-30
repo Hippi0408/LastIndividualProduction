@@ -93,6 +93,34 @@ void CBallast::Draw()
 }
 
 //*****************************************************************************
+//半径の設定
+//*****************************************************************************
+void CBallast::SetRadius()
+{
+	//各辺
+	float fSideX, fSideY, fSideZ;
+
+	//サイズ
+	D3DXVECTOR3 Max, Min;
+
+	//サイズの最大最小の取得
+	Max = GetVtxMax();
+	Min = GetVtxMin();
+
+	//各辺の計算
+	fSideX = Max.x - Min.x;
+	fSideY = Max.y - Min.y;
+	fSideZ = Max.z - Min.z;
+
+	//対角線の生成
+	float fDiagonalLine = sqrt(fSideX * fSideX + fSideY * fSideY + fSideZ * fSideZ);
+
+	//対角線から半径の生成
+	m_fRadius = fDiagonalLine / 2.0f;
+
+}
+
+//*****************************************************************************
 //	当たり判定
 //*****************************************************************************
 D3DXVECTOR3 CBallast::ConclusionCollision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, D3DXVECTOR3 max, D3DXVECTOR3 min)

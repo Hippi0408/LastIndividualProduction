@@ -58,8 +58,15 @@ public:
 	//障害物の当たり判定
 	D3DXVECTOR3 CollisionBallast(int nMapGrid, D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, D3DXVECTOR3 max, D3DXVECTOR3 min);
 
+	//エネミーとの当たり判定
+	void CollisionEnemy();
+
+	//浮遊状態のリスト追加
+	void SetFloatingBallst(CBallast* pBallast);
+
 private:
 	std::map<int, std::list<CBallast*>> m_BallastMapData;		//マップ上のオブジェクトをリストで管理する変数
+	std::list<CBallast*> m_FloatingBallstList;					//浮遊状態の瓦礫
 	int m_nPlListNumber;
 	CMeshfield *m_pMeshfieldCopy;								//メッシュフィールドポインタのコピー（このコピーは解放をしない）
 	int m_nMeshfieldNumMax;										//メッシュのマスの数の最大

@@ -67,6 +67,8 @@ HRESULT CMotionParts::Init()
 		return -1;
 	}
 	m_nDestFrame = 0;
+	m_bTopUnUpdate = false;
+	m_bUnUpdate = false;
 	return S_OK;
 }
 
@@ -269,19 +271,7 @@ void CMotionParts::KeyCheck()
 
 				ClearMotionMove();
 
-
-				AllNextMotionPosition(m_nModelObjNum);
-
-				
-
-				//SetMotion(nNextMotionNum);
-
-				//MoveMotionModel(m_nModelObjNum, nNextMotionNum);
-
-				////次に再生するモーション番号
-				//nNextMotionNum = m_MotionKey[nNowMotionNum].nNextMotionNum;
-
-				//m_nMotionPlayMotonNum[m_nModelObjNum] = nNextMotionNum;
+				AllNextMotionPosition(m_nModelObjNum,m_bTopUnUpdate);
 			}
 			else
 			{
@@ -361,7 +351,7 @@ void CMotionParts::NextMotionPosition()
 //*****************************************************************************
 //全部のパーツ次の位置までの計算
 //*****************************************************************************
-void CMotionParts::AllNextMotionPosition(int nMotionNum)
+void CMotionParts::AllNextMotionPosition(int nMotionNum, bool bUnUpdate)
 {
 	CMotionParts* pMotionParts = m_pMotionPartsTop;
 
@@ -369,8 +359,16 @@ void CMotionParts::AllNextMotionPosition(int nMotionNum)
 	{
 		if (pMotionParts->GetModelObjNum() == nMotionNum)
 		{
-			pMotionParts->ClearMotionMove();
-			pMotionParts->NextMotionPosition();
+			if (bUnUpdate)
+			{
+				pMotionParts->SetUnUpdate(true);
+			}
+			else
+			{
+				pMotionParts->ClearMotionMove();
+				pMotionParts->NextMotionPosition();
+			}
+			
 		}
 
 		pMotionParts = pMotionParts->GetNextMotionParts();
@@ -429,6 +427,13 @@ void CMotionParts::ALLUpdate()
 
 	while (pMotionParts != nullptr)
 	{
+		if (pMotionParts->GetUnUpdate())
+		{
+			pMotionParts = pMotionParts->GetNextMotionParts();
+
+			continue;
+		}
+
 		pMotionParts->Update();
 
 		if (pMotionParts->IsUnused())
@@ -525,9 +530,11 @@ CMotionParts * CMotionParts::GetMotionPartsPointer(int nMotionNum, int nPartsNum
 //*****************************************************************************
 //モーションモデルの移動
 //*****************************************************************************
-void CMotionParts::MoveMotionModel(int nModelNum, int nMotionNum, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot)
+void CMotionParts::MoveMotionModel(int nModelNum, int nMotionNum, D3DXVECTOR3 *pos, D3DXVECTOR3 *rot, bool bUnUpdate)
 {
 	CMotionParts* pMotionParts = CMotionParts::GetMotionPartsPointer(nModelNum, 0);
+
+	pMotionParts->SetTopUnUpdate(bUnUpdate);
 
 	if (pMotionParts->GetMotionData().bLoop)
 	{
@@ -553,6 +560,7 @@ void CMotionParts::MoveMotionModel(int nModelNum, int nMotionNum, D3DXVECTOR3 *p
 	{
 		GetMotionPartsPointer(nModelNum, 0)->SetParentRot(*rot);
 	}
+
 }
 
 //*****************************************************************************

@@ -49,7 +49,9 @@ class CEnemy;
 class CEnemy_Manager : public CObject
 {
 private:
-	
+	static const int DAMAGE_TYPE_MAX = 5;
+	static const float RADIUS_TYPE[DAMAGE_TYPE_MAX];
+	static const int DAMAGE_TYPE[DAMAGE_TYPE_MAX];
 public:
 	CEnemy_Manager();
 	~CEnemy_Manager() override;
@@ -61,7 +63,7 @@ public:
 
 	void CreateEnemy(EnemyInitData enemyinitdata);
 
-
+	bool EnemyCollision(D3DXVECTOR3 pos,float fRadius);
 private:
 
 	//エネミーのリスト

@@ -306,6 +306,8 @@ void CPsychokinesis::Psychokinesis()
 	//リストに追加
 	m_BallastCopyList.push_back(pBallast);
 
+	//リストに追加
+	pBallast_Manager->SetFloatingBallst(pBallast);
 }
 
 //*****************************************************************************
