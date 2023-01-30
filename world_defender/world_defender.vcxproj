@@ -161,7 +161,9 @@
     <ClCompile Include="convenience_function.cpp" />
     <ClCompile Include="DirectInput.cpp" />
     <ClCompile Include="enemy.cpp" />
+    <ClCompile Include="enemy_boss.cpp" />
     <ClCompile Include="enemy_manager.cpp" />
+    <ClCompile Include="enemy_smallfish.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="input.cpp" />
@@ -200,7 +202,9 @@
     <ClInclude Include="convenience_function.h" />
     <ClInclude Include="DirectInput.h" />
     <ClInclude Include="enemy.h" />
+    <ClInclude Include="enemy_boss.h" />
     <ClInclude Include="enemy_manager.h" />
+    <ClInclude Include="enemy_smallfish.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="input.h" />

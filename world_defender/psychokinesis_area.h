@@ -40,6 +40,7 @@ public:
 	void Update(D3DXVECTOR3 Pos);//PosXVˆ—
 	void Draw() override;//•`‰æˆ—
 
+	void SetRadius(float fRadius) { m_fRadius = fRadius; }
 	float GetRadius() { return m_fRadius; }
 	float GetSizeTop() { return m_fSizeTop; }
 	

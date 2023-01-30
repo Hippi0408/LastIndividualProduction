@@ -1,25 +1,25 @@
 //=============================================================================
 //
-// enemyu.h
+// enemyu_smallfish.h
 // Author : koduna hirohito
 //
 //=============================================================================
-#ifndef _ENEMY_H_			//このマクロ定義がされなかったら
-#define _ENEMY_H_			//2重インクルード防止のマクロ定義
+#ifndef _ENEMY_SMALL_FISH_H_			//このマクロ定義がされなかったら
+#define _ENEMY_SMALL_FISH_H_			//2重インクルード防止のマクロ定義
 
 //*****************************************************************************
 // インクルード
 //*****************************************************************************
-#include "movable_obj.h"
+#include "enemy.h"
 
 //*****************************************************************************
 // 前方宣言
 //*****************************************************************************
-class CPsychokinesis_Area;
+
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class CEnemy : public CMovable_Obj
+class CEnemy_SmallFish : public CEnemy
 {
 private:
 	static const int INIT_LIFE = 1;
@@ -28,30 +28,25 @@ private:
 	static const float JUMP_INERTIA;
 	static const float INIT_RADIUS;
 public:
-	CEnemy();
-	virtual ~CEnemy() override;
+	CEnemy_SmallFish();
+	~CEnemy_SmallFish() override;
 
-	virtual HRESULT Init() override;
-	virtual void Uninit() override;
-	virtual void Update() override;
-	virtual void Draw() override;
+	HRESULT Init() override;
+	void Uninit() override;
+	void Update() override;
+	void Draw() override;
 
-	virtual bool IsUnused();
-	virtual void SetMotionModel();
-
-	void SetMovingDistance(float fMovingDistance) { m_fMovingDistance = fMovingDistance; }
-	float GetMovingDistance() { return m_fMovingDistance; }
+	bool IsUnused() override;
+	void SetMotionModel() override;
 
 	//慣性のGet
-	virtual float GetMoveInertia() override { return MOVE_INERTIA; }
+	float GetMoveInertia() override { return MOVE_INERTIA; }
 
 	//ジャンプ慣性のGet
-	virtual float GetJumpMoveInertia() override { return JUMP_INERTIA; }
+	float GetJumpMoveInertia() override { return JUMP_INERTIA; }
 
 private:
-	float m_fMovingDistance;
-	CPsychokinesis_Area* m_pPsychokinesis_Area;
-	
+
 };
 
 #endif

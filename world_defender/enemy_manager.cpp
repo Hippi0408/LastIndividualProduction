@@ -112,6 +112,31 @@ void CEnemy_Manager::Update()
 //*****************************************************************************
 void CEnemy_Manager::Draw()
 {
+
+	//イテレーターループ
+	for (auto itr = m_EnemyList.begin(); itr != m_EnemyList.end();)
+	{
+		//イテレーターからエネミーのポインタの代入
+		CEnemy* pEnemy = *itr;
+
+		//エネミーポインタの解放
+		if (pEnemy == nullptr)
+		{
+			//次のイテレーターの代入、現在のイテレーターを破棄
+			itr = m_EnemyList.erase(itr);
+
+			//以下の処理を無視する
+			continue;
+		}
+
+		//エネミーの更新処理
+		pEnemy->Draw();
+
+		
+		//イテレーターを進める
+		itr++;
+	}
+
 }
 
 //*****************************************************************************
@@ -185,9 +210,12 @@ bool CEnemy_Manager::EnemyCollision(D3DXVECTOR3 pos, float fRadius)
 
 		//エネミー位置
 		D3DXVECTOR3 EnemyPos = pEnemy->GetPos();
+		
 		//エネミー半径
 		float fEnemyRadius = pEnemy->GetRadius();
 
+		//当たり判定の中心を半径分上昇させる
+		EnemyPos.y += fEnemyRadius;
 
 		//エネミーの当たり判定処理
 		bool bHit = CConvenience_Function::SphereCollision(pos, fRadius, EnemyPos, fEnemyRadius);

@@ -286,7 +286,7 @@ void CGame::Draw()
 
 	m_pPlayer->Draw();
 
-	
+	m_pEnmeyManager->Draw();
 
 }
 
