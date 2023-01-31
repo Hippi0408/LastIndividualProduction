@@ -377,3 +377,20 @@ D3DXVECTOR3 CConvenience_Function::InnerProductCollisionSideZExtrusion(D3DXVECTO
 	//Posを返す
 	return pos;
 }
+
+//*****************************************************************************
+// 点の方向ベクトルの生成
+//*****************************************************************************
+D3DXVECTOR3 CConvenience_Function::PointOrientationVectorGeneration(D3DXVECTOR3 pos1, D3DXVECTOR3 pos2)
+{
+	//方向ベクトル
+	D3DXVECTOR3 vec;
+
+	//ベクトルの生成
+	vec = pos1 - pos2;
+
+	//長さを1にする
+	D3DXVec3Normalize(&vec,&vec);
+
+	return vec;
+}

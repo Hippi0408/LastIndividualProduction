@@ -37,6 +37,7 @@ public:
 	static D3DXVECTOR3 InnerProductCollisionBaseExtrusion(D3DXVECTOR3 Top1, D3DXVECTOR3 Normal, D3DXVECTOR3 TopPos);
 	static D3DXVECTOR3 InnerProductCollisionSideXExtrusion(D3DXVECTOR3 Top1, D3DXVECTOR3 Normal, D3DXVECTOR3 TopPos);
 	static D3DXVECTOR3 InnerProductCollisionSideZExtrusion(D3DXVECTOR3 Top1, D3DXVECTOR3 Normal, D3DXVECTOR3 TopPos);
+	static D3DXVECTOR3 PointOrientationVectorGeneration(D3DXVECTOR3 pos1, D3DXVECTOR3 pos2);
 private:
 };
 

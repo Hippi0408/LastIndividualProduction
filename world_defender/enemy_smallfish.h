@@ -26,7 +26,9 @@ private:
 	static const D3DXVECTOR3 INIT_POS;
 	static const float MOVE_INERTIA;
 	static const float JUMP_INERTIA;
-	static const float INIT_RADIUS;
+	static const float INIT_RADIUS; 
+	static const float SEARCH_RANGE;
+
 public:
 	CEnemy_SmallFish();
 	~CEnemy_SmallFish() override;

@@ -20,9 +20,10 @@
 #include "psychokinesis_area.h"
 
 const D3DXVECTOR3 CEnemy_SmallFish::INIT_POS = D3DXVECTOR3(1000.0f, 0.0f, -0.0f);
-const float CEnemy_SmallFish::MOVE_INERTIA = 0.1f;
-const float CEnemy_SmallFish::JUMP_INERTIA = 0.1f;
-const float CEnemy_SmallFish::INIT_RADIUS = 1600.0f;
+const float CEnemy_SmallFish::MOVE_INERTIA = 5.0f;
+const float CEnemy_SmallFish::JUMP_INERTIA = 0.1f; 
+const float CEnemy_SmallFish::INIT_RADIUS = 100.0f;
+const float CEnemy_SmallFish::SEARCH_RANGE = 1000.0f;
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
@@ -44,6 +45,13 @@ CEnemy_SmallFish::~CEnemy_SmallFish()
 //*****************************************************************************
 HRESULT CEnemy_SmallFish::Init()
 {
+
+	//親クラスの初期化
+	if (FAILED(CEnemy::Init()))
+	{
+		return -1;
+	}
+
 	//ライフの設定
 	SetLife(INIT_LIFE);
 
@@ -70,6 +78,8 @@ HRESULT CEnemy_SmallFish::Init()
 //*****************************************************************************
 void CEnemy_SmallFish::Uninit()
 {
+	//親クラスの終了処理
+	CEnemy::Uninit();
 }
 
 //*****************************************************************************
@@ -77,70 +87,48 @@ void CEnemy_SmallFish::Uninit()
 //*****************************************************************************
 void CEnemy_SmallFish::Update()
 {
-	CManager *pManager = GetManager();
+	//親クラスの更新処理
+	CEnemy::Update();
 
+	//自身の位置
+	D3DXVECTOR3 pos = GetPos();
+
+	//マネージャーからプレイヤーの情報の取得
+	CManager* pManager = GetManager();
 	CGame* pGame = (CGame*)pManager->GetGameObject();
+	CPlayer* pPlayer = pGame->GetPlayer();
 
-	D3DXVECTOR3 add = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	//プレイヤーの位置
+	D3DXVECTOR3 PLpos = pPlayer->GetPos();
 
-	AddPos(add);
-
-
-	D3DXVECTOR3 pos, groundpos;
-
-	pos = GetPos();
-
-	groundpos = pGame->GetMeshfield()->Collision(pos);
-
-	if (pos.y < -100.0f)
+	//索敵範囲にいるかどうか
+	if (!CConvenience_Function::CircleCollision(pos, SEARCH_RANGE, PLpos, 0.0f))
 	{
-		pos.y = 0.0f;
-		SetPos(pos);
+		return;
 	}
 
-	int nMotion = 0;
-
-	//入力デバイスの取得
-	CInput *pInput = CInput::GetKey();
-
-	if (pInput->Press(DIK_UP))
-	{
-		pos.z += 50.0f;
-		SetPos(pos);
-	}
-	else if (pInput->Press(DIK_DOWN))
-	{
-		pos.z += -50.0f;
-		SetPos(pos);
-	}
-	else if (pInput->Press(DIK_RIGHT))
-	{
-		pos.x += 50.0f;
-		SetPos(pos);
-	}
-	else if (pInput->Press(DIK_LEFT))
-	{
-		pos.x += -50.0f;
-		SetPos(pos);
-	}
+	//プレイヤーの方向へのベクトル
+	D3DXVECTOR3 vec = CConvenience_Function::PointOrientationVectorGeneration(PLpos, pos);
 
 
-	CMotionParts::MoveMotionModel(GetMotionNum(), nMotion, &GetPos(), &GetRot());
+	//プレイヤーに近づく
+	AddPos(vec * MOVE_INERTIA);
 
-	D3DXVECTOR3 Plpos;
+	//当たり判定(他のエネミーとの)
 
-	Plpos = pGame->GetPlayer()->GetPos();
-	pos = GetPos();
 
-	Plpos.y += 0.0f;
 
-	bool bCollision = CConvenience_Function::SphereCollision(pos, 0.0f, Plpos, 100.0f);
 
-	if (bCollision)
-	{
-		SetLife(0);
-		CMotionParts::SetBoolDraw(true, GetMotionNum());
-	}
+	//エネミーのrot
+	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	rot.y = atan2f(vec.x, vec.z) + D3DX_PI;
+
+	//rot設定
+	SetRot(rot);
+
+
+	//モーション
+	CMotionParts::MoveMotionModel(GetMotionNum(), 0, &GetPos(), &GetRot());
 
 }
 
@@ -149,6 +137,8 @@ void CEnemy_SmallFish::Update()
 //*****************************************************************************
 void CEnemy_SmallFish::Draw()
 {
+	//親クラスの描画処理
+	CEnemy::Draw();
 }
 
 //*****************************************************************************
@@ -156,14 +146,10 @@ void CEnemy_SmallFish::Draw()
 //*****************************************************************************
 bool CEnemy_SmallFish::IsUnused()
 {
-
 	if (CMovable_Obj::CheckLife())
 	{
-		CMotionParts::MoveMotionModel(GetMotionNum(), 4, &GetPos(), &GetRot(), true);
-
 		return true;
 	}
-
 
 	return false;
 }

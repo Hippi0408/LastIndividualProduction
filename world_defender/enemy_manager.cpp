@@ -9,6 +9,8 @@
 // インクルード
 //*****************************************************************************
 #include "enemy.h"
+#include "enemy_boss.h"
+#include "enemy_smallfish.h"
 #include "enemy_manager.h"
 #include <assert.h>
 #include "convenience_function.h"
@@ -152,6 +154,12 @@ void CEnemy_Manager::CreateEnemy(EnemyInitData enemyinitdata)
 	{
 	case ENEMY_00:
 		pEnemy = new CEnemy;
+		break;
+	case ENEMY_01:
+		pEnemy = new CEnemy_SmallFish;
+		break;
+	case ENEMY_02:
+		pEnemy = new CEnemy_Boss;
 		break;
 	default:
 		assert(false);
