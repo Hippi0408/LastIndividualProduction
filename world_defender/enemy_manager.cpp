@@ -261,3 +261,85 @@ bool CEnemy_Manager::EnemyCollision(D3DXVECTOR3 pos, float fRadius)
 
 	return false;
 }
+
+//*****************************************************************************
+// エネミー同士の当たり判定処理(押し戻し)
+//*****************************************************************************
+void CEnemy_Manager::EnemyOnEnemyCollision(CEnemy * pTargetEnemy)
+{
+	//イテレーターループ
+	for (auto itr = m_EnemyList.begin(); itr != m_EnemyList.end();)
+	{
+		//イテレーターからエネミーのポインタの代入
+		CEnemy* pEnemy = *itr;
+
+		//エネミーポインタの解放
+		if (pEnemy == nullptr)
+		{
+			//次のイテレーターの代入、現在のイテレーターを破棄
+			itr = m_EnemyList.erase(itr);
+
+			//以下の処理を無視する
+			continue;
+		}
+
+		//対象エネミーと同じではないか
+		if (pEnemy == pTargetEnemy)
+		{
+			//イテレーターを進める
+			itr++;
+
+			//以下の処理を無視する
+			continue;
+		}
+
+		//判定
+		bool bHit = CConvenience_Function::CircleCollision(pEnemy->GetPos(), pEnemy->GetRadius(), pTargetEnemy->GetPos(), pTargetEnemy->GetRadius());
+
+		//上記の結果がfalse
+		if (!bHit)
+		{
+			//イテレーターを進める
+			itr++;
+
+			//以下の処理を無視する
+			continue;
+		}
+		
+		//位置の保存
+		D3DXVECTOR3 Pos1 = pEnemy->GetPos();
+		D3DXVECTOR3 Pos2 = pTargetEnemy->GetPos();
+
+		//２この物体の半径同士の和
+		float fDiff = pEnemy->GetRadius() + pTargetEnemy->GetRadius();
+
+		//計算用変数
+		float fCalculationX, fCalculationZ;
+
+		//Xの差分
+		fCalculationX = Pos1.x - Pos2.x;
+		//Yの差分
+		fCalculationZ = Pos1.z - Pos2.z;
+
+		//現在の２点の距離
+		float fLength = sqrtf(fCalculationX * fCalculationX + fCalculationZ * fCalculationZ);
+
+		//押し出す長さ
+		float fAddLength = fDiff - fLength;
+
+		//最終的な押し出し値
+		D3DXVECTOR3 Add = CConvenience_Function::PointOrientationVectorGeneration(Pos2, Pos1);
+
+		//長さを掛ける
+		Add *= fAddLength;
+		
+		//押し出し
+		pTargetEnemy->AddPos(Add);
+
+		//処理を抜ける
+		return;
+	}
+
+
+
+}

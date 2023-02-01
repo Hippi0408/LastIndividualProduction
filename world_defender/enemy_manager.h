@@ -63,7 +63,8 @@ public:
 
 	void CreateEnemy(EnemyInitData enemyinitdata);
 
-	bool EnemyCollision(D3DXVECTOR3 pos,float fRadius);
+	bool EnemyCollision(D3DXVECTOR3 pos, float fRadius);
+	void EnemyOnEnemyCollision(CEnemy* pTargetEnemy);
 private:
 
 	//エネミーのリスト

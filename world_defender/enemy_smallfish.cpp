@@ -17,7 +17,7 @@
 #include "input.h"
 #include "object_type_list.h"
 #include "convenience_function.h"
-#include "psychokinesis_area.h"
+#include "enemy_manager.h"
 
 const D3DXVECTOR3 CEnemy_SmallFish::INIT_POS = D3DXVECTOR3(1000.0f, 0.0f, -0.0f);
 const float CEnemy_SmallFish::MOVE_INERTIA = 5.0f;
@@ -114,10 +114,12 @@ void CEnemy_SmallFish::Update()
 	//プレイヤーに近づく
 	AddPos(vec * MOVE_INERTIA);
 
+
+	//エネミーマネージャーの取得
+	CEnemy_Manager* pEnemy_Manager = pGame->GetEnemy_Manager();
+
 	//当たり判定(他のエネミーとの)
-
-
-
+	pEnemy_Manager->EnemyOnEnemyCollision(this);
 
 	//エネミーのrot
 	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f,0.0f,0.0f);
