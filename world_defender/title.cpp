@@ -13,7 +13,7 @@
 #include "input.h"
 #include "texture.h"
 #include "ui.h"
-
+#include "sound.h"
 
 //*****************************************************************************
 // コンストラクタ
@@ -35,6 +35,9 @@ CTitle::~CTitle()
 //*****************************************************************************
 HRESULT CTitle::Init()
 {
+	//サウンド
+	PlaySound(SOUND_LABEL_BGM_TITLE);
+
 	//nullptr
 	m_pUi = nullptr;
 
@@ -64,6 +67,9 @@ HRESULT CTitle::Init()
 //*****************************************************************************
 void CTitle::Uninit()
 {
+	//サウンド
+	StopSound();
+
 	//UiRelease
 	if (m_pUi != nullptr)
 	{

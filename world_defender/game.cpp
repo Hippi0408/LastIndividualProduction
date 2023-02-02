@@ -25,6 +25,8 @@
 #include "ballast_manager.h"
 #include <assert.h>
 #include "mesh_cylinder.h"
+#include "sound.h"
+#include "gauge.h"
 
 //*****************************************************************************
 // コンストラクタ
@@ -45,6 +47,12 @@ CGame::~CGame()
 //*****************************************************************************
 HRESULT CGame::Init()
 {
+
+	//サウンド停止
+	StopSound();
+	//サウンド
+	PlaySound(SOUND_LABEL_BGM_GAME);
+
 	//カメラ
 	m_pCamera = new CTpsCamera;
 	if (FAILED(m_pCamera->Init()))
@@ -125,6 +133,9 @@ HRESULT CGame::Init()
 //*****************************************************************************
 void CGame::Uninit()
 {
+	//サウンド
+	StopSound();
+
 	//カメラ
 	if (m_pCamera != nullptr)
 	{
@@ -181,6 +192,8 @@ void CGame::Uninit()
 	C3DObject::UninitAllModel();
 
 	CMotionParts::ALLUninit();
+
+	CGauge::AllUninit();
 }
 
 //*****************************************************************************
@@ -291,6 +304,9 @@ void CGame::Draw()
 	m_pPlayer->Draw();
 
 	m_pEnmeyManager->Draw();
+
+	//ゲージ
+	CGauge::AllDraw();
 
 }
 

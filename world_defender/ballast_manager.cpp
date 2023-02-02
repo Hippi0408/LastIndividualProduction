@@ -18,6 +18,7 @@
 #include "enemy_manager.h"
 #include "read.h"
 #include "ballast_acquired.h"
+#include "sound.h"
 
 const float CBallast_Manager::MAP_MAX = 15000.0f;
 const D3DXVECTOR3 CBallast_Manager::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -376,6 +377,8 @@ void CBallast_Manager::CollisionEnemy()
 			continue;
 		}
 
+		//ƒTƒEƒ“ƒh
+		PlaySound(SOUND_LABEL_SE_EXPLOSION);
 		
 		D3DXVECTOR3 vec = pBallast->GetPosMove() * -1.0f;
 

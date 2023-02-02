@@ -14,6 +14,7 @@
 #include "texture.h"
 #include "input.h"
 #include "manager.h"
+#include "sound.h"
 
 //*****************************************************************************
 // コンストラクタ
@@ -34,6 +35,9 @@ CResult::~CResult()
 //*****************************************************************************
 HRESULT CResult::Init()
 {
+	//サウンド
+	PlaySound(SOUND_LABEL_BGM_RESULT);
+
 	//nullptr
 	m_pUi = nullptr;
 
@@ -63,6 +67,9 @@ HRESULT CResult::Init()
 //*****************************************************************************
 void CResult::Uninit()
 {
+	//サウンド
+	StopSound();
+
 	//UiRelease
 	if (m_pUi != nullptr)
 	{

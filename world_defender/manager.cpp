@@ -16,6 +16,7 @@
 #include "input.h"
 #include "texture.h"
 #include "fade.h"
+#include "sound.h"
 
 //*****************************************************************************
 // コンストラクタ
@@ -43,6 +44,9 @@ CManager::~CManager()
 //*****************************************************************************
 HRESULT CManager::Init(HINSTANCE hInstance,HWND hWnd, bool bWindow)
 {
+	//サウンド
+	InitSound(hWnd);
+
 	m_bChange = false;
 	m_Mode = TYPE_GAME;
 	CTexture::Create();
@@ -82,6 +86,9 @@ HRESULT CManager::Init(HINSTANCE hInstance,HWND hWnd, bool bWindow)
 //*****************************************************************************
 void CManager::Uninit()
 {
+	//サウンド
+	UninitSound();
+
 	//入力処理の終了処理
 	m_pInput->Uninit();
 

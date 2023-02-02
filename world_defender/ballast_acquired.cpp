@@ -11,8 +11,8 @@
 #include "ballast_acquired.h"
 #include "convenience_function.h"
 
-const float CBallast_Acquired::GRAVITY = 2.0f;
-const float CBallast_Acquired::MOVE_ATTENUATION = 0.05f;
+const float CBallast_Acquired::GRAVITY = -0.5f;
+const float CBallast_Acquired::MOVE_ATTENUATION = 0.1f;
 const float CBallast_Acquired::MOVE_MAGNIFICATION = 3.0f;
 
 //*****************************************************************************
@@ -38,7 +38,7 @@ void CBallast_Acquired::Update()
 
 	D3DXVECTOR3 move = GetPosMove();
 
-	move += (move - D3DXVECTOR3(0.0f, GRAVITY, 0.0f)) * MOVE_ATTENUATION;
+	move += (move - D3DXVECTOR3(0.0f, 0.0f, 0.0f)) * MOVE_ATTENUATION;
 
 	SetPosMove(move);
 
@@ -48,6 +48,12 @@ void CBallast_Acquired::Update()
 
 		D3DXVECTOR3 pos = GetParentPos();
 		SetParentPos(D3DXVECTOR3(pos.x, 0.0f, pos.z));
+	}
+	else
+	{
+		move.y += GRAVITY;
+
+		SetPosMove(move);
 	}
 
 	//親クラスの更新

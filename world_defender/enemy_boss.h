@@ -15,6 +15,7 @@
 //*****************************************************************************
 // 前方宣言
 //*****************************************************************************
+class CStatGauge;
 
 //*****************************************************************************
 // クラス定義
@@ -22,7 +23,7 @@
 class CEnemy_Boss : public CEnemy
 {
 private:
-	static const int INIT_LIFE = 300;
+	static const int INIT_LIFE = 1000;
 	static const D3DXVECTOR3 INIT_POS;
 	static const float MOVE_INERTIA;
 	static const float JUMP_INERTIA;
@@ -39,6 +40,8 @@ public:
 	bool IsUnused() override;
 	void SetMotionModel() override;
 
+	void AddLife(int nAdd) override;
+
 	//慣性のGet
 	float GetMoveInertia() override { return MOVE_INERTIA; }
 
@@ -46,7 +49,7 @@ public:
 	float GetJumpMoveInertia() override { return JUMP_INERTIA; }
 
 private:
-	
+	CStatGauge *m_pLife;
 };
 
 #endif

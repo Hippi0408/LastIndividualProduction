@@ -18,6 +18,7 @@
 #include "object_type_list.h"
 #include "convenience_function.h"
 #include "psychokinesis_area.h"
+#include "statgauge.h"
 
 const D3DXVECTOR3 CEnemy_Boss::INIT_POS = D3DXVECTOR3(1000.0f, 0.0f, -0.0f);
 const float CEnemy_Boss::MOVE_INERTIA = 0.1f;
@@ -30,6 +31,7 @@ CEnemy_Boss::CEnemy_Boss()
 {
 	CMovable_Obj::SetLife(INIT_LIFE);
 	CMovable_Obj::SetRadius(INIT_RADIUS);
+	m_pLife = nullptr;
 }
 
 //*****************************************************************************
@@ -44,6 +46,24 @@ CEnemy_Boss::~CEnemy_Boss()
 //*****************************************************************************
 HRESULT CEnemy_Boss::Init()
 {
+	CStatGauge::SStatGauge StatGauge;
+
+	StatGauge.pos = D3DXVECTOR3(150.0f, 60.0f, 0.0f);
+	StatGauge.rot = D3DXVECTOR3(0.0f, 0.0f, -D3DX_PI * 0.5f);
+	StatGauge.color = D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f);
+	StatGauge.fXSize = 60.0f;
+	StatGauge.fYSize = 1200.0f;
+	StatGauge.nValueMax = INIT_LIFE;
+	StatGauge.nRecoveryCntMaqx = 0;
+	StatGauge.nRecovery = 0;
+
+	m_pLife = new CStatGauge;
+	if (FAILED(m_pLife->Init()))
+	{
+		return -1;
+	}
+	m_pLife->CreateStatBar(StatGauge);
+
 	//ƒ‰ƒCƒt‚ÌÝ’è
 	SetLife(INIT_LIFE);
 
@@ -70,6 +90,13 @@ HRESULT CEnemy_Boss::Init()
 //*****************************************************************************
 void CEnemy_Boss::Uninit()
 {
+	if (m_pLife != nullptr)
+	{
+		m_pLife->Uninit();
+		delete m_pLife;
+		m_pLife = nullptr;
+	}
+
 }
 
 //*****************************************************************************
@@ -77,6 +104,18 @@ void CEnemy_Boss::Uninit()
 //*****************************************************************************
 void CEnemy_Boss::Update()
 {
+	if (m_pLife != nullptr)
+	{
+		if (m_pLife->ValueCheck())
+		{
+			CManager * pManager = GetManager();
+			pManager->NextMode(TYPE_RESULT,300);
+		}
+
+		m_pLife->Update();
+
+	}
+
 	CManager *pManager = GetManager();
 
 	CGame* pGame = (CGame*)pManager->GetGameObject();
@@ -126,22 +165,6 @@ void CEnemy_Boss::Update()
 
 
 	CMotionParts::MoveMotionModel(GetMotionNum(), nMotion, &GetPos(), &GetRot());
-
-	D3DXVECTOR3 Plpos;
-
-	Plpos = pGame->GetPlayer()->GetPos();
-	pos = GetPos();
-
-	Plpos.y += 0.0f;
-
-	bool bCollision = CConvenience_Function::SphereCollision(pos, 0.0f, Plpos, 100.0f);
-
-	if (bCollision)
-	{
-		SetLife(0);
-		CMotionParts::SetBoolDraw(true, GetMotionNum());
-	}
-
 }
 
 //*****************************************************************************
@@ -178,4 +201,14 @@ void CEnemy_Boss::SetMotionModel()
 	SetMotionNum(cRead.ReadMotion("data/MOTION/motionboss.txt"));
 
 	CMotionParts::AllSetObject_Type_List(GetMotionNum(), OBJ_ENEMY);
+}
+
+//*****************************************************************************
+// HP‚ÌŒ¸­
+//*****************************************************************************
+void CEnemy_Boss::AddLife(int nAdd)
+{
+	CMovable_Obj::AddLife(nAdd);
+
+	m_pLife->SetStatGauge(nAdd);
 }

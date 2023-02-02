@@ -161,12 +161,14 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="convenience_function.cpp" />
     <ClCompile Include="DirectInput.cpp" />
+    <ClCompile Include="elasticitypolygon.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="enemy_boss.cpp" />
     <ClCompile Include="enemy_manager.cpp" />
     <ClCompile Include="enemy_smallfish.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="gauge.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="inputjoypad.cpp" />
     <ClCompile Include="inputkeyboard.cpp" />
@@ -187,6 +189,8 @@
     <ClCompile Include="read.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="result.cpp" />
+    <ClCompile Include="sound.cpp" />
+    <ClCompile Include="statgauge.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="title.cpp" />
     <ClCompile Include="tps_camera.cpp" />
@@ -203,12 +207,14 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="convenience_function.h" />
     <ClInclude Include="DirectInput.h" />
+    <ClInclude Include="elasticitypolygon.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="enemy_boss.h" />
     <ClInclude Include="enemy_manager.h" />
     <ClInclude Include="enemy_smallfish.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="gauge.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="inputjoypad.h" />
     <ClInclude Include="inputkeyboard.h" />
@@ -232,6 +238,8 @@
     <ClInclude Include="renderer.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="result.h" />
+    <ClInclude Include="sound.h" />
+    <ClInclude Include="statgauge.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="title.h" />
     <ClInclude Include="tps_camera.h" />

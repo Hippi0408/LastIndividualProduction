@@ -56,7 +56,7 @@ public:
 	//ライフのGet、Set、Add
 	int GetLife() { return m_nLife; }
 	void SetLife(int nLife) { m_nLife = nLife; }
-	void AddLife(int nAdd) { m_nLife += nAdd; }
+	virtual void AddLife(int nAdd) { m_nLife += nAdd; }
 	//ライフが指定数以下(false)、以上（true）の場合,trueを返す
 	bool CheckLife(int nLife = 0, bool b = false);
 
