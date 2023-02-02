@@ -16,6 +16,8 @@
 #include "meshfield.h"
 #include "convenience_function.h"
 #include "enemy_manager.h"
+#include "read.h"
+#include "ballast_acquired.h"
 
 const float CBallast_Manager::MAP_MAX = 15000.0f;
 const D3DXVECTOR3 CBallast_Manager::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -44,6 +46,9 @@ HRESULT CBallast_Manager::Init()
 	m_nPlListNumber = 0;
 	m_nMeshfieldNumMax = 0;
 	m_pMeshfieldCopy = nullptr;
+
+	CRead Read;
+	m_nBallast_Acquired_Model = Read.ReadXFile("data/MODEL/岩.x");
 
 	return S_OK;
 }
@@ -173,7 +178,8 @@ void CBallast_Manager::SetBallast(int nNumber, Object_Data Data)
 	pBallast->SetListNumber(nNumber);
 
 	//使用するモデル番号、瓦礫の位置、瓦礫の向き
-	pBallast->Set3DObject(Data.nPattn, Data.pos, Data.rot);
+	pBallast->Set3DObject(Data.nPattn, D3DXVECTOR3(0.0f,0.0f,0.0f), Data.rot);
+	pBallast->SetParentPos(Data.pos);
 
 	//法線設定
 	pBallast->SetNormal();
@@ -231,7 +237,7 @@ CBallast * CBallast_Manager::CheckCircleCollision(D3DXVECTOR3 pos, float fRadius
 			}
 
 			//サイコキネシスエリアにあるかどうかpBallast->GetVtxMax().x
-			if (CConvenience_Function::CircleCollision(pos,fRadius, pBallast->GetPos(), 0.0f))
+			if (CConvenience_Function::CircleCollision(pos,fRadius, pBallast->GetParentPos(), 0.0f))
 			{
 				return pBallast;
 			}
@@ -270,7 +276,7 @@ void CBallast_Manager::WithinRangeColor(int nMapGrid, D3DXVECTOR3 pos, float fRa
 		}
 
 		//サイコキネシスエリアにあるかどうかpBallast->GetVtxMax().x
-		if (CConvenience_Function::CircleCollision(pos, fRadius, pBallast->GetPos(), 0.0f))
+		if (CConvenience_Function::CircleCollision(pos, fRadius, pBallast->GetParentPos(), 0.0f))
 		{
 			pBallast->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.6f), D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.4f), 0.05f);
 			pBallast->SetWithinRangeColor(true);
@@ -370,6 +376,14 @@ void CBallast_Manager::CollisionEnemy()
 			continue;
 		}
 
+		
+		D3DXVECTOR3 vec = pBallast->GetPosMove() * -1.0f;
+
+		D3DXVec3Normalize(&vec, &vec);
+
+		SetBallastAcquired(vec, pBallast->GetWorldPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+
+
 		//瓦礫の使用状態を変更
 		pBallast->SetUse(false);
 
@@ -387,5 +401,58 @@ void CBallast_Manager::SetFloatingBallst(CBallast * pBallast)
 {
 	//リストに瓦礫情報を追加
 	m_FloatingBallstList.push_back(pBallast);
+}
+
+//*****************************************************************************
+//後天的瓦礫の生成(引数は飛ばしたい方向ベクトル,あとは基本情報)
+//*****************************************************************************
+void CBallast_Manager::SetBallastAcquired(D3DXVECTOR3 vec, D3DXVECTOR3 pos, D3DXVECTOR3 rot)
+{
+	//マップチップの位置
+	int nNumber = 0;
+
+	//吹っ飛ぶ方向
+	D3DXVECTOR3 Vec = vec;
+
+	//後天的瓦礫クラスの生成
+	CBallast_Acquired* pBallastAcquired = new CBallast_Acquired;
+
+	//初期化
+	if (FAILED(pBallastAcquired->Init()))
+	{
+		assert(false);
+	}
+	
+	//マップチップの位置確認
+	nNumber = m_pMeshfieldCopy->CheckPosLocation(pos);
+
+	//メッシュ内の位置（番号）
+	pBallastAcquired->SetListNumber(nNumber);
+
+	//使用するモデル番号、瓦礫の位置、瓦礫の向き
+	pBallastAcquired->Set3DObject(m_nBallast_Acquired_Model, D3DXVECTOR3(0.0f,0.0f,0.0f), rot);
+
+	pBallastAcquired->SetParentPos(pos);
+
+	//吹っ飛ぶ方向(乱数を含める)
+	Vec.x += (float)(rand() % 10 - 5);
+	Vec.y += (float)(rand() % 10 - 5);
+	Vec.z += (float)(rand() % 10 - 5);
+
+	//ノーマライズ
+	D3DXVec3Normalize(&Vec,&Vec);
+
+	//吹っ飛ぶ方向の設定
+	pBallastAcquired->SetVec(Vec);
+
+	//法線設定
+	pBallastAcquired->SetNormal();
+
+	//半径設定
+	pBallastAcquired->SetRadius();
+
+	//リストに瓦礫情報を追加
+	m_BallastMapData[nNumber].push_back(pBallastAcquired);
+
 }
 

@@ -64,13 +64,18 @@ public:
 	//浮遊状態のリスト追加
 	void SetFloatingBallst(CBallast* pBallast);
 
+	//後天的瓦礫の生成(引数は飛ばしたい方向ベクトル,あとは基本情報)
+	void SetBallastAcquired(D3DXVECTOR3 vec,D3DXVECTOR3 pos, D3DXVECTOR3 rot);
+
+
+
 private:
 	std::map<int, std::list<CBallast*>> m_BallastMapData;		//マップ上のオブジェクトをリストで管理する変数
 	std::list<CBallast*> m_FloatingBallstList;					//浮遊状態の瓦礫
 	int m_nPlListNumber;
 	CMeshfield *m_pMeshfieldCopy;								//メッシュフィールドポインタのコピー（このコピーは解放をしない）
 	int m_nMeshfieldNumMax;										//メッシュのマスの数の最大
-
+	int m_nBallast_Acquired_Model;
 };
 
 #endif

@@ -18,12 +18,15 @@
 #include "object_type_list.h"
 #include "convenience_function.h"
 #include "enemy_manager.h"
+#include "ballast_manager.h"
 
 const D3DXVECTOR3 CEnemy_SmallFish::INIT_POS = D3DXVECTOR3(1000.0f, 0.0f, -0.0f);
 const float CEnemy_SmallFish::MOVE_INERTIA = 5.0f;
 const float CEnemy_SmallFish::JUMP_INERTIA = 0.1f; 
 const float CEnemy_SmallFish::INIT_RADIUS = 100.0f;
 const float CEnemy_SmallFish::SEARCH_RANGE = 1000.0f;
+const D3DXVECTOR3 CEnemy_SmallFish::ENEMY_SIZE_MAX = D3DXVECTOR3(INIT_RADIUS, INIT_RADIUS, INIT_RADIUS);
+const D3DXVECTOR3 CEnemy_SmallFish::ENEMY_SIZE_MIN = D3DXVECTOR3(-INIT_RADIUS, 0.0f, -INIT_RADIUS);
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
@@ -78,6 +81,9 @@ HRESULT CEnemy_SmallFish::Init()
 //*****************************************************************************
 void CEnemy_SmallFish::Uninit()
 {
+	//モーション
+	CMotionParts::MoveMotionModel(GetMotionNum(), 1, &GetPos(), &GetRot(),true);
+
 	//親クラスの終了処理
 	CEnemy::Uninit();
 }
@@ -104,12 +110,17 @@ void CEnemy_SmallFish::Update()
 	//索敵範囲にいるかどうか
 	if (!CConvenience_Function::CircleCollision(pos, SEARCH_RANGE, PLpos, 0.0f))
 	{
+		//モーション
+		CMotionParts::MoveMotionModel(GetMotionNum(), 0, &GetPos(), &GetRot());
+
 		return;
 	}
 
 	//プレイヤーの方向へのベクトル
 	D3DXVECTOR3 vec = CConvenience_Function::PointOrientationVectorGeneration(PLpos, pos);
 
+	//Y方向をなくす
+	vec.y = 0.0f;
 
 	//プレイヤーに近づく
 	AddPos(vec * MOVE_INERTIA);
@@ -121,6 +132,57 @@ void CEnemy_SmallFish::Update()
 	//当たり判定(他のエネミーとの)
 	pEnemy_Manager->EnemyOnEnemyCollision(this);
 
+	
+
+	
+
+	//-------------------------------------------------------
+	// 瓦礫との当たり判定
+	//-------------------------------------------------------
+
+	//瓦礫マネージャーの取得
+	CBallast_Manager* pBallast_Manager = pGame->GetBallast_Manager();
+
+	//マップ上のどこに居るか
+	int nMapGrid = pGame->GetMeshfield()->CheckPosLocation(pos);
+
+	//マップの奥行にメッシュ数
+	int nDepthGrid = pGame->GetMeshfield()->GetMeshZ();
+
+	//当たり判定をチェックするメッシュ
+	int aMapGrid[CHECK_RANGE];
+
+	//プレイヤーのいるメッシュ
+	int nEnemyMapGrid = nMapGrid - nDepthGrid;
+
+	//プレイヤーのいるメッシュから周り８箇所の割り出し
+	for (int nCnt = 0; nCnt < CHECK_RANGE_X; nCnt++)
+	{
+		aMapGrid[nCnt * CHECK_RANGE_X] = nEnemyMapGrid + nDepthGrid * nCnt - 1;
+		aMapGrid[nCnt * CHECK_RANGE_X + 1] = nEnemyMapGrid + nDepthGrid * nCnt;
+		aMapGrid[nCnt * CHECK_RANGE_X + 2] = nEnemyMapGrid + nDepthGrid * nCnt + 1;
+	}
+
+	//瓦礫との当たり判定
+	D3DXVECTOR3 Add = GetPos();
+
+	//指定範囲の瓦礫の当たり判定
+	for (int nCnt = 0; nCnt < CHECK_RANGE; nCnt++)
+	{
+		//瓦礫の当たり判定
+		Add = pGame->GetBallast_Manager()->CollisionBallast(aMapGrid[nCnt], GetPos(), GetOldPos(), ENEMY_SIZE_MAX, ENEMY_SIZE_MIN);
+
+		if (Add != GetPos())
+		{
+			break;
+		}
+
+	}
+
+	//瓦礫との当たり判定
+	SetPos(Add);
+
+
 	//エネミーのrot
 	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	rot.y = atan2f(vec.x, vec.z) + D3DX_PI;
@@ -130,7 +192,7 @@ void CEnemy_SmallFish::Update()
 
 
 	//モーション
-	CMotionParts::MoveMotionModel(GetMotionNum(), 0, &GetPos(), &GetRot());
+	CMotionParts::MoveMotionModel(GetMotionNum(), 1, &GetPos(), &GetRot());
 
 }
 

@@ -77,14 +77,14 @@ HRESULT CGame::Init()
 	EnemyInitData EnemyInitData;
 
 	EnemyInitData.fmove = 10.0f;
-	EnemyInitData.pos = D3DXVECTOR3(500.0f,0.0f, 500.0f);
+	EnemyInitData.pos = D3DXVECTOR3(3000.0f,0.0f, 500.0f);
 	EnemyInitData.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	EnemyInitData.type = ENEMY_01;
+	EnemyInitData.type = ENEMY_02;
 
 	m_pEnmeyManager->CreateEnemy(EnemyInitData);
 
-	EnemyInitData.pos = D3DXVECTOR3(500.0f, 0.0f, -500.0f);
-	m_pEnmeyManager->CreateEnemy(EnemyInitData);
+	/*EnemyInitData.pos = D3DXVECTOR3(500.0f, 0.0f, -500.0f);
+	m_pEnmeyManager->CreateEnemy(EnemyInitData);*/
 
 	//BG3D
 	m_pMeshfieldBG = cRead.ReadMap("data/MAPTXT/map.txt");

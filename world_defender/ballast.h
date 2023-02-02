@@ -30,10 +30,10 @@ public:
 	CBallast();
 	~CBallast() override;
 
-	HRESULT Init() override;//初期化
-	void Uninit() override;//終了処理
-	void Update() override;//更新処理
-	void Draw() override;//描画処理
+	virtual HRESULT Init() override;//初期化
+	virtual void Uninit() override;//終了処理
+	virtual void Update() override;//更新処理
+	virtual void Draw() override;//描画処理
 
 	//瓦礫の位置のSet、Get
 	void SetListNumber(int nNumber) { m_nListNumber = nNumber; }

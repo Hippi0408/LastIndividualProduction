@@ -10,6 +10,9 @@
 //-----------------------------------------------------------------------------
 #include "ballast.h"
 #include "convenience_function.h"
+#include "game.h"
+#include "manager.h"
+#include "ballast_manager.h"
 
 //*****************************************************************************
 // コンストラクタ
@@ -61,13 +64,25 @@ void CBallast::Uninit()
 void CBallast::Update()
 {
 	//各情報の取得
-	D3DXVECTOR3 pos = GetPos();
+	D3DXVECTOR3 pos;
 	D3DXVECTOR3 move = GetPosMove();
 	D3DXVECTOR3 rot = GetRot();
 
-	//子の位置の更新
-	pos += move;
-	SetPos(pos);
+	if (!m_bFloating)
+	{
+		//子の位置の更新
+		pos = GetParentPos();
+		pos += move;
+		SetParentPos(pos);
+	}
+	else
+	{
+		//子の位置の更新
+		pos = GetPos();
+		pos += move;
+		SetPos(pos);
+	}
+
 
 	//向きの更新
 	rot += m_MoveRot;
@@ -133,7 +148,7 @@ D3DXVECTOR3 CBallast::ConclusionCollision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, D
 	D3DXVECTOR3 HittingTargetPosMax[SURFACE_MAX], HittingTargetPosMin[SURFACE_MAX], HittingTargetOldPosMax[SURFACE_MAX], HittingTargetOldPosMin[SURFACE_MAX];
 
 	//モデルの位置
-	D3DXVECTOR3 ModelPos = GetParentPos();
+	D3DXVECTOR3 ModelPos = GetPos();
 	D3DXVECTOR3 ModelRot = GetRot();
 	D3DXVECTOR3 ModelMax = GetVtxMax();
 	D3DXVECTOR3 ModelMin = GetVtxMin();

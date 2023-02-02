@@ -483,9 +483,6 @@ int CMotionParts::CreateMotionObj(MotionData* pMotionData, int nPartsMax)
 		}
 
 		pMotionParts->SetPartsNum(nCnt);//一つのモーションの中の番号
-		//pMotionParts->SetModelPattnNum(pMotionData[nCnt].nModelPattern);//使用するモデルのインデックス
-		//pMotionParts->SetPos(pMotionData[nCnt].pos);//モデルの位置
-		//pMotionParts->SetRot(pMotionData[nCnt].rot);//モデルの向き
 
 		pMotionParts->Set3DObject(pMotionData[nCnt].nModelPattern, pMotionData[nCnt].pos, pMotionData[nCnt].rot);
 		

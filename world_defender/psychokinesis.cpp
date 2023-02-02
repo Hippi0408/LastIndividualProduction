@@ -265,7 +265,7 @@ void CPsychokinesis::Psychokinesis()
 
 	//プレイヤーまでの位置
 	D3DXVECTOR3 PositionWithPlayer;
-	PositionWithPlayer = pBallast->GetPos() - m_PlPos;
+	PositionWithPlayer = pBallast->GetParentPos() - m_PlPos;
 
 	//位置の設定
 	pBallast->SetPos(PositionWithPlayer);
@@ -280,7 +280,7 @@ void CPsychokinesis::Psychokinesis()
 	pBallast->SetPositionWithPlayer(PositionWithPlayer);
 
 	//瓦礫の現在の位置
-	Pos = pBallast->GetPos();
+	Pos = pBallast->GetParentPos();
 
 	//移動量の計算
 	move = (PositionWithPlayer - Pos) * 0.01f;

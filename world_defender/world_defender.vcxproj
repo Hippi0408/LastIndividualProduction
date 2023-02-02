@@ -155,6 +155,7 @@
     <ClCompile Include="3dobject.cpp" />
     <ClCompile Include="3dpolygon.cpp" />
     <ClCompile Include="ballast.cpp" />
+    <ClCompile Include="ballast_acquired.cpp" />
     <ClCompile Include="ballast_manager.cpp" />
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="camera.cpp" />
@@ -196,6 +197,7 @@
     <ClInclude Include="3dobject.h" />
     <ClInclude Include="3dpolygon.h" />
     <ClInclude Include="ballast.h" />
+    <ClInclude Include="ballast_acquired.h" />
     <ClInclude Include="ballast_manager.h" />
     <ClInclude Include="billboard.h" />
     <ClInclude Include="camera.h" />

@@ -47,7 +47,11 @@ CEnemy::~CEnemy()
 //*****************************************************************************
 HRESULT CEnemy::Init()
 {
-
+	//親クラスの初期化
+	if (FAILED(CMovable_Obj::Init()))
+	{
+		return -1;
+	}
 
 
 #ifdef _DEBUG
@@ -81,6 +85,9 @@ void CEnemy::Uninit()
 		m_pPsychokinesis_Area = nullptr;
 	}
 #endif // _DEBUG
+
+	//親クラスの終了処理
+	CMovable_Obj::Uninit();
 }
 
 //*****************************************************************************
@@ -88,6 +95,11 @@ void CEnemy::Uninit()
 //*****************************************************************************
 void CEnemy::Update()
 {
+
+	//親クラスの更新
+	CMovable_Obj::Update();
+
+
 #ifdef _DEBUG
 	//サイコキネシスエリアの更新（Posあり）
 	m_pPsychokinesis_Area->Update(GetPos());
@@ -102,6 +114,9 @@ void CEnemy::Update()
 //*****************************************************************************
 void CEnemy::Draw()
 {
+	//親クラスの描画
+	CMovable_Obj::Draw();
+
 #ifdef _DEBUG
 	//サイコキネシスエリアの描画
 	m_pPsychokinesis_Area->Draw();
