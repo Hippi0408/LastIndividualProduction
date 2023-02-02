@@ -159,6 +159,7 @@
     <ClCompile Include="ballast_manager.cpp" />
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="camera_round.cpp" />
     <ClCompile Include="convenience_function.cpp" />
     <ClCompile Include="DirectInput.cpp" />
     <ClCompile Include="elasticitypolygon.cpp" />
@@ -205,6 +206,7 @@
     <ClInclude Include="ballast_manager.h" />
     <ClInclude Include="billboard.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="camera_round.h" />
     <ClInclude Include="convenience_function.h" />
     <ClInclude Include="DirectInput.h" />
     <ClInclude Include="elasticitypolygon.h" />

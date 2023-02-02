@@ -1,11 +1,11 @@
 //=============================================================================
 //
-// tps_camera.h
+// camera_round.h
 // Author : koduna hirohito
 //
 //=============================================================================
-#ifndef _TPS_CAMERA_H_			//このマクロ定義がされなかったら
-#define _TPS_CAMERA_H_			//2重インクルード防止のマクロ定義
+#ifndef _CAMERA_ROUND_H_			//このマクロ定義がされなかったら
+#define _CAMERA_ROUND_H_			//2重インクルード防止のマクロ定義
 
 //*****************************************************************************
 // インクルード
@@ -19,28 +19,21 @@
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class CTpsCamera : public CCamera
+class CCamera_Round : public CCamera
 {
 private:
-	static const D3DXVECTOR3 RANGE_WITH_PLAYER_V;
-	static const D3DXVECTOR3 RANGE_WITH_PLAYER_R;
 	static const float DISTANCE;
+	static const float ROT_MOVE;
 public:
-	CTpsCamera();
-	~CTpsCamera() override;
+	CCamera_Round();
+	~CCamera_Round() override;
 
 	HRESULT Init() override;
 	void Update() override;
-
-	D3DXVECTOR3 GetCameraVec();
 	
 private:
-	D3DXVECTOR3 m_VPos;
 	D3DXVECTOR3 m_Rot;
-	D3DXVECTOR3 m_CameraVec;
-	D3DXVECTOR3 m_CameraVectorConversion;
-	float m_fPlayerDistance;
-	D3DXVECTOR3 m_DestPos;
+	D3DXVECTOR3 m_RotMove;
 };
 
 #endif

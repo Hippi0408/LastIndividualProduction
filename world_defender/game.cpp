@@ -27,6 +27,7 @@
 #include "mesh_cylinder.h"
 #include "sound.h"
 #include "gauge.h"
+#include "camera_round.h"
 
 //*****************************************************************************
 // コンストラクタ
@@ -54,7 +55,7 @@ HRESULT CGame::Init()
 	PlaySound(SOUND_LABEL_BGM_GAME);
 
 	//カメラ
-	m_pCamera = new CTpsCamera;
+	m_pCamera = new CCamera_Round;
 	if (FAILED(m_pCamera->Init()))
 	{
 		return -1;
@@ -85,7 +86,7 @@ HRESULT CGame::Init()
 	EnemyInitData EnemyInitData;
 
 	EnemyInitData.fmove = 10.0f;
-	EnemyInitData.pos = D3DXVECTOR3(3000.0f,0.0f, 500.0f);
+	EnemyInitData.pos = D3DXVECTOR3(0.0f,0.0f, 3000.0f);
 	EnemyInitData.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	EnemyInitData.type = ENEMY_02;
 
