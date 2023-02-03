@@ -46,6 +46,13 @@ CEnemy_Boss::~CEnemy_Boss()
 //*****************************************************************************
 HRESULT CEnemy_Boss::Init()
 {
+	//マネージャーからゲームの情報取得
+	CManager *pManager = GetManager();
+	CGame* pGame = (CGame*)pManager->GetGameObject();
+
+	//周回カメラの設定
+	pGame->SetRoundCamera(300);
+
 	CStatGauge::SStatGauge StatGauge;
 
 	StatGauge.pos = D3DXVECTOR3(150.0f, 60.0f, 0.0f);
@@ -110,6 +117,10 @@ void CEnemy_Boss::Update()
 		{
 			CManager * pManager = GetManager();
 			pManager->NextMode(TYPE_RESULT,300);
+			CGame* pGame = (CGame*)pManager->GetGameObject();
+
+			//周回カメラの設定
+			pGame->SetRoundCamera(300);
 		}
 
 		m_pLife->Update();
@@ -163,6 +174,8 @@ void CEnemy_Boss::Update()
 		SetPos(pos);
 	}
 
+	//周回カメラのposRの設定
+	pGame->SetRoundCameraPosR(pos);
 
 	CMotionParts::MoveMotionModel(GetMotionNum(), nMotion, &GetPos(), &GetRot());
 }

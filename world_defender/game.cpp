@@ -55,8 +55,13 @@ HRESULT CGame::Init()
 	PlaySound(SOUND_LABEL_BGM_GAME);
 
 	//カメラ
-	m_pCamera = new CCamera_Round;
+	m_pCamera = new CTpsCamera;
 	if (FAILED(m_pCamera->Init()))
+	{
+		return -1;
+	}
+	m_pCameraRound = new CCamera_Round;
+	if (FAILED(m_pCameraRound->Init()))
 	{
 		return -1;
 	}
@@ -86,7 +91,7 @@ HRESULT CGame::Init()
 	EnemyInitData EnemyInitData;
 
 	EnemyInitData.fmove = 10.0f;
-	EnemyInitData.pos = D3DXVECTOR3(0.0f,0.0f, 3000.0f);
+	EnemyInitData.pos = D3DXVECTOR3(0.0f,0.0f, 5000.0f);
 	EnemyInitData.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	EnemyInitData.type = ENEMY_02;
 
@@ -144,6 +149,13 @@ void CGame::Uninit()
 		delete m_pCamera;
 		m_pCamera = nullptr;
 	}
+	if (m_pCameraRound != nullptr)
+	{
+		m_pCameraRound->Uninit();
+		delete m_pCameraRound;
+		m_pCameraRound = nullptr;
+	}
+
 	//ライト
 	if (m_pLight != nullptr)
 	{
@@ -203,7 +215,27 @@ void CGame::Uninit()
 void CGame::Update()
 {
 	m_pMesh_Cylinder->Update(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	m_pCamera->Update();
+
+	//カメラの更新
+	if(m_bRoundCamera)
+	{
+		m_pCameraRound->Update();
+	}
+	else
+	{
+		m_pCamera->Update();
+	}
+
+	//周回カメラ用のカウントチェック
+	if (m_nRoundCnt > m_nRoundCntMax)
+	{
+		m_bRoundCamera = false;
+	}
+	else
+	{
+		m_nRoundCnt++;
+	}
+
 	m_pEnmeyManager->Update();
 	m_pPlayer->Update();
 	m_pBallastManager->Update();
@@ -291,8 +323,15 @@ void CGame::Update()
 //*****************************************************************************
 void CGame::Draw()
 {
-	//カメラ
-	m_pCamera->SetCamera();
+	//カメラの更新
+	if (m_bRoundCamera)
+	{
+		m_pCameraRound->SetCamera();
+	}
+	else
+	{
+		m_pCamera->SetCamera();
+	}
 
 	m_pMesh_Cylinder->Draw();
 
@@ -328,4 +367,27 @@ void CGame::CreateBallastManager(CMeshfield * pMeshfield)
 	//メッシュフィールドの情報から必要な数値の取得
 	m_pBallastManager->MeshfieldSet(pMeshfield);
 
+}
+
+//*****************************************************************************
+// 周回カメラの開始
+//*****************************************************************************
+void CGame::SetRoundCamera(int nRoundCntMax)
+{
+	// 周回カメラの開始
+	m_bRoundCamera = true;
+
+	// 周回カメラの最大カウントを保存
+	m_nRoundCntMax = nRoundCntMax;
+
+	// 周回カメラのカウントの初期化
+	m_nRoundCnt = 0;
+}
+
+//*****************************************************************************
+// 周回カメラのPosRの設定
+//*****************************************************************************
+void CGame::SetRoundCameraPosR(D3DXVECTOR3 posR)
+{
+	m_pCameraRound->SetPosR(posR);
 }

@@ -180,21 +180,7 @@ void CRenderer::DrawFPS(const int nFps)
 	RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 	TCHAR str[256];
 
-	//マネージャーからゲームオブジェクトの取得
-	CManager *pManager = GetManager();
-	CGame* pGame = (CGame*)pManager->GetGameObject();
-	CPlayer* pPlayer = pGame->GetPlayer();
-
-
-	D3DXVECTOR3 pos, rot;
-	int nModelNum;
-
-	pos = pPlayer->GetMove();
-	rot = pPlayer->GetRot();
-	nModelNum = pPlayer->GetMpaGrid();
-	
-	sprintf(str, _T("FPS : %d\nPos : %f %f %f\nModelNum : %d\n")
-		, nFps, pos.x, pos.y, pos.z, nModelNum);
+	sprintf(str, _T("FPS : %d\n"), nFps);
 
 	// テキスト描画
 	m_pFont->DrawText(NULL, str, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));
