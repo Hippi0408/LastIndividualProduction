@@ -51,7 +51,17 @@ void CCamera::Uninit()
 //*****************************************************************************
 void CCamera::Update()
 {
-	
+	if (m_nVibrationCnt < m_nVibrationCntMax)
+	{
+		m_nVibrationCnt++;
+		m_AddVibration.x = (float)(rand() % m_nVibration);
+		m_AddVibration.y = (float)(rand() % m_nVibration);
+		m_AddVibration.z = (float)(rand() % m_nVibration);
+	}
+	else
+	{
+		m_AddVibration = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	}
 }
 
 //*****************************************************************************
@@ -75,7 +85,7 @@ void CCamera::SetCamera()
 	//ビューマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxView);
 
-	D3DXMatrixLookAtLH(&m_mtxView, &m_posV, &m_posR, &m_vecU);
+	D3DXMatrixLookAtLH(&m_mtxView, &(m_posV + m_AddVibration), &(m_posR + m_AddVibration), &m_vecU);
 
 	//ビューマトリックスの設定
 	pD3DDevice->SetTransform(D3DTS_VIEW, &m_mtxView);
@@ -101,4 +111,25 @@ float CCamera::GetRot()
 	float fAngle = atan2f(vec.x, vec.z);
 
 	return fAngle;
+}
+
+void CCamera::SetVibration(int nVibrationCntMax, int nVibration)
+{
+	m_nVibration = nVibration;
+
+	m_nVibrationCntMax = nVibrationCntMax;
+
+	m_nVibrationCnt = 0;
+
+	//m_AddVibration = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+}
+
+bool CCamera::CheckVibration()
+{
+	if (m_nVibrationCnt < m_nVibrationCntMax)
+	{
+		return true;
+	}
+
+	return false;
 }

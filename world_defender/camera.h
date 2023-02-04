@@ -42,9 +42,11 @@ public:
 	void SetPosR(D3DXVECTOR3 posR) { m_posR = posR; }
 	void AddPosR(D3DXVECTOR3 addR) { m_posR += addR; }
 
-
 	void SetVecU(D3DXVECTOR3 vecU) { m_vecU = vecU; }
 	float GetRot();
+
+	void SetVibration(int nVibrationCntMax, int nVibration);
+	bool CheckVibration();
 
 private:
 	D3DXVECTOR3 m_posV;		//視点
@@ -55,6 +57,10 @@ private:
 	D3DXMATRIX m_mtxProjection; //プロジェクションマトリックス
 	D3DXMATRIX m_mtxView;		  //ビューマトリックス
 	float fDistance;			//視点か注視点のまでの距離
+	D3DXVECTOR3 m_AddVibration;
+	int m_nVibration;
+	int m_nVibrationCnt;
+	int m_nVibrationCntMax;
 };
 
 #endif

@@ -51,6 +51,9 @@ public:
 
 	void SetRoundCamera(int nRoundCntMax);
 	void SetRoundCameraPosR(D3DXVECTOR3 posV);
+
+	void SetVibration(int nVibrationMax, int nVibration);
+	bool CheckVibration();
 private:
 	CCamera* m_pCameraRound;
 	CCamera* m_pCamera;

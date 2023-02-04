@@ -10,6 +10,10 @@
 //-----------------------------------------------------------------------------
 #include "ballast_acquired.h"
 #include "convenience_function.h"
+#include "manager.h"
+#include "game.h"
+#include "meshfield.h"
+#include "ballast_manager.h"
 
 const float CBallast_Acquired::GRAVITY = -0.5f;
 const float CBallast_Acquired::MOVE_ATTENUATION = 0.1f;
@@ -48,8 +52,21 @@ void CBallast_Acquired::Update()
 
 		D3DXVECTOR3 pos = GetParentPos();
 		SetParentPos(D3DXVECTOR3(pos.x, 0.0f, pos.z));
+
+		CManager* pManager = GetManager();
+		CGame* pGame = (CGame*)pManager->GetGameObject();
+		CMeshfield* pMeshfield = pGame->GetMeshfield();
+		//マップチップの番号
+		int nMap = pMeshfield->CheckPosLocation(GetParentPos());
+		//上記の保存
+		SetListNumber(nMap);
+
+		CBallast_Manager* pBallast_Manager = pGame->GetBallast_Manager();
+
+		//リストの入れ替え
+		pBallast_Manager->ReplacementList(this, nMap);
 	}
-	else
+	else if(GetParentPos().y > 0.0f)
 	{
 		move.y += GRAVITY;
 

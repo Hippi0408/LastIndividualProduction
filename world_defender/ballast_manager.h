@@ -67,6 +67,8 @@ public:
 	//後天的瓦礫の生成(引数は飛ばしたい方向ベクトル,あとは基本情報)
 	void SetBallastAcquired(D3DXVECTOR3 vec,D3DXVECTOR3 pos, D3DXVECTOR3 rot);
 
+	//リスト内の入れ替え
+	void ReplacementList(CBallast* pBallast, int nNext);
 
 
 private:

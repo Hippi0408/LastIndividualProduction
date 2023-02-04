@@ -57,7 +57,7 @@ HRESULT CTitle::Init()
 	int nIndex = CTexture::LoadTexture("data/TEXTURE/ƒ^ƒCƒgƒ‹.png");
 	pPolygon[0].SetTextIndex(nIndex);
 	pPolygon[0].SetPos(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0.0f));
-	pPolygon[0].SetDiagonalLine(200.0f, 200.0f);
+	pPolygon[0].SetDiagonalLine(500.0f, 500.0f);
 	pPolygon[0].SetPolygon();
 	return S_OK;
 }

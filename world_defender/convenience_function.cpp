@@ -129,6 +129,28 @@ bool CConvenience_Function::SphereCollision(D3DXVECTOR3 pos1, float fRadius1, D3
 }
 
 //*****************************************************************************
+// 2点間の距離
+//*****************************************************************************
+float CConvenience_Function::PointDistance(D3DXVECTOR3 pos1, D3DXVECTOR3 pos2)
+{
+	//位置の保存
+	D3DXVECTOR3 Pos1 = pos1;
+	D3DXVECTOR3 Pos2 = pos2;
+
+	//計算用変数
+	D3DXVECTOR3 Distance;
+
+	//2点との距離
+	Distance = Pos1 - Pos2;
+
+	//現在の２点の距離
+	float fLength = sqrtf(Distance.x * Distance.x + Distance.y * Distance.y + Distance.z * Distance.z);
+
+	//計算結果を返す
+	return fLength;
+}
+
+//*****************************************************************************
 // 内積の矩形当たり判定、中にいるかどうか
 //*****************************************************************************
 bool CConvenience_Function::InnerProductCollision(D3DXVECTOR3 * pTop1, D3DXVECTOR3 * pTop2, D3DXVECTOR3 TopTarget)

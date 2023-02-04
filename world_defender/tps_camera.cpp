@@ -65,6 +65,8 @@ HRESULT CTpsCamera::Init()
 //*****************************************************************************
 void CTpsCamera::Update()
 {
+	CCamera::Update();
+
 	//入力デバイスの取得
 	CInput* pInput = CInput::GetKey();
 

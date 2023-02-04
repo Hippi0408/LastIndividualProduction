@@ -91,14 +91,19 @@ HRESULT CGame::Init()
 	EnemyInitData EnemyInitData;
 
 	EnemyInitData.fmove = 10.0f;
-	EnemyInitData.pos = D3DXVECTOR3(0.0f,0.0f, 5000.0f);
+	EnemyInitData.pos = D3DXVECTOR3(0.0f,0.0f, 9000.0f);
 	EnemyInitData.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	EnemyInitData.type = ENEMY_02;
 
 	m_pEnmeyManager->CreateEnemy(EnemyInitData);
 
-	/*EnemyInitData.pos = D3DXVECTOR3(500.0f, 0.0f, -500.0f);
-	m_pEnmeyManager->CreateEnemy(EnemyInitData);*/
+	EnemyInitData.pos = D3DXVECTOR3(500.0f, 0.0f, 1600.0f);
+	EnemyInitData.type = ENEMY_01;
+
+	m_pEnmeyManager->CreateEnemy(EnemyInitData);
+
+	EnemyInitData.pos = D3DXVECTOR3(500.0f, 0.0f, 1500.0f);
+	m_pEnmeyManager->CreateEnemy(EnemyInitData);
 
 	//BG3D
 	m_pMeshfieldBG = cRead.ReadMap("data/MAPTXT/map.txt");
@@ -241,72 +246,6 @@ void CGame::Update()
 	m_pBallastManager->Update();
 	CInput *pInput = CInput::GetKey();
 
-	if (pInput->Press(DIK_UP))
-	{
-		m_pCamera->AddPosV(D3DXVECTOR3(0.0f, 0.0f, 5.0f));
-		m_pCamera->AddPosR(D3DXVECTOR3(0.0f, 0.0f, 5.0f));
-	}
-	else if (pInput->Press(DIK_DOWN))
-	{
-		m_pCamera->AddPosV(D3DXVECTOR3(0.0f, 0.0f, -5.0f));
-		m_pCamera->AddPosR(D3DXVECTOR3(0.0f, 0.0f, -5.0f));
-	}
-
-	if (pInput->Press(DIK_LEFT))
-	{
-		m_pCamera->AddPosV(D3DXVECTOR3(-5.0f, 0.0f, 0.0f));
-		m_pCamera->AddPosR(D3DXVECTOR3(-5.0f, 0.0f, 0.0f));
-	}
-	else if (pInput->Press(DIK_RIGHT))
-	{
-		m_pCamera->AddPosV(D3DXVECTOR3(5.0f, 0.0f, 0.0f));
-		m_pCamera->AddPosR(D3DXVECTOR3(5.0f, 0.0f, 0.0f));
-	}
-
-
-	if (pInput->Press(DIK_RSHIFT))
-	{
-		m_pCamera->AddPosV(D3DXVECTOR3(0.0f, 5.0f, 0.0f));
-		m_pCamera->AddPosR(D3DXVECTOR3(0.0f, 5.0f, 0.0f));
-	}
-	else if (pInput->Press(DIK_RCONTROL))
-	{
-		m_pCamera->AddPosV(D3DXVECTOR3(0.0f, -5.0f, 0.0f));
-		m_pCamera->AddPosR(D3DXVECTOR3(0.0f, -5.0f, 0.0f));
-	}
-
-	if (pInput->Press(DIK_I))
-	{
-		m_pCamera->AddPosV(D3DXVECTOR3(0.0f, 5.0f, 0.0f));
-	}
-	else if (pInput->Press(DIK_K))
-	{
-		m_pCamera->AddPosV(D3DXVECTOR3(0.0f, -5.0f, 0.0f));
-	}
-
-
-	if (pInput->Press(DIK_T))
-	{
-		m_pCamera->AddPosV(D3DXVECTOR3(0.0f, 0.0f, 5.0f));
-		//m_pCamera->AddPosR(D3DXVECTOR3(0.0f, 0.0f, 5.0f));
-	}
-	else if (pInput->Press(DIK_G))
-	{
-		m_pCamera->AddPosV(D3DXVECTOR3(0.0f, 0.0f, -5.0f));
-		//m_pCamera->AddPosR(D3DXVECTOR3(0.0f, 0.0f, -5.0f));
-	}
-
-	if (pInput->Press(DIK_F))
-	{
-		m_pCamera->AddPosV(D3DXVECTOR3(-5.0f, 0.0f, 0.0f));
-		//m_pCamera->AddPosR(D3DXVECTOR3(-5.0f, 0.0f, 0.0f));
-	}
-	else if (pInput->Press(DIK_H))
-	{
-		m_pCamera->AddPosV(D3DXVECTOR3(5.0f, 0.0f, 0.0f));
-		//m_pCamera->AddPosR(D3DXVECTOR3(5.0f, 0.0f, 0.0f));
-	}
-
 	CMotionParts::ALLUpdate();
 
 	if (pInput->Trigger(KEY_DECISION))
@@ -390,4 +329,37 @@ void CGame::SetRoundCamera(int nRoundCntMax)
 void CGame::SetRoundCameraPosR(D3DXVECTOR3 posR)
 {
 	m_pCameraRound->SetPosR(posR);
+}
+
+//*****************************************************************************
+// ƒJƒƒ‰‚ÌU“®Ý’è
+//*****************************************************************************
+void CGame::SetVibration(int nVibrationMax,int nVibration)
+{
+	//ƒJƒƒ‰‚ÌU“®Ý’è
+	if (m_bRoundCamera)
+	{
+		m_pCameraRound->SetVibration(nVibrationMax, nVibration);
+	}
+	else
+	{
+		m_pCamera->SetVibration(nVibrationMax, nVibration);
+	}
+}
+
+//*****************************************************************************
+// U“®‚ª‚ ‚é‚©‚Ç‚¤‚©
+//*****************************************************************************
+bool CGame::CheckVibration()
+{
+	//ƒJƒƒ‰‚ÌU“®ƒ`ƒFƒbƒN
+	if (m_bRoundCamera)
+	{
+		return m_pCameraRound->CheckVibration();
+	}
+	else
+	{
+		return m_pCamera->CheckVibration();
+	}
+	return false;
 }

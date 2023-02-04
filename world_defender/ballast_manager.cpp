@@ -362,6 +362,10 @@ void CBallast_Manager::CollisionEnemy()
 		//浮遊状態かどうか
 		if (!pBallast->GetFloating())
 		{
+			//イテレーターを進める
+			itr++;
+
+			//処理を無視する
 			continue;
 		}
 
@@ -385,7 +389,6 @@ void CBallast_Manager::CollisionEnemy()
 		D3DXVec3Normalize(&vec, &vec);
 
 		SetBallastAcquired(vec, pBallast->GetWorldPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-
 
 		//瓦礫の使用状態を変更
 		pBallast->SetUse(false);
@@ -457,5 +460,49 @@ void CBallast_Manager::SetBallastAcquired(D3DXVECTOR3 vec, D3DXVECTOR3 pos, D3DX
 	//リストに瓦礫情報を追加
 	m_BallastMapData[nNumber].push_back(pBallastAcquired);
 
+}
+
+//*****************************************************************************
+//リスト内の入れ替え
+//*****************************************************************************
+void CBallast_Manager::ReplacementList(CBallast * pBallast, int nNext)
+{
+	//最後に登録されていた番号
+	int nLastNum = pBallast->GetListNumber();
+
+	if (nNext == nLastNum)
+	{
+		return;
+	}
+
+	//イテレーターループ
+	for (auto itr = m_BallastMapData[nLastNum].begin(); itr != m_BallastMapData[nLastNum].end(); itr++)
+	{
+		//イテレーターから瓦礫のポインタの代入
+		CBallast* pballast = *itr;
+
+		//瓦礫NULLチェック
+		if (pballast == nullptr)
+		{
+			assert(false);
+		}
+
+		//指定のポインタかどうか
+		if (pBallast != pballast)
+		{
+			//イテレーターを進める
+			itr++;
+
+			//処理を無視する
+			continue;
+		}
+	
+		//次のイテレーターの代入、現在のイテレーターを破棄
+		itr = m_FloatingBallstList.erase(itr);
+	}
+
+
+	//リストに瓦礫情報を追加
+	m_BallastMapData[nNext].push_back(pBallast);
 }
 

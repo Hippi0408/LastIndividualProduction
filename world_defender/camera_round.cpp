@@ -48,6 +48,8 @@ HRESULT CCamera_Round::Init()
 //*****************************************************************************
 void CCamera_Round::Update()
 {
+	CCamera::Update();
+
 	//Ž‹“_
 	D3DXVECTOR3 posV = GetPosV();
 

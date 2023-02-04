@@ -24,10 +24,12 @@ class CEnemy_Boss : public CEnemy
 {
 private:
 	static const int INIT_LIFE = 1000;
+	static const int MOVE_VIBRATION = 5;
 	static const D3DXVECTOR3 INIT_POS;
 	static const float MOVE_INERTIA;
 	static const float JUMP_INERTIA;
 	static const float INIT_RADIUS;
+	
 public:
 	CEnemy_Boss();
 	~CEnemy_Boss() override;
@@ -50,6 +52,7 @@ public:
 
 private:
 	CStatGauge *m_pLife;
+	bool m_bAppearanceMotion;
 };
 
 #endif
