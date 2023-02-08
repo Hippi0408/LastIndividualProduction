@@ -39,13 +39,6 @@ CBallast_Acquired::~CBallast_Acquired()
 //*****************************************************************************
 void CBallast_Acquired::Update()
 {
-
-	D3DXVECTOR3 move = GetPosMove();
-
-	move += (move - D3DXVECTOR3(0.0f, 0.0f, 0.0f)) * MOVE_ATTENUATION;
-
-	SetPosMove(move);
-
 	if (GetParentPos().y < 0.0f)
 	{
 		SetPosMove(D3DXVECTOR3(0.0f,0.0f,0.0f));
@@ -66,12 +59,17 @@ void CBallast_Acquired::Update()
 		//リストの入れ替え
 		pBallast_Manager->ReplacementList(this, nMap);
 	}
-	else if(GetParentPos().y > 0.0f)
+	else if(GetParentPos().y > 0.0f && !CheckFloating())
 	{
+		D3DXVECTOR3 move = GetPosMove();
+
+		move += (move - D3DXVECTOR3(0.0f, 0.0f, 0.0f)) * MOVE_ATTENUATION;
+
 		move.y += GRAVITY;
 
 		SetPosMove(move);
 	}
+
 
 	//親クラスの更新
 	CBallast::Update();
