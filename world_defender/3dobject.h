@@ -102,6 +102,7 @@ public:
 	void SetMatrix(D3DXMATRIX mtx) { m_Model.mtxWorld = mtx; }
 	D3DXVECTOR3 GetSize();
 	void SetModelPattnNum(int nPattnNum) { m_Model.nPattn = nPattnNum; }
+	int GetModelPattnNum() { return m_Model.nPattn; }
 	void CalculationMatrix();
 	void SetNormal();			//法線設定
 	void UpdateNormal();		//法線の向きの更新

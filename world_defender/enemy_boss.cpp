@@ -49,6 +49,12 @@ CEnemy_Boss::~CEnemy_Boss()
 //*****************************************************************************
 HRESULT CEnemy_Boss::Init()
 {
+	//親クラスの初期化
+	if (FAILED(CEnemy::Init()))
+	{
+		return -1;
+	}
+
 	//マネージャーからゲームの情報取得
 	CManager *pManager = GetManager();
 	CGame* pGame = (CGame*)pManager->GetGameObject();
@@ -103,6 +109,8 @@ HRESULT CEnemy_Boss::Init()
 //*****************************************************************************
 void CEnemy_Boss::Uninit()
 {
+	//親クラスの終了処理
+	CEnemy::Uninit();
 	if (m_pLife != nullptr)
 	{
 		m_pLife->Uninit();
@@ -151,7 +159,7 @@ void CEnemy_Boss::Update()
 	}
 
 	//親クラスの更新
-	CMovable_Obj::Update();
+	CEnemy::Update();
 
 	//マネージャーの取得
 	CManager *pManager = GetManager();
@@ -298,6 +306,8 @@ void CEnemy_Boss::Update()
 //*****************************************************************************
 void CEnemy_Boss::Draw()
 {
+	//親クラスの描画処理
+	CEnemy::Draw();
 }
 
 //*****************************************************************************

@@ -69,6 +69,8 @@ private:
 
 	//エネミーのリスト
 	std::list<CEnemy*> m_EnemyList;
+
+	int m_nEnemySmasllfish;
 };
 
 #endif

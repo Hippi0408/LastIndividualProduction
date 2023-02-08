@@ -15,12 +15,12 @@
 #include "object_type_list.h"
 
 const D3DXVECTOR3 CMotionParts::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-CMotionParts *CMotionParts::m_pMotionPartsTop = nullptr;
-CMotionParts *CMotionParts::m_pMotionPartsCurrent = nullptr;
 int CMotionParts::m_nModelMax = 0;
-int CMotionParts::m_nMotionPlayMotonNum[MAX_MOTION_ALL] = {};
-int CMotionParts::m_nMotionDestMotonNum[MAX_MOTION_ALL] = {};
-int CMotionParts::m_nMotionRegistrationNum[MAX_MOTION_ALL] = {};
+std::list<CMotionParts*> CMotionParts::m_MotionPartslist;			 //全てのパーツのリスト
+std::map<int, int> CMotionParts::m_nMotionPlayMotonNum;			//今再生中のモーション番号
+std::map<int, int> CMotionParts::m_nMotionDestMotonNum;			//次再生モーション番号
+std::map<int, int> CMotionParts::m_nMotionRegistrationNum;			//登録したモーションモデル群のモーションの登録数
+
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
@@ -28,24 +28,8 @@ CMotionParts::CMotionParts()
 {
 	m_nFrame = 0;
 	m_nKey = 0;
-	m_pRarent = nullptr;
-	m_bDraw = false;
-
-	if (m_pMotionPartsTop == nullptr)
-	{
-		m_pMotionPartsTop = this;
-	}
-
-	m_pNextMotionParts = nullptr;
-
-	m_pLastTimeMotionParts = GetCurrentMotionParts();
-
-	if (m_pLastTimeMotionParts != nullptr)
-	{
-		m_pLastTimeMotionParts->SetNextMotionParts(this);
-
-	}
-	SetCurrentMotionParts(this);
+	m_pParent = nullptr;
+	
 
 	m_nModelObjNum = m_nModelMax;
 }
@@ -68,7 +52,8 @@ HRESULT CMotionParts::Init()
 	}
 	m_nDestFrame = 0;
 	m_bTopUnUpdate = false;
-	m_bUnUpdate = false;
+	m_bUnUpdate = true;
+	m_bDraw = true;
 	return S_OK;
 }
 
@@ -77,26 +62,6 @@ HRESULT CMotionParts::Init()
 //*****************************************************************************
 void CMotionParts::Uninit()
 {
-	if (m_pMotionPartsTop == this)
-	{
-		m_pMotionPartsTop = m_pNextMotionParts;
-	}
-
-	if (m_pMotionPartsCurrent == this)
-	{
-		m_pMotionPartsCurrent = m_pLastTimeMotionParts;
-	}
-
-	if (m_pLastTimeMotionParts != nullptr)
-	{
-		m_pLastTimeMotionParts->SetNextMotionParts(m_pNextMotionParts);
-	}
-
-	if (m_pNextMotionParts != nullptr)
-	{
-		m_pNextMotionParts->SetLastTimeMotionParts(m_pLastTimeMotionParts);
-	}
-
 	for (int nMotion = 0; nMotion < m_nMotionRegistrationNum[m_nModelObjNum]; nMotion++)
 	{
 		if (m_MotionKey[nMotion].pKey != nullptr)
@@ -106,10 +71,7 @@ void CMotionParts::Uninit()
 		}
 	}
 
-
 	C3DObject::Uninit();
-
-	delete this;
 }
 
 //*****************************************************************************
@@ -153,7 +115,7 @@ void CMotionParts::Update()
 //*****************************************************************************
 void CMotionParts::Draw()
 {
-	D3DXMATRIX mtxRarent;
+	D3DXMATRIX mtxParent;
 	D3DXMATRIX mtx;
 	CManager *pManager = GetManager();
 
@@ -161,14 +123,14 @@ void CMotionParts::Draw()
 
 	pD3DDevice = pManager->GetDeviceManager();
 	// 親が存在する場合
-	if (m_pRarent != nullptr)
+	if (m_pParent != nullptr)
 	{
-		mtxRarent = m_pRarent->GetMatrix();
+		mtxParent = m_pParent->GetMatrix();
 	}
 	else
 	{
 		//ワールドマトリックスの初期化
-		D3DXMatrixIdentity(&mtxRarent);
+		D3DXMatrixIdentity(&mtxParent);
 	}
 	
 	//自身のマトリックスの計算
@@ -176,7 +138,7 @@ void CMotionParts::Draw()
 	mtx = GetMatrix();
 
 	//モデルのマトリックス　＊　親のワールドマトリックス
-	D3DXMatrixMultiply(&mtx, &mtx, &mtxRarent);
+	D3DXMatrixMultiply(&mtx, &mtx, &mtxParent);
 
 	SetMatrix(mtx);
 
@@ -353,27 +315,40 @@ void CMotionParts::NextMotionPosition()
 //*****************************************************************************
 void CMotionParts::AllNextMotionPosition(int nMotionNum, bool bUnUpdate)
 {
-	CMotionParts* pMotionParts = m_pMotionPartsTop;
-
-	while (pMotionParts != nullptr)
+	//イテレーターループ
+	for (auto itr = m_MotionPartslist.begin(); itr != m_MotionPartslist.end();)
 	{
+		//イテレーターからモーションパーツのポインタの代入
+		CMotionParts* pMotionParts = *itr;
+
+		//モーションパーツポインタの解放
+		if (pMotionParts == nullptr)
+		{
+			//次のイテレーターの代入、現在のイテレーターを破棄
+			itr = m_MotionPartslist.erase(itr);
+
+			//以下の処理を無視する
+			continue;
+		}
+
 		if (pMotionParts->GetModelObjNum() == nMotionNum)
 		{
 			if (bUnUpdate)
 			{
-				pMotionParts->SetUnUpdate(true);
+				pMotionParts->SetUnUpdate(false);
 			}
 			else
 			{
 				pMotionParts->ClearMotionMove();
 				pMotionParts->NextMotionPosition();
 			}
-			
+
 		}
 
-		pMotionParts = pMotionParts->GetNextMotionParts();
+		
+		//イテレーターを進める
+		itr++;
 	}
-
 }
 
 //*****************************************************************************
@@ -404,17 +379,65 @@ bool CMotionParts::GetMotionParts(int nMotionNum)
 }
 
 //*****************************************************************************
+//更新と描画のオンオフ
+//*****************************************************************************
+void CMotionParts::UnUpdateDraw(int nMotionNum, bool bUnUpdate, bool bDraw)
+{
+	//イテレーターループ
+	for (auto itr = m_MotionPartslist.begin(); itr != m_MotionPartslist.end();)
+	{
+		//イテレーターからモーションパーツのポインタの代入
+		CMotionParts* pMotionParts = *itr;
+
+		//モーションパーツポインタの解放
+		if (pMotionParts == nullptr)
+		{
+			//次のイテレーターの代入、現在のイテレーターを破棄
+			itr = m_MotionPartslist.erase(itr);
+
+			//以下の処理を無視する
+			continue;
+		}
+
+		//モーションモデルの更新と描画の有無
+		if (pMotionParts->GetMotionParts(nMotionNum))
+		{
+			//更新
+			pMotionParts->SetUnUpdate(bUnUpdate);
+			//描画
+			pMotionParts->SetBoolDraw(bDraw);
+
+		}
+
+		
+
+		//イテレーターを進める
+		itr++;
+	}
+}
+
+//*****************************************************************************
 // ALL終了処理
 //*****************************************************************************
 void CMotionParts::ALLUninit()
 {
-	CMotionParts* pMotionParts = m_pMotionPartsTop;
-
-	while (pMotionParts != nullptr)
+	//イテレーターループ
+	for (auto itr = m_MotionPartslist.begin(); itr != m_MotionPartslist.end();)
 	{
-		CMotionParts* pMotionPartsNext = pMotionParts->GetNextMotionParts();
-		pMotionParts->Uninit();
-		pMotionParts = pMotionPartsNext;
+		//イテレーターからモーションパーツのポインタの代入
+		CMotionParts* pMotionParts = *itr;
+
+		//モーションパーツポインタの解放
+		if (pMotionParts != nullptr)
+		{
+			//終了処理
+			pMotionParts->Uninit();
+			delete pMotionParts;
+			pMotionParts = nullptr;
+		}
+
+		//次のイテレーターの代入、現在のイテレーターを破棄
+		itr = m_MotionPartslist.erase(itr);
 	}
 }
 
@@ -423,29 +446,52 @@ void CMotionParts::ALLUninit()
 //*****************************************************************************
 void CMotionParts::ALLUpdate()
 {
-	CMotionParts* pMotionParts = m_pMotionPartsTop;
-
-	while (pMotionParts != nullptr)
+	//イテレーターループ
+	for (auto itr = m_MotionPartslist.begin(); itr != m_MotionPartslist.end();)
 	{
-		if (pMotionParts->GetUnUpdate())
-		{
-			pMotionParts = pMotionParts->GetNextMotionParts();
+		//イテレーターからエネミーのポインタの代入
+		CMotionParts* pMotionParts = *itr;
 
+		//モーションパーツポインタの解放
+		if (pMotionParts == nullptr)
+		{
+			//次のイテレーターの代入、現在のイテレーターを破棄
+			itr = m_MotionPartslist.erase(itr);
+
+			//以下の処理を無視する
 			continue;
 		}
 
+		//更新処理をしない
+		if (!pMotionParts->GetUnUpdate())
+		{
+			//イテレーターを進める
+			itr++;
+
+			//以下の処理を無視する
+			continue;
+		}
+
+		//モーションパーツの更新処理
 		pMotionParts->Update();
 
+		//終了条件処理
 		if (pMotionParts->IsUnused())
 		{
-			CMotionParts* pMotionPartsBreak = pMotionParts;
-			pMotionParts = pMotionPartsBreak->GetNextMotionParts();
-			pMotionPartsBreak->Uninit();
+			//終了処理
+			pMotionParts->Uninit();
+			delete pMotionParts;
+			pMotionParts = nullptr;
+
+			//次のイテレーターの代入、現在のイテレーターを破棄
+			itr = m_MotionPartslist.erase(itr);
+
+			//以下の処理を無視する
+			continue;
 		}
-		else
-		{
-			pMotionParts = pMotionParts->GetNextMotionParts();
-		}
+
+		//イテレーターを進める
+		itr++;
 	}
 }
 
@@ -454,17 +500,38 @@ void CMotionParts::ALLUpdate()
 //*****************************************************************************
 void CMotionParts::ALLDraw()
 {
-	CMotionParts* pMotionParts = m_pMotionPartsTop;
-
-	while (pMotionParts != nullptr)
+	//イテレーターループ
+	for (auto itr = m_MotionPartslist.begin(); itr != m_MotionPartslist.end();)
 	{
-		if (pMotionParts->GetBoolDraw())
+		//イテレーターからエネミーのポインタの代入
+		CMotionParts* pMotionParts = *itr;
+
+		//モーションパーツポインタの解放
+		if (pMotionParts == nullptr)
 		{
-			pMotionParts = pMotionParts->GetNextMotionParts();
+			//次のイテレーターの代入、現在のイテレーターを破棄
+			itr = m_MotionPartslist.erase(itr);
+
+			//以下の処理を無視する
 			continue;
 		}
+
+		//描画をしない
+		if (!pMotionParts->GetBoolDraw())
+		{
+			//イテレーターを進める
+			itr++;
+
+			//以下の処理を無視する
+			continue;
+		}
+		//モーションパーツの更新処理
 		pMotionParts->Draw();
-		pMotionParts = pMotionParts->GetNextMotionParts();
+
+
+
+		//イテレーターを進める
+		itr++;
 	}
 }
 
@@ -489,16 +556,23 @@ int CMotionParts::CreateMotionObj(MotionData* pMotionData, int nPartsMax)
 		if (pMotionData[nCnt].nParentNum >= 0)
 		{
 			//親の設定
-			pMotionParts->SetMotionRarent(GetMotionPartsPointer(m_nModelMax, pMotionData[nCnt].nParentNum));
+			pMotionParts->SetMotionParent(GetMotionPartsPointer(m_nModelMax, pMotionData[nCnt].nParentNum));
 		}
 		
 		pMotionParts->SetNormal();
+
+		//リストにエネミー情報を追加
+		m_MotionPartslist.push_back(pMotionParts);
 	}
 
 	int nModelNum = m_nModelMax;
 
 	//動く物体の登録完了
 	SettingCompletion();
+
+	//モーションモデルの再生に必要な情報の初期化
+	m_nMotionPlayMotonNum[nModelNum] = 0;
+	m_nMotionDestMotonNum[nModelNum] = 0;
 
 	return nModelNum;
 
@@ -509,16 +583,31 @@ int CMotionParts::CreateMotionObj(MotionData* pMotionData, int nPartsMax)
 //*****************************************************************************
 CMotionParts * CMotionParts::GetMotionPartsPointer(int nMotionNum, int nPartsNum)
 {
-	CMotionParts* pMotionParts = m_pMotionPartsTop;
-
-	while (pMotionParts != nullptr)
+	//イテレーターループ
+	for (auto itr = m_MotionPartslist.begin(); itr != m_MotionPartslist.end();)
 	{
+		//イテレーターからモーションパーツのポインタの代入
+		CMotionParts* pMotionParts = *itr;
+
+		//モーションパーツポインタの解放
+		if (pMotionParts == nullptr)
+		{
+			//次のイテレーターの代入、現在のイテレーターを破棄
+			itr = m_MotionPartslist.erase(itr);
+
+			//以下の処理を無視する
+			continue;
+		}
+
+		// 条件に合うポインタを返す
 		if (pMotionParts->GetMotionParts(nMotionNum, nPartsNum))
 		{
 			return pMotionParts;
 		}
 
-		pMotionParts = pMotionParts->GetNextMotionParts();
+
+		//イテレーターを進める
+		itr++;
 	}
 
 	return nullptr;
@@ -565,15 +654,30 @@ void CMotionParts::MoveMotionModel(int nModelNum, int nMotionNum, D3DXVECTOR3 *p
 //*****************************************************************************
 void CMotionParts::SetBoolDraw(bool bDraw, int nMotionNum)
 {
-	CMotionParts* pMotionParts = m_pMotionPartsTop;
-
-	while (pMotionParts != nullptr)
+	//イテレーターループ
+	for (auto itr = m_MotionPartslist.begin(); itr != m_MotionPartslist.end();)
 	{
+		//イテレーターからモーションパーツのポインタの代入
+		CMotionParts* pMotionParts = *itr;
+
+		//モーションパーツポインタの解放
+		if (pMotionParts == nullptr)
+		{
+			//次のイテレーターの代入、現在のイテレーターを破棄
+			itr = m_MotionPartslist.erase(itr);
+
+			//以下の処理を無視する
+			continue;
+		}
+
+		//モーションモデルの描画の有無
 		if (pMotionParts->GetMotionParts(nMotionNum))
 		{
 			pMotionParts->SetBoolDraw(bDraw);
 		}
-		pMotionParts = pMotionParts->GetNextMotionParts();
+
+		//イテレーターを進める
+		itr++;
 	}
 }
 
@@ -582,15 +686,30 @@ void CMotionParts::SetBoolDraw(bool bDraw, int nMotionNum)
 //*****************************************************************************
 void CMotionParts::SetLight(D3DXVECTOR3 vec, int nMotionNum)
 {
-	CMotionParts* pMotionParts = m_pMotionPartsTop;
-
-	while (pMotionParts != nullptr)
+	//イテレーターループ
+	for (auto itr = m_MotionPartslist.begin(); itr != m_MotionPartslist.end();)
 	{
+		//イテレーターからモーションパーツのポインタの代入
+		CMotionParts* pMotionParts = *itr;
+
+		//モーションパーツポインタの解放
+		if (pMotionParts == nullptr)
+		{
+			//次のイテレーターの代入、現在のイテレーターを破棄
+			itr = m_MotionPartslist.erase(itr);
+
+			//以下の処理を無視する
+			continue;
+		}
+
+		//モーションモデルのライトベクトル
 		if (pMotionParts->GetMotionParts(nMotionNum))
 		{
 			pMotionParts->SetLightVec(vec);
 		}
-		pMotionParts = pMotionParts->GetNextMotionParts();
+		
+		//イテレーターを進める
+		itr++;
 	}
 }
 
@@ -599,17 +718,32 @@ void CMotionParts::SetLight(D3DXVECTOR3 vec, int nMotionNum)
 //*****************************************************************************
 void CMotionParts::AllSetShadowPos(D3DXVECTOR3 pos, int nMotionNum)
 {
-	CMotionParts* pMotionParts = m_pMotionPartsTop;
-
-	while (pMotionParts != nullptr)
+	//イテレーターループ
+	for (auto itr = m_MotionPartslist.begin(); itr != m_MotionPartslist.end();)
 	{
+		//イテレーターからモーションパーツのポインタの代入
+		CMotionParts* pMotionParts = *itr;
+
+		//モーションパーツポインタの解放
+		if (pMotionParts == nullptr)
+		{
+			//次のイテレーターの代入、現在のイテレーターを破棄
+			itr = m_MotionPartslist.erase(itr);
+
+			//以下の処理を無視する
+			continue;
+		}
+
+		//影の設定
 		if (pMotionParts->GetMotionParts(nMotionNum))
 		{
 			D3DXVECTOR3 ShadowPos = pMotionParts->GetWorldPos();
 			ShadowPos.y = pos.y;
 			pMotionParts->SetShadowPos(ShadowPos);
 		}
-		pMotionParts = pMotionParts->GetNextMotionParts();
+
+		//イテレーターを進める
+		itr++;
 	}
 }
 
@@ -661,26 +795,35 @@ void CMotionParts::SetMotionFileData(const MotionMoveData MotionMoveData, int nM
 //*****************************************************************************
 bool CMotionParts::AllCollision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, Object_Type_List myobject_type_list)
 {
-	CMotionParts* pMotionParts = m_pMotionPartsTop;
-
-	while (pMotionParts != nullptr)
+	//イテレーターループ
+	for (auto itr = m_MotionPartslist.begin(); itr != m_MotionPartslist.end();)
 	{
+		//イテレーターからモーションパーツのポインタの代入
+		CMotionParts* pMotionParts = *itr;
+
+		//モーションパーツポインタの解放
+		if (pMotionParts == nullptr)
+		{
+			//次のイテレーターの代入、現在のイテレーターを破棄
+			itr = m_MotionPartslist.erase(itr);
+
+			//以下の処理を無視する
+			continue;
+		}
+
+		//当たり判定（自分のモデル番号、自分の位置）
 		Object_Type_List object_type_list = pMotionParts->GetObject_Type_List();
 		if (object_type_list == myobject_type_list)
 		{
-			//D3DXVECTOR3 Add = pMotionParts->Collision(pos, oldpos);
-			/*if (Add != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
-			{
-				return Add;
-			}*/
-
 			if (pMotionParts->NormalCollision(pos))
 			{
 				return true;
 			}
-			
+
 		}
-		pMotionParts = pMotionParts->GetNextMotionParts();
+
+		//イテレーターを進める
+		itr++;
 	}
 
 	return false;
@@ -699,11 +842,24 @@ void CMotionParts::SettingParent(int nChildren, int nParent)
 	CMotionParts* pMotionPartsChildren = nullptr;
 	CMotionParts* pMotionPartsParent = nullptr;
 
-	CMotionParts* pMotionParts = m_pMotionPartsTop;
-
-	while (pMotionParts != nullptr)
+	//イテレーターループ
+	for (auto itr = m_MotionPartslist.begin(); itr != m_MotionPartslist.end();)
 	{
-		if(pMotionParts->GetMotionParts(nChildren,0))
+		//イテレーターからモーションパーツのポインタの代入
+		CMotionParts* pMotionParts = *itr;
+
+		//モーションパーツポインタの解放
+		if (pMotionParts == nullptr)
+		{
+			//次のイテレーターの代入、現在のイテレーターを破棄
+			itr = m_MotionPartslist.erase(itr);
+
+			//以下の処理を無視する
+			continue;
+		}
+
+		//親を後天的に設定する（子供番号、親番号）
+		if (pMotionParts->GetMotionParts(nChildren, 0))
 		{
 			pMotionPartsChildren = pMotionParts;
 		}
@@ -713,17 +869,20 @@ void CMotionParts::SettingParent(int nChildren, int nParent)
 			pMotionPartsParent = pMotionParts;
 		}
 
-		pMotionParts = pMotionParts->GetNextMotionParts();
+		//イテレーターを進める
+		itr++;
 	}
+
+
 
 	if (pMotionPartsChildren == nullptr || pMotionPartsParent == nullptr)
 	{
 		return;
 	}
 
-	if (pMotionPartsChildren->GetMotionRarent() == nullptr)
+	if (pMotionPartsChildren->GetMotionParent() == nullptr)
 	{
-		pMotionPartsChildren->SetMotionRarent(pMotionPartsParent);
+		pMotionPartsChildren->SetMotionParent(pMotionPartsParent);
 	}
 
 
@@ -734,17 +893,220 @@ void CMotionParts::SettingParent(int nChildren, int nParent)
 //*****************************************************************************
 void CMotionParts::AllSetObject_Type_List(int nModelNum, Object_Type_List object_type_list)
 {
-	CMotionParts* pMotionParts = m_pMotionPartsTop;
-
-	while (pMotionParts != nullptr)
+	//イテレーターループ
+	for (auto itr = m_MotionPartslist.begin(); itr != m_MotionPartslist.end();)
 	{
+		//イテレーターからモーションパーツのポインタの代入
+		CMotionParts* pMotionParts = *itr;
+
+		//モーションパーツポインタの解放
+		if (pMotionParts == nullptr)
+		{
+			//次のイテレーターの代入、現在のイテレーターを破棄
+			itr = m_MotionPartslist.erase(itr);
+
+			//以下の処理を無視する
+			continue;
+		}
+
+		//モデルが何かを設定する
 		int nNum = pMotionParts->GetModelObjNum();
 		if (nNum == nModelNum)
 		{
 			pMotionParts->SetObject_Type_List(object_type_list);
 
 		}
-		pMotionParts = pMotionParts->GetNextMotionParts();
+
+		//イテレーターを進める
+		itr++;
+	}
+}
+
+//*****************************************************************************
+//モーションデータの複製
+//*****************************************************************************
+int CMotionParts::CopyMotionModel(int nModelNum)
+{
+	int nPartsNum = 0;//カウンター
+	
+	//対象のモーションモデルポインタ
+	CMotionParts* pTargetMotionParts = nullptr;
+
+	//複製元
+	pTargetMotionParts = GetMotionPartsPointer(nModelNum, nPartsNum);//条件に合うポインタの獲得
+
+	//パーツの複製
+	while (pTargetMotionParts != nullptr)
+	{
+		CMotionParts* pMotionParts = new CMotionParts;
+
+		if (FAILED(pMotionParts->Init()))
+		{
+			assert(false);
+		}
+
+		pMotionParts->SetPartsNum(nPartsNum);//一つのモーションの中の番号
+
+
+		int nModelPattern = pTargetMotionParts->GetModelPattnNum();
+		D3DXVECTOR3 pos = pTargetMotionParts->GetPos();
+		D3DXVECTOR3 rot = pTargetMotionParts->GetRot();
+
+		//基本情報の保存
+		pMotionParts->Set3DObject(nModelPattern, pos, rot);
+
+		//親の設定(親が存在するなら)
+		if (nPartsNum > 0)
+		{
+			//親番号の取得
+			int nParent = pTargetMotionParts->GetMotionParent()->GetPartsNum();
+
+			//親の設定
+			pMotionParts->SetMotionParent(GetMotionPartsPointer(m_nModelMax, nParent));
+		}
+
+		//モーションデータの番号
+		pMotionParts->SetModelObjNum(m_nModelMax);
+
+		//法線設定
+		pMotionParts->SetNormal();
+
+		//リストにモーションモデル情報を追加
+		m_MotionPartslist.push_back(pMotionParts);
+
+		//カウンターを進める
+		nPartsNum++;
+
+		//対象のモーションモデルポインタ
+		pTargetMotionParts = GetMotionPartsPointer(nModelNum, nPartsNum);
+
 	}
 
+	//登録したモーション数の初期化
+	m_nMotionRegistrationNum[m_nModelMax] = 0;
+
+	//一時保管場所
+	CMotionParts* pMotionParts = nullptr;
+
+	//動きの複製
+	nPartsNum = 0;//カウンター
+
+	//複製先
+	pMotionParts = GetMotionPartsPointer(m_nModelMax, nPartsNum);//条件に合うポインタの獲得
+
+	//モデルデータ情報の設定
+	while (pMotionParts != nullptr)
+	{
+		//コピー元のモーションデータ
+		CMotionParts* pSourceInformationMotionParts = GetMotionPartsPointer(nModelNum, nPartsNum);
+		
+
+		//モーションデータ情報の設定
+		for (int nCntMotion = 0; nCntMotion < m_nMotionRegistrationNum[nModelNum]; nCntMotion++)
+		{
+			//一時保管場所
+			KEY_SET KeySet;
+
+			//コピー元の情報取得
+			KEY_SET KeySourceInformation = pSourceInformationMotionParts->GetKeyData(nCntMotion);
+
+			//Keyの最大数
+			int nKeyMax = KeySourceInformation.nKeyMax;
+
+			//Key情報の生成
+			KeySet.pKey = new KEY[nKeyMax];
+
+			//Keyデータ情報の設定
+			for (int nCntKey = 0; nCntKey < nKeyMax; nCntKey++)
+			{
+				//フレーム
+				KeySet.pKey[nCntKey].nFrame = KeySourceInformation.pKey[nCntKey].nFrame;
+				//Pos
+				KeySet.pKey[nCntKey].pos = KeySourceInformation.pKey[nCntKey].pos;
+				//Rot
+				KeySet.pKey[nCntKey].rot = KeySourceInformation.pKey[nCntKey].rot;
+			}
+
+			//ループ設定
+			KeySet.bLoop = KeySourceInformation.bLoop;
+			//キーの最大
+			KeySet.nKeyMax = KeySourceInformation.nKeyMax;
+			//次に再生するモーション番号
+			KeySet.nNextMotionNum = KeySourceInformation.nNextMotionNum;
+
+			//登録
+			pMotionParts->SetMotionData(KeySet);
+
+			//モーションの登録完了数
+			m_nMotionRegistrationNum[m_nModelMax]++;
+
+		}
+
+		nPartsNum++;//カウンターを進める
+		pMotionParts = GetMotionPartsPointer(m_nModelMax, nPartsNum);//条件に合うポインタの獲得
+
+		//登録したモーション数の初期化
+		m_nMotionRegistrationNum[m_nModelMax] = 0;
+	}
+
+	//モーションモデルの再生に必要な情報の初期化
+	m_nMotionPlayMotonNum[nModelNum] = 0;
+	m_nMotionDestMotonNum[nModelNum] = 0;
+
+	// 登録したモーション数
+	m_nMotionRegistrationNum[m_nModelMax] = m_nMotionRegistrationNum[nModelNum];
+
+	int nNewModelNum = m_nModelMax;
+
+	//動く物体の登録完了
+	SettingCompletion();
+
+	return nNewModelNum;
+
+}
+
+//*****************************************************************************
+//指定データの破壊
+//*****************************************************************************
+void CMotionParts::DestructionMotionModel(int nModelNum)
+{
+
+	//イテレーターループ
+	for (auto itr = m_MotionPartslist.begin(); itr != m_MotionPartslist.end();)
+	{
+		//イテレーターから指定データのポインタの代入
+		CMotionParts* pMotionParts = *itr;
+
+		//モーションパーツポインタの解放
+		if (pMotionParts == nullptr)
+		{
+			assert(false);
+		}
+
+		//対象の情報ではなかったら
+		if (pMotionParts->GetModelObjNum() != nModelNum)
+		{
+			//イテレーターを進める
+			itr++;
+
+			//以下の処理を無視する
+			continue;
+		}
+
+		//終了処理
+		pMotionParts->Uninit();
+		delete pMotionParts;
+		pMotionParts = nullptr;
+
+		//次のイテレーターの代入、現在のイテレーターを破棄
+		itr = m_MotionPartslist.erase(itr);
+
+		
+	}
+		
+
+	//Mapの要素を破壊
+	m_nMotionPlayMotonNum.erase(nModelNum);			//今再生中のモーション番号
+	m_nMotionDestMotonNum.erase(nModelNum);			//次再生モーション番号
+	m_nMotionRegistrationNum.erase(nModelNum);			//登録したモーションモデル群のモーションの登録数
 }

@@ -32,6 +32,7 @@ const D3DXVECTOR3 CEnemy_SmallFish::ENEMY_SIZE_MIN = D3DXVECTOR3(-INIT_RADIUS, 0
 //*****************************************************************************
 CEnemy_SmallFish::CEnemy_SmallFish()
 {
+	m_nRandomMoveCnt = 0;
 	CMovable_Obj::SetLife(INIT_LIFE);
 	CMovable_Obj::SetRadius(INIT_RADIUS);
 }
@@ -82,7 +83,8 @@ HRESULT CEnemy_SmallFish::Init()
 void CEnemy_SmallFish::Uninit()
 {
 	//モーション
-	CMotionParts::MoveMotionModel(GetMotionNum(), 1, &GetPos(), &GetRot(),true);
+	//CMotionParts::UnUpdateDraw();
+	CMotionParts::DestructionMotionModel(GetMotionNum());
 
 	//親クラスの終了処理
 	CEnemy::Uninit();
@@ -108,22 +110,23 @@ void CEnemy_SmallFish::Update()
 	D3DXVECTOR3 PLpos = pPlayer->GetPos();
 
 	//索敵範囲にいるかどうか
-	if (!CConvenience_Function::CircleCollision(pos, SEARCH_RANGE, PLpos, 0.0f))
+	if (CConvenience_Function::CircleCollision(pos, SEARCH_RANGE, PLpos, 0.0f))
 	{
-		//モーション
-		CMotionParts::MoveMotionModel(GetMotionNum(), 0, &GetPos(), &GetRot());
+		//プレイヤーの方向へのベクトル
+		D3DXVECTOR3 vec = CConvenience_Function::PointOrientationVectorGeneration(PLpos, pos);
 
-		return;
+		//Y方向をなくす
+		vec.y = 0.0f;
+
+		//プレイヤーに近づく
+		SetMove(vec * MOVE_INERTIA);
 	}
-
-	//プレイヤーの方向へのベクトル
-	D3DXVECTOR3 vec = CConvenience_Function::PointOrientationVectorGeneration(PLpos, pos);
-
-	//Y方向をなくす
-	vec.y = 0.0f;
-
-	//プレイヤーに近づく
-	AddPos(vec * MOVE_INERTIA);
+	else
+	{
+		//ランダム行動
+		RandomMove();
+	}
+	
 
 
 	//エネミーマネージャーの取得
@@ -170,7 +173,7 @@ void CEnemy_SmallFish::Update()
 	for (int nCnt = 0; nCnt < CHECK_RANGE; nCnt++)
 	{
 		//瓦礫の当たり判定
-		Add = pGame->GetBallast_Manager()->CollisionBallast(aMapGrid[nCnt], GetPos(), GetOldPos(), ENEMY_SIZE_MAX, ENEMY_SIZE_MIN);
+		Add = pBallast_Manager->CollisionBallast(aMapGrid[nCnt], GetPos(), GetOldPos(), ENEMY_SIZE_MAX, ENEMY_SIZE_MIN);
 
 		if (Add != GetPos())
 		{
@@ -184,8 +187,9 @@ void CEnemy_SmallFish::Update()
 
 
 	//エネミーのrot
-	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f,0.0f,0.0f);
-	rot.y = atan2f(vec.x, vec.z) + D3DX_PI;
+	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	D3DXVECTOR3 MoveVec = GetMoveVec();
+	rot.y = atan2f(MoveVec.x, MoveVec.z) - D3DX_PI;
 
 	//rot設定
 	SetRot(rot);
@@ -225,7 +229,39 @@ void CEnemy_SmallFish::SetMotionModel()
 {
 	CRead cRead;
 
-	SetMotionNum(cRead.ReadMotion("data/MOTION/motionenemy.txt"));
+	//SetMotionNum(cRead.ReadMotion("data/MOTION/motionenemy.txt"));
 
 	CMotionParts::AllSetObject_Type_List(GetMotionNum(), OBJ_ENEMY);
+}
+
+//*****************************************************************************
+// ランダム行動
+//*****************************************************************************
+void CEnemy_SmallFish::RandomMove()
+{
+	if (m_nRandomMoveCnt > 0)
+	{
+		m_nRandomMoveCnt--;
+
+		D3DXVECTOR3 moveVec =  GetMoveVec();
+
+		SetMove(MOVE_INERTIA * moveVec);
+
+		return;
+	}
+
+	m_nRandomMoveCnt = rand() % RANDOM_MOVE_CNT_MAX;
+
+	float fAngle = D3DXToRadian(rand() % 360);
+
+	D3DXVECTOR3 vec = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	vec.x = cosf(fAngle);
+	vec.z = sinf(fAngle);
+	vec.y = 0.0f;
+
+	D3DXVec3Normalize(&vec,&vec);
+
+
+	SetMove(MOVE_INERTIA * vec);
 }

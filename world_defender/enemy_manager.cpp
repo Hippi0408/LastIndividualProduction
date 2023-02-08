@@ -14,6 +14,8 @@
 #include "enemy_manager.h"
 #include <assert.h>
 #include "convenience_function.h"
+#include "read.h"
+#include "motion_parts.h"
 
 const float CEnemy_Manager::RADIUS_TYPE[] = { 40.0f ,30.0f ,20.0f ,10.0f ,0.0f };
 const int CEnemy_Manager::DAMAGE_TYPE[] = { 40 ,30 ,20 ,10 ,0 };
@@ -37,6 +39,12 @@ CEnemy_Manager::~CEnemy_Manager()
 //*****************************************************************************
 HRESULT CEnemy_Manager::Init()
 {
+	CRead Read;
+
+	m_nEnemySmasllfish = Read.ReadMotion("data/MOTION/motionenemy.txt");
+
+	CMotionParts::UnUpdateDraw(m_nEnemySmasllfish);
+
 	return S_OK;
 }
 
@@ -157,6 +165,7 @@ void CEnemy_Manager::CreateEnemy(EnemyInitData enemyinitdata)
 		break;
 	case ENEMY_01:
 		pEnemy = new CEnemy_SmallFish;
+		pEnemy->SetMotionNum(CMotionParts::CopyMotionModel(m_nEnemySmasllfish));
 		break;
 	case ENEMY_02:
 		pEnemy = new CEnemy_Boss;
