@@ -272,6 +272,48 @@ bool CEnemy_Manager::EnemyCollision(D3DXVECTOR3 pos, float fRadius)
 }
 
 //*****************************************************************************
+// プレイヤーとのの当たり判定処理
+//*****************************************************************************
+bool CEnemy_Manager::PlayerCollision(D3DXVECTOR3 pos, float fRadius)
+{
+	//イテレーターループ
+	for (auto itr = m_EnemyList.begin(); itr != m_EnemyList.end();)
+	{
+		//イテレーターからエネミーのポインタの代入
+		CEnemy* pEnemy = *itr;
+
+		//エネミーポインタの解放
+		if (pEnemy == nullptr)
+		{
+			//次のイテレーターの代入、現在のイテレーターを破棄
+			itr = m_EnemyList.erase(itr);
+
+			//以下の処理を無視する
+			continue;
+		}
+
+		
+		//判定
+		bool bHit = CConvenience_Function::CircleCollision(pEnemy->GetPos(), pEnemy->GetRadius(), pos, fRadius);
+
+		//上記の結果がtrue
+		if (bHit)
+		{
+			//処理を抜ける
+			return true;
+		}
+
+		//イテレーターを進める
+		itr++;
+
+		//以下の処理を無視する
+		continue;
+	}
+
+	return false;
+}
+
+//*****************************************************************************
 // エネミー同士の当たり判定処理(押し戻し)
 //*****************************************************************************
 void CEnemy_Manager::EnemyOnEnemyCollision(CEnemy * pTargetEnemy)

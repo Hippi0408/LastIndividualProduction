@@ -64,6 +64,7 @@ public:
 	void CreateEnemy(EnemyInitData enemyinitdata);
 
 	bool EnemyCollision(D3DXVECTOR3 pos, float fRadius);
+	bool PlayerCollision(D3DXVECTOR3 pos, float fRadius);
 	void EnemyOnEnemyCollision(CEnemy* pTargetEnemy);
 private:
 

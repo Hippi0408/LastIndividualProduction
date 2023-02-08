@@ -26,6 +26,7 @@ class CPlayer : public CMovable_Obj
 {
 private:
 	static const int INIT_LIFE = 100;
+	static const int INVINCIBLE_TIME = 120;
 	static const int CHECK_RANGE_X = 3;
 	static const int CHECK_RANGE_Z = 3;
 	static const int CHECK_RANGE = CHECK_RANGE_X * CHECK_RANGE_Z;
@@ -37,6 +38,8 @@ private:
 	static const float MOVE_DASH;
 	static const float MOVE_INERTIA;
 	static const float JUMP_INERTIA;
+	static const float INIT_RADIUS;
+	static const float KNOCK_BACK;
 	static const D3DXVECTOR3 PLAYER_SIZE_MAX;
 	static const D3DXVECTOR3 PLAYER_SIZE_MIN;
 
@@ -79,6 +82,8 @@ private:
 	CPsychokinesis* m_pPsychokinesis;
 	int m_nMapGrid;//マップ上の位置
 	bool m_bJump;
+	bool m_bHit;//ダメージの有無
+	int m_nInvincibleTime;
 };
 
 #endif

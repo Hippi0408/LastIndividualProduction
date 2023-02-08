@@ -21,6 +21,7 @@
 #include "object_type_list.h"
 #include "psychokinesis.h"
 #include "ballast_manager.h"
+#include "enemy_manager.h"
 
 const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f); 
 const float CPlayer::PLAYER_GRAVITY = 2.0f;
@@ -30,6 +31,8 @@ const float CPlayer::MOVE_DASH = MOVE_NORMAL * 2.0f;
 const float CPlayer::MOVE_INERTIA = 0.1f;
 const float CPlayer::JUMP_INERTIA = 0.01f;
 const float CPlayer::JUMP_POWER = 60.0f;
+const float CPlayer::INIT_RADIUS = 60.0f;
+const float CPlayer::KNOCK_BACK = 100.0f;
 const D3DXVECTOR3 CPlayer::PLAYER_SIZE_MAX = D3DXVECTOR3(15.0f, 100.0f, 15.0f);
 const D3DXVECTOR3 CPlayer::PLAYER_SIZE_MIN = D3DXVECTOR3(-15.0f, 0.0f, -15.0f);
 
@@ -71,6 +74,12 @@ HRESULT CPlayer::Init()
 	m_DestRotLowerBody = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	m_bJump = false;
+
+	m_bHit = false;
+
+	m_nInvincibleTime = 0;
+
+	SetRadius(INIT_RADIUS);
 
 	CRead cRead;
 
@@ -141,25 +150,36 @@ void CPlayer::Update()
 	//親クラスの更新
 	CMovable_Obj::Update();
 
-	
-	// 当たり判定系処理
-	Collision();
+	//ダメージ中は動けない
+	if (!m_bHit)
+	{
+		// 当たり判定系処理
+		Collision();
+	}
 
-	//移動の処理の更新
-	Move();
-	
-
-	
-
+	if (!m_bHit)
+	{
+		//移動の処理の更新
+		Move();
+	}
 	
 	// モーション処理
 	Motion();
 	
+	//無敵時間の更新
+	if (m_bHit)
+	{
+		if (m_nInvincibleTime > 0)
+		{
+			m_nInvincibleTime--;
+		}
+		else
+		{
+			m_nInvincibleTime = 0;
 
-
-	
-
-
+			m_bHit = false;
+		}
+	}
 	
 	//現在のプレイヤーの位置の取得
 	D3DXVECTOR3 pos = GetPos();
@@ -384,6 +404,42 @@ void CPlayer::Collision()
 	//瓦礫との当たり判定
 	SetPos(Add);
 
+
+	//-------------------------------------------------------
+	// エネミーとの当たり判定
+	//-------------------------------------------------------
+
+	//エネミーマネージャーの取得
+	CEnemy_Manager* pEnemyManager = pGame->GetEnemy_Manager();
+
+	//判定
+	m_bHit = pEnemyManager->PlayerCollision(GetPos(),GetRadius());
+
+	//ノックバックの発生
+	if (!m_bHit)
+	{
+		return;
+	}
+
+	//-------------------------------------------------------
+	//ノックバック
+	//-------------------------------------------------------
+
+	//移動量
+	D3DXVECTOR3 MoveVec = GetMove();
+
+	//移動量の逆ベクトル
+	MoveVec *= -1.0f;
+	D3DXVec3Normalize(&MoveVec, &MoveVec);
+
+	//移動方向ベクトルにノックバック用移動量を掛ける
+	MoveVec *= KNOCK_BACK;
+
+	//移動量の設定
+	SetMove(MoveVec);
+
+	//無敵時間の発生
+	m_nInvincibleTime = INVINCIBLE_TIME;
 }
 
 //*****************************************************************************
@@ -415,8 +471,16 @@ void CPlayer::Motion()
 	int nMotionNumUp = 0;
 	int nMotionNumDown = 0;
 
-	
-	if (m_bJump)
+	if (m_bHit)
+	{
+		if (m_nInvincibleTime >= INVINCIBLE_TIME)
+		{
+			//ダウン用のモーション番号
+			nMotionNumUp = 4;
+			nMotionNumDown = nMotionNumUp;
+		}
+	}
+	else if (m_bJump)
 	{
 		//ジャンプ中用のモーション番号
 		nMotionNumUp = 6;
@@ -443,7 +507,7 @@ void CPlayer::Motion()
 		nMotionNumDown = nMotionNumUp;
 	}
 
-	if (pInput->Press(MOUSE_INPUT_LEFT))
+	if (pInput->Press(MOUSE_INPUT_LEFT) && !m_bHit)
 	{
 		//攻撃モーション
 		nMotionNumDown = 7;
