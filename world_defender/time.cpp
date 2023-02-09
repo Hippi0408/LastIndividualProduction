@@ -21,6 +21,9 @@ const D3DXVECTOR3 CTime::EARTH_POS = D3DXVECTOR3(0.0f, 30.0f, 0.0f);
 CTime::CTime()
 {
 	m_pTimeGauge = nullptr;
+	m_pCrayfish = nullptr;
+	m_pEarth = nullptr;
+	m_pWarningBorder = nullptr;
 	m_bUpdate = false;
 }
 
@@ -103,6 +106,22 @@ HRESULT CTime::Init(int nTimeMax)
 	m_pEarth->SetDiagonalLine(100.0f, 100.0f);
 	m_pEarth->SetPolygon();
 
+	//ŒxƒtƒŒ[ƒ€
+	m_pWarningBorder = new C2DPolygon;
+
+	if (FAILED(m_pWarningBorder->Init()))
+	{
+		return -1;
+	}
+
+	//î•ñ‚ÌÝ’è
+	nIndex = CTexture::LoadTexture("data/TEXTURE/ŒxƒtƒŒ[ƒ€.png");
+	m_pWarningBorder->SetTextIndex(nIndex);
+	m_pWarningBorder->SetPos(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f,0.0f));
+	m_pWarningBorder->SetDiagonalLine(SCREEN_WIDTH, SCREEN_HEIGHT);
+	m_pWarningBorder->SetColor(D3DXCOLOR(1.0f,0.0f,0.0f,0.0f));
+	m_pWarningBorder->SetPolygon();
+
 	return S_OK;
 }
 
@@ -135,6 +154,13 @@ void CTime::Uninit()
 		m_pEarth = nullptr;
 	}
 	
+	//ŒxƒtƒŒ[ƒ€
+	if (m_pWarningBorder != nullptr)
+	{
+		m_pWarningBorder->Uninit();
+		delete m_pWarningBorder;
+		m_pWarningBorder = nullptr;
+	}
 }
 
 //*****************************************************************************
@@ -157,6 +183,14 @@ void CTime::Update()
 
 	m_pEarth->SetPos(m_pTimeGauge->GetPos() + EARTH_POS);
 	m_pEarth->Update();
+
+	D3DXCOLOR WarningColor = m_pWarningBorder->GetColor();
+
+	WarningColor.a = 1.0 - m_pTimeGauge->GetRatio();
+
+	m_pWarningBorder->SetColor(WarningColor);
+
+	m_pWarningBorder->Update();
 }
 
 //*****************************************************************************
@@ -164,8 +198,10 @@ void CTime::Update()
 //*****************************************************************************
 void CTime::Draw()
 {
+	m_pWarningBorder->Draw();
 	m_pEarth->Draw();
 	m_pCrayfish->Draw();
+	
 }
 
 bool CTime::CheckTime(int nTime)

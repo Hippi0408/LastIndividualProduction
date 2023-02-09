@@ -207,6 +207,9 @@ void CStatGauge::IncreaseAndDecreaseAndTexture()
 	//ŒvŽZ
 	fRatio = fHeight / fHeightMax;
 
+	//Š„‡•Û‘¶
+	m_fRatio = fRatio;
+
 	//Œ»Ý‚ÌUVMin
 	D3DXVECTOR2 UVMin = m_pStatGauge->GetUVSizeMin();
 

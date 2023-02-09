@@ -43,6 +43,7 @@ public:
 private:
 	C2DPolygon* m_pCrayfish;
 	C2DPolygon* m_pEarth;
+	C2DPolygon* m_pWarningBorder;
 	CStatGauge* m_pTimeGauge;
 	bool m_bUpdate;
 };

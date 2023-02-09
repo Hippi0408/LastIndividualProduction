@@ -74,6 +74,8 @@ public:
 
 	D3DXVECTOR3 GetPos() { return m_Pos; }
 	D3DXVECTOR3 GetTopPos() { return m_TopPos; }
+
+	float GetRatio() { return m_fRatio; }
 private:
 	int m_nCntRecovery;
 	int m_nCntRecoveryMax;
@@ -88,6 +90,7 @@ private:
 	int m_nValue;
 	int m_nValueMax;
 	bool m_bTextureChange;
+	float m_fRatio; //åªç›ÇÃÉQÅ[ÉWÇÃäÑçá
 };
 
 #endif
