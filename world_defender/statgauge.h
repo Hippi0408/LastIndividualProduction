@@ -64,20 +64,30 @@ public:
 	void SetStatGauge(int nStatGauge);
 
 	bool GetGaugeState(GaugeState GaugeState);
-	bool ValueCheck();
-	bool ValueCheck(int nCheck);
+	bool ValueCheck(int nCheck = 0);
 
+	void SetTextureNum(int nTexture);
 
+	void SetTextureChange(bool bTextureChange) { m_bTextureChange = bTextureChange; }
+
+	void IncreaseAndDecreaseAndTexture();
+
+	D3DXVECTOR3 GetPos() { return m_Pos; }
+	D3DXVECTOR3 GetTopPos() { return m_TopPos; }
 private:
 	int m_nCntRecovery;
 	int m_nCntRecoveryMax;
 	int m_nRecovery;
-
+	int m_nTexture;
 	GaugeState m_GaugeState;
+
+	D3DXVECTOR3 m_Pos;
+	D3DXVECTOR3 m_TopPos;
 
 	CGauge *m_pStatGauge;
 	int m_nValue;
 	int m_nValueMax;
+	bool m_bTextureChange;
 };
 
 #endif

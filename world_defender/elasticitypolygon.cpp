@@ -29,6 +29,8 @@ CElasticityPolygon::CElasticityPolygon()
 	m_lenUnder = 0.0f;
 	m_fHeightElasticity = 0.0f;
 	m_fHeightMax = 0.0f;
+	m_UVSizeMax = D3DXVECTOR2(1.0f, 1.0f);
+	m_UVSizeMin = D3DXVECTOR2(0.0f, 0.0f);
 }
 
 //*****************************************************************************
@@ -74,10 +76,10 @@ HRESULT CElasticityPolygon::Init()
 	pVtx[3].rhw = 1.0f;
 
 	//テクスチャ座標の設定
-	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
-	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+	pVtx[0].tex = D3DXVECTOR2(m_UVSizeMin.x, m_UVSizeMax.y);
+	pVtx[1].tex = D3DXVECTOR2(m_UVSizeMax.x, m_UVSizeMax.y);
+	pVtx[2].tex = D3DXVECTOR2(m_UVSizeMax.x, m_UVSizeMin.y);
+	pVtx[3].tex = D3DXVECTOR2(m_UVSizeMin.x, m_UVSizeMin.y);
 
 	// 頂点カラーの設定
 	pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
@@ -209,10 +211,10 @@ void CElasticityPolygon::SetPolygon()
 	pVtx[3].pos = D3DXVECTOR3(m_Pos.x + sinf(rot + m_angleUnder) * m_lenUnder, m_Pos.y + cosf(rot + m_angleUnder) * m_lenUnder, 0.0f);
 
 	//テクスチャ座標の設定
-	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
-	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+	pVtx[0].tex = D3DXVECTOR2(m_UVSizeMin.x, m_UVSizeMin.y);
+	pVtx[1].tex = D3DXVECTOR2(m_UVSizeMax.x, m_UVSizeMin.y);
+	pVtx[2].tex = D3DXVECTOR2(m_UVSizeMax.x, m_UVSizeMax.y);
+	pVtx[3].tex = D3DXVECTOR2(m_UVSizeMin.x, m_UVSizeMax.y);
 
 	// 頂点カラーの設定
 	pVtx[0].col = m_Col;

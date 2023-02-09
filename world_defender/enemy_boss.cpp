@@ -146,6 +146,9 @@ void CEnemy_Boss::Update()
 			//カメラの振動設定
 			pGame->SetVibration(400,70);
 
+			//ゲームエンドフラグを立てる
+			pGame->GameEnd();
+
 			//死亡モーションの再生
 			CMotionParts::MoveMotionModel(GetMotionNum(), 4, &GetPos(), &GetRot(), true);
 

@@ -20,7 +20,11 @@ CStatGauge::CStatGauge()
 	m_pStatGauge = nullptr;
 	m_nCntRecovery = 0;
 	m_nValue = 0;
+	m_nTexture = 0;
 	m_GaugeState = NormalGauge;
+	m_bTextureChange = false;
+	m_Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_TopPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 }
 
 //*****************************************************************************
@@ -43,6 +47,7 @@ HRESULT CStatGauge::Init()
 	}
 
 	m_pStatGauge->SetFadeSpeed(0.1f);
+	m_pStatGauge->SetTextIndex(m_nTexture);
 	return S_OK;
 }
 
@@ -80,7 +85,18 @@ void CStatGauge::Update()
 		SetStatGauge(m_nRecovery);
 	}
 
+	// 増減とテクスチャのリンク
+	if (m_bTextureChange)
+	{
+		IncreaseAndDecreaseAndTexture();
+	}
+
 	m_pStatGauge->Update();
+
+	m_TopPos = m_Pos;
+
+	m_TopPos.y -= m_pStatGauge->GetHeightElasticity();
+
 }
 
 //*****************************************************************************
@@ -102,6 +118,7 @@ void CStatGauge::CreateStatBar(SStatGauge SStatGauge)
 		m_nValueMax = SStatGauge.nValueMax;
 		m_nCntRecoveryMax = SStatGauge.nRecoveryCntMaqx;
 		m_pStatGauge->SetUp(SStatGauge.pos, SStatGauge.rot);
+		m_Pos = SStatGauge.pos;
 		m_pStatGauge->SetDiagonalLine(SStatGauge.fXSize, 0.0f);
 		m_pStatGauge->SetNumerics(SStatGauge.nValueMax, SStatGauge.nValueMax);
 		m_pStatGauge->SetHeightElasticity(SStatGauge.fYSize);
@@ -170,22 +187,52 @@ bool CStatGauge::GetGaugeState(GaugeState GaugeState)
 }
 
 //*****************************************************************************
+// 増減とテクスチャのリンク
+//*****************************************************************************
+void CStatGauge::IncreaseAndDecreaseAndTexture()
+{
+	//ゲージの最大高さと現在の高さ
+	float fHeight, fHeightMax;
+
+	//現在の高さ
+	fHeight = (float)m_nValue;
+
+	//最大高さ
+	fHeightMax = (float)m_nValueMax;
+
+
+	//割合計算用
+	float fRatio;
+
+	//計算
+	fRatio = fHeight / fHeightMax;
+
+	//現在のUVMin
+	D3DXVECTOR2 UVMin = m_pStatGauge->GetUVSizeMin();
+
+	//最大値の変更
+	UVMin.y = 1.0f - fRatio;
+
+	//保存
+	m_pStatGauge->SetUVSizeMin(UVMin);
+
+}
+
+//*****************************************************************************
 // ダメージ処理
 //*****************************************************************************
-bool CStatGauge::ValueCheck()
+bool CStatGauge::ValueCheck(int nCheck)
 {
-	if (m_nValue <= 0)
+	if (m_nValue <= nCheck)
 	{
 		return true;
 	}
 	return false;
 }
 
-bool CStatGauge::ValueCheck(int nCheck)
+void CStatGauge::SetTextureNum(int nTexture)
 {
-	if (m_nValue >= nCheck)
-	{
-		return true;
-	}
-	return false;
+	m_nTexture = nTexture;
+	m_pStatGauge->SetTextIndex(m_nTexture);
 }
+

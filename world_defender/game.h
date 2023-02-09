@@ -23,6 +23,7 @@ class CPlayer;
 class CBallast_Manager;
 class CEnemy_Manager;
 class CMesh_Cylinder;
+class CTime;
 
 //*****************************************************************************
 // ƒNƒ‰ƒX’è‹`
@@ -54,6 +55,8 @@ public:
 
 	void SetVibration(int nVibrationMax, int nVibration);
 	bool CheckVibration();
+
+	void GameEnd() { m_bGameEnd = true; }
 private:
 	CCamera* m_pCameraRound;
 	CCamera* m_pCamera;
@@ -63,9 +66,11 @@ private:
 	CEnemy_Manager* m_pEnmeyManager;
 	CBallast_Manager* m_pBallastManager;
 	CMesh_Cylinder* m_pMesh_Cylinder;
+	CTime* m_pTime;
 	int m_nRoundCnt;
 	int m_nRoundCntMax;
 	bool m_bRoundCamera;
+	bool m_bGameEnd;
 };
 
 #endif

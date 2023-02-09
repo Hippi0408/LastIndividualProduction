@@ -28,12 +28,14 @@
 #include "sound.h"
 #include "gauge.h"
 #include "camera_round.h"
+#include "time.h"
 
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
 CGame::CGame()
 {
+	m_bGameEnd = false;
 }
 
 //*****************************************************************************
@@ -127,7 +129,11 @@ HRESULT CGame::Init()
 
 	m_pMesh_Cylinder->SetMesh_Cylinder(Mesh_Cylinder_Structure);
 
-
+	m_pTime = new CTime;
+	if (FAILED(m_pTime->Init(3600)))
+	{
+		return -1;
+	}
 
 	//入力デバイスの取得
 	CInput *pInput = CInput::GetKey();
@@ -207,6 +213,13 @@ void CGame::Uninit()
 		m_pMesh_Cylinder = nullptr;
 	}
 
+	if (m_pTime != nullptr)
+	{
+		m_pTime->Uninit();
+		delete m_pTime;
+		m_pTime = nullptr;
+	}
+
 	C3DObject::UninitAllModel();
 
 	CMotionParts::ALLUninit();
@@ -235,6 +248,7 @@ void CGame::Update()
 	if (m_nRoundCnt > m_nRoundCntMax)
 	{
 		m_bRoundCamera = false;
+		m_pTime->SetTimeUpdate(true);
 	}
 	else
 	{
@@ -242,16 +256,32 @@ void CGame::Update()
 	}
 
 	m_pEnmeyManager->Update();
-	m_pPlayer->Update();
+
+	//ゲームエンドではなかったら更新
+	if (!m_bGameEnd)
+	{
+		m_pPlayer->Update();
+		m_pTime->Update();
+	}
+
 	m_pBallastManager->Update();
+	
 	CInput *pInput = CInput::GetKey();
 
 	CMotionParts::ALLUpdate();
 
 	if (pInput->Trigger(KEY_DECISION))
 	{
+		m_bGameEnd = true;
 		//画面内のカーソルの復活
 		pInput->SetCursorErase(false);
+		CManager * pManager = GetManager();
+		pManager->NextMode(TYPE_RESULT);
+	}
+
+	if (m_pTime->CheckTime())
+	{
+		m_bGameEnd = true;
 		CManager * pManager = GetManager();
 		pManager->NextMode(TYPE_RESULT);
 	}
@@ -284,8 +314,13 @@ void CGame::Draw()
 
 	m_pEnmeyManager->Draw();
 
-	//ゲージ
-	CGauge::AllDraw();
+	/*if (!m_bRoundCamera)
+	{*/
+		//ゲージ
+		CGauge::AllDraw();
+
+		m_pTime->Draw();
+	//}
 
 }
 

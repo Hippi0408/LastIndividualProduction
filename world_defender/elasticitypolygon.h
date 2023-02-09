@@ -49,14 +49,23 @@ public:
 	void SetHeightElasticity(float fHeightElasticity);//伸びるポリゴン縦幅のセット
 	void SetHeightMax(float fHeightMax) { m_fHeightMax = fHeightMax; }//伸びるポリゴン縦幅Maxのセット
 	float GetHeightMax() { return m_fHeightMax; }
+	float GetHeight() { return m_fHeight; }
 	void AddHeightElasticity(float fHeightElasticity) { m_fHeightElasticity += fHeightElasticity; }//伸びるポリゴンの延長
 	float GetHeightElasticity() { return m_fHeightElasticity; }//現在の長さ
+
+	D3DXVECTOR2 GetUVSizeMax() { return m_UVSizeMax; }
+	D3DXVECTOR2 GetUVSizeMin() { return m_UVSizeMin; }
+
+	void SetUVSizeMax(D3DXVECTOR2 UVSize) { m_UVSizeMax = UVSize; }
+	void SetUVSizeMin(D3DXVECTOR2 UVSize) { m_UVSizeMin = UVSize; }
 
 private:
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;//頂点バッファへのポインタ
 	D3DXVECTOR3 m_Pos;
 	D3DXVECTOR3 m_Rot;
 	D3DXCOLOR m_Col;
+	D3DXVECTOR2 m_UVSizeMax;
+	D3DXVECTOR2 m_UVSizeMin;
 
 	float m_fWidth;//横幅
 	float m_fHeight;//縦幅
