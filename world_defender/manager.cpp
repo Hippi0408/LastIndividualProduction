@@ -48,7 +48,7 @@ HRESULT CManager::Init(HINSTANCE hInstance,HWND hWnd, bool bWindow)
 	InitSound(hWnd);
 
 	m_bChange = false;
-	m_Mode = TYPE_GAME;
+	m_Mode = TYPE_TITLE;
 	CTexture::Create();
 
 	m_pInput = CInput::Create();
@@ -66,7 +66,7 @@ HRESULT CManager::Init(HINSTANCE hInstance,HWND hWnd, bool bWindow)
 		return -1;
 	}
 
-	m_pGame = new CGame;
+	m_pGame = new CTitle;
 	if (FAILED(m_pGame->Init()))
 	{
 		return -1;

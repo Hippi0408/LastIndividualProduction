@@ -18,6 +18,7 @@
 class CShadow;
 class CPsychokinesis_Area;
 class CPsychokinesis;
+class CAdrenaline_Gauge;
 
 //*****************************************************************************
 // クラス定義
@@ -80,6 +81,7 @@ private:
 	D3DXVECTOR3 m_CameraVec;
 	CPsychokinesis_Area* m_pPsychokinesis_Area;
 	CPsychokinesis* m_pPsychokinesis;
+	CAdrenaline_Gauge* m_pAdrenaline_Gauge;
 	int m_nMapGrid;//マップ上の位置
 	bool m_bJump;
 	bool m_bHit;//ダメージの有無

@@ -22,6 +22,7 @@
 #include "psychokinesis.h"
 #include "ballast_manager.h"
 #include "enemy_manager.h"
+#include "adrenaline_gauge.h"
 
 const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f); 
 const float CPlayer::PLAYER_GRAVITY = 2.0f;
@@ -112,6 +113,14 @@ HRESULT CPlayer::Init()
 		return -1;
 	}
 
+	//アドレナリンゲージ
+	m_pAdrenaline_Gauge = new CAdrenaline_Gauge;
+	if (FAILED(m_pAdrenaline_Gauge->Init()))
+	{
+		return -1;
+	}
+
+
 	return S_OK;
 }
 
@@ -136,6 +145,15 @@ void CPlayer::Uninit()
 		m_pPsychokinesis->Uninit();
 		delete m_pPsychokinesis;
 		m_pPsychokinesis = nullptr;
+	}
+
+	//アドレナリンゲージの解放
+	if (m_pAdrenaline_Gauge != nullptr)
+	{
+		//終了処理
+		m_pAdrenaline_Gauge->Uninit();
+		delete m_pAdrenaline_Gauge;
+		m_pAdrenaline_Gauge = nullptr;
 	}
 }
 
@@ -190,6 +208,16 @@ void CPlayer::Update()
 	//サイコキネシスの更新
 	m_pPsychokinesis->Update(m_nMapGrid,pos, GetRot(), m_CameraVec, m_pPsychokinesis_Area->GetRadius(), m_pPsychokinesis_Area->GetSizeTop());
 
+	//アドレナリンゲージ更新処理
+	m_pAdrenaline_Gauge->Update();
+
+
+	if (pInput->Trigger(DIK_T))
+	{
+		m_pAdrenaline_Gauge->AddGauge(10);
+	}
+
+
 	//現在は使われていない（影の判定）
 	/*if (groundpos != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
 	{
@@ -204,6 +232,9 @@ void CPlayer::Draw()
 {
 	//サイコキネシスエリアの描画
 	m_pPsychokinesis_Area->Draw();
+
+	//アドレナリンゲージ描画処理
+	m_pAdrenaline_Gauge->Draw();
 }
 
 //*****************************************************************************

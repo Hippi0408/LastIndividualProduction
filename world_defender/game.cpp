@@ -314,13 +314,13 @@ void CGame::Draw()
 
 	m_pEnmeyManager->Draw();
 
-	/*if (!m_bRoundCamera)
-	{*/
+	if (!m_bRoundCamera)
+	{
 		//ƒQ[ƒW
 		CGauge::AllDraw();
 
 		m_pTime->Draw();
-	//}
+	}
 
 }
 
