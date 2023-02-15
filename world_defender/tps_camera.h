@@ -24,7 +24,7 @@ class CTpsCamera : public CCamera
 private:
 	static const D3DXVECTOR3 RANGE_WITH_PLAYER_V;
 	static const D3DXVECTOR3 RANGE_WITH_PLAYER_R;
-	static const float DISTANCE;
+	static const float DISTANCE_MAX;
 public:
 	CTpsCamera();
 	~CTpsCamera() override;
@@ -33,6 +33,8 @@ public:
 	void Update() override;
 
 	D3DXVECTOR3 GetCameraVec();
+
+	void RateCalculation(float fRate);
 	
 private:
 	D3DXVECTOR3 m_VPos;
@@ -41,6 +43,7 @@ private:
 	D3DXVECTOR3 m_CameraVectorConversion;
 	float m_fPlayerDistance;
 	D3DXVECTOR3 m_DestPos;
+	float m_fDistance;
 };
 
 #endif

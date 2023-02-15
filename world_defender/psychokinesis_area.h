@@ -27,6 +27,7 @@ private:
 	static const D3DXVECTOR3 INIT_POS;
 	static const float HEIGHT_LOCUS; 
 	static const float RADIUS_INIT;
+	static const float RADIUS_MAX;
 	static const float RADIUS_MOVE;
 	static const float SIZE_TOP;
 public:
@@ -44,6 +45,8 @@ public:
 	float GetRadius() { return m_fRadius; }
 	float GetSizeTop() { return m_fSizeTop; }
 	
+	void RateCalculation(float fRate);
+
 private:
 	D3DXVECTOR3 m_PLPos;
 	CMesh_Cylinder* m_pMesh_Cylinder;

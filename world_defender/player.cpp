@@ -23,6 +23,7 @@
 #include "ballast_manager.h"
 #include "enemy_manager.h"
 #include "adrenaline_gauge.h"
+#include "tps_camera.h"
 
 const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f); 
 const float CPlayer::PLAYER_GRAVITY = 2.0f;
@@ -202,14 +203,27 @@ void CPlayer::Update()
 	//現在のプレイヤーの位置の取得
 	D3DXVECTOR3 pos = GetPos();
 
+	//アドレナリンゲージ更新処理
+	m_pAdrenaline_Gauge->Update();
+
+
+	//マネージャーからTPSカメラの取得
+	CManager *pManager = GetManager();
+	CGame* pGame = (CGame*)pManager->GetGameObject();
+	CTpsCamera* pTpsCamera = (CTpsCamera*)pGame->GetCamera();
+
+
+	pTpsCamera->RateCalculation(m_pAdrenaline_Gauge->GetRateCalculation());
+	m_pPsychokinesis_Area->RateCalculation(m_pAdrenaline_Gauge->GetRateCalculation());
+
+
 	//サイコキネシスエリアの更新（Posあり）
 	m_pPsychokinesis_Area->Update(pos);
 
 	//サイコキネシスの更新
 	m_pPsychokinesis->Update(m_nMapGrid, pos, GetRot(), m_CameraVec, m_pPsychokinesis_Area->GetRadius(), m_pPsychokinesis_Area->GetSizeTop());
 
-	//アドレナリンゲージ更新処理
-	m_pAdrenaline_Gauge->Update();
+	
 
 
 	if (pInput->Trigger(DIK_T))

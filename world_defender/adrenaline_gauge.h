@@ -43,6 +43,8 @@ public:
 
 	void AddGauge(int nAdd);
 
+	float GetRateCalculation();
+
 private:
 	CStatGauge* m_pAdrenaline_Gauge;
 	C2D6Polygon* m_pGauge;

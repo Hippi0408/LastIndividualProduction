@@ -15,7 +15,7 @@
 #include "input.h"
 #include "convenience_function.h"
 
-const float CTpsCamera::DISTANCE = 150.0f;
+const float CTpsCamera::DISTANCE_MAX = 3500.0f;
 const D3DXVECTOR3 CTpsCamera::RANGE_WITH_PLAYER_V = D3DXVECTOR3(100.0f, 0.0f, -500.0f);
 //const D3DXVECTOR3 CTpsCamera::RANGE_WITH_PLAYER_R = D3DXVECTOR3(0.0f, 0.0f, 300.0f);
 const D3DXVECTOR3 CTpsCamera::RANGE_WITH_PLAYER_R = D3DXVECTOR3(100.0f, 0.0f, 0.0f);
@@ -29,6 +29,7 @@ CTpsCamera::CTpsCamera()
 	m_fPlayerDistance = 0.0f;
 	m_DestPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_VPos = RANGE_WITH_PLAYER_V;
+	m_fDistance = 0.0f;
 }
 
 //*****************************************************************************
@@ -75,13 +76,13 @@ void CTpsCamera::Update()
 
 	if (pInput->Trigger(DIK_P))
 	{
-		m_VPos += m_CameraVec * DISTANCE;
+		m_VPos += m_CameraVec * DISTANCE_MAX;
 
 		//m_VPos.y += 50.0f;
 	}
 	else if (pInput->Trigger(DIK_O))
 	{
-		m_VPos -= m_CameraVec * DISTANCE;
+		m_VPos -= m_CameraVec * DISTANCE_MAX;
 		//m_VPos.y -= 50.0f;
 	}
 
@@ -139,7 +140,11 @@ void CTpsCamera::Update()
 
 	D3DXVECTOR3 posV, posR,add;
 
-	D3DXVec3TransformCoord(&posV, &m_VPos, &mtxworld);
+	posV.x = m_VPos.x + m_CameraVec.x * m_fDistance;
+	posV.y = m_VPos.y + m_CameraVec.y * m_fDistance;
+	posV.z = m_VPos.z + m_CameraVec.z * m_fDistance;
+
+	D3DXVec3TransformCoord(&posV, &posV, &mtxworld);
 	D3DXVec3TransformCoord(&posR, &RANGE_WITH_PLAYER_R, &mtxworld);
 	D3DXVec3TransformCoord(&m_CameraVectorConversion, &m_CameraVec, &mtxworld);
 	D3DXVec3Normalize(&m_CameraVectorConversion, &m_CameraVectorConversion);
@@ -162,4 +167,9 @@ D3DXVECTOR3 CTpsCamera::GetCameraVec()
 {
 	//return D3DXVECTOR3(m_CameraVectorConversion.x, -m_CameraVectorConversion.y, m_CameraVectorConversion.z);
 	return m_Rot;
+}
+
+void CTpsCamera::RateCalculation(float fRate)
+{
+	m_fDistance = DISTANCE_MAX * fRate;
 }

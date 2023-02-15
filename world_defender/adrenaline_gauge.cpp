@@ -161,6 +161,16 @@ void CAdrenaline_Gauge::Update()
 		m_nGauge--;
 	}
 
+
+	if (m_nGauge > MAX_GAUGE)
+	{
+		m_nGauge = MAX_GAUGE;
+	}
+	else if (m_nGauge < 0)
+	{
+		m_nGauge = 0;
+	}
+
 	float fRatio = (float)m_nGauge / MAX_GAUGE;
 
 	m_pGauge->SetRatio(fRatio);
@@ -180,5 +190,10 @@ void CAdrenaline_Gauge::Draw()
 void CAdrenaline_Gauge::AddGauge(int nAdd)
 {
 	m_nGaugeDest += nAdd;
+}
+
+float CAdrenaline_Gauge::GetRateCalculation()
+{
+	return (float)m_nGauge / MAX_GAUGE;
 }
 

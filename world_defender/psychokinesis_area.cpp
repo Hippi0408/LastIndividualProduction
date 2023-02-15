@@ -18,6 +18,7 @@
 const D3DXVECTOR3 CPsychokinesis_Area::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 const float CPsychokinesis_Area::HEIGHT_LOCUS = 80.0f;
 const float CPsychokinesis_Area::RADIUS_INIT = 200.0f;
+const float CPsychokinesis_Area::RADIUS_MAX = 1600.0f;
 const float CPsychokinesis_Area::SIZE_TOP = 50.0f;
 const float CPsychokinesis_Area::RADIUS_MOVE = D3DXToRadian(5);
 //*****************************************************************************
@@ -26,7 +27,7 @@ const float CPsychokinesis_Area::RADIUS_MOVE = D3DXToRadian(5);
 CPsychokinesis_Area::CPsychokinesis_Area()
 {
 	m_PLPos = INIT_POS;
-	m_fRadius = RADIUS_INIT;
+	m_fRadius = 0.0f;
 	m_fSizeTop = SIZE_TOP;
 	m_pMesh_Cylinder = nullptr;
 }
@@ -60,7 +61,7 @@ HRESULT CPsychokinesis_Area::Init()
 
 	Mesh_Cylinder_Structure Mesh_Cylinder_Structure;
 
-	Mesh_Cylinder_Structure.fRadius = m_fRadius;
+	Mesh_Cylinder_Structure.fRadius = RADIUS_INIT;
 	Mesh_Cylinder_Structure.fSizeYTop = m_fSizeTop;
 	Mesh_Cylinder_Structure.nPolygonX = 30;
 	Mesh_Cylinder_Structure.nPolygonY = 1;
@@ -115,21 +116,7 @@ void CPsychokinesis_Area::Uninit()
 //*****************************************************************************
 void CPsychokinesis_Area::Update()
 {
-	//入力デバイスの取得
-	CInput *pInput = CInput::GetKey();
-
-	if (pInput->Trigger(DIK_P))
-	{
-		m_fRadius += 100.0f;
-		m_fSizeTop += 10.0f;
-	}
-	else if (pInput->Trigger(DIK_O))
-	{
-		m_fRadius -= 100.0f;
-		m_fSizeTop -= 10.0f;
-	}
-
-	m_pMesh_Cylinder->SetRadius(m_fRadius);
+	m_pMesh_Cylinder->SetRadius(RADIUS_INIT + m_fRadius);
 	m_pMesh_Cylinder->SetSizeTop(m_fSizeTop);
 
 	m_pMesh_Cylinder->Update(m_PLPos);
@@ -154,5 +141,13 @@ void CPsychokinesis_Area::Draw()
 {
 	//描画処理
 	m_pMesh_Cylinder->Draw();
+}
+
+//*****************************************************************************
+// 割合計算処理
+//*****************************************************************************
+void CPsychokinesis_Area::RateCalculation(float fRate)
+{
+	m_fRadius = RADIUS_MAX * fRate;
 }
 
