@@ -27,6 +27,9 @@ private:
 	static const int INIT_TIME = 3600;
 	static const D3DXVECTOR3 CRAYFISH_POS;
 	static const D3DXVECTOR3 EARTH_POS;
+	static const int CRAYFISH_ANGLE_CNT = 60;
+	static const int CRAYFISH_ANGLE_NUM = 4;
+	static const float CRAYFISH_ANGLE[CRAYFISH_ANGLE_NUM];
 public:
 	CTime();
 	~CTime() override;
@@ -46,6 +49,8 @@ private:
 	C2DPolygon* m_pWarningBorder;
 	CStatGauge* m_pTimeGauge;
 	bool m_bUpdate;
+	int m_nChangeAngleCnt;
+	int m_nChangeAngleNum;
 };
 
 #endif

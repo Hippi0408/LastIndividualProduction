@@ -13,8 +13,9 @@
 #include "texture.h"
 #include "2dpolygon.h"
 
-const D3DXVECTOR3 CTime::CRAYFISH_POS = D3DXVECTOR3(50.0f, -30.0f, 0.0f);
+const D3DXVECTOR3 CTime::CRAYFISH_POS = D3DXVECTOR3(0.0f, -40.0f, 0.0f);
 const D3DXVECTOR3 CTime::EARTH_POS = D3DXVECTOR3(0.0f, 30.0f, 0.0f);
+const float CTime::CRAYFISH_ANGLE[] = { D3DXToRadian(45),0.0f, D3DXToRadian(-45),0.0f };
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
@@ -44,7 +45,8 @@ HRESULT CTime::Init()
 		return -1;
 	}
 
-
+	m_nChangeAngleCnt = 0;
+	m_nChangeAngleNum = 0;
 	return S_OK;
 }
 
@@ -179,6 +181,17 @@ void CTime::Update()
 	D3DXVECTOR3 TopPos = m_pTimeGauge->GetTopPos();
 
 	m_pCrayfish->SetPos(TopPos + CRAYFISH_POS);
+
+	if (m_nChangeAngleCnt > CRAYFISH_ANGLE_CNT)
+	{
+		m_nChangeAngleCnt = 0;
+		m_pCrayfish->SetRot(D3DXVECTOR3(0.0f,0.0f, CRAYFISH_ANGLE[m_nChangeAngleNum]));
+		m_nChangeAngleNum = (m_nChangeAngleNum + 1) % CRAYFISH_ANGLE_NUM;
+	}
+	else
+	{
+		m_nChangeAngleCnt++;
+	}
 	m_pCrayfish->Update();
 
 	m_pEarth->SetPos(m_pTimeGauge->GetPos() + EARTH_POS);

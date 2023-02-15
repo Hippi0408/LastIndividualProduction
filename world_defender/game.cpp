@@ -310,14 +310,14 @@ void CGame::Draw()
 
 	m_pBallastManager->Draw();
 
-	m_pPlayer->Draw();
-
 	m_pEnmeyManager->Draw();
 
 	if (!m_bRoundCamera)
 	{
 		//ƒQ[ƒW
 		CGauge::AllDraw();
+
+		m_pPlayer->Draw();
 
 		m_pTime->Draw();
 	}

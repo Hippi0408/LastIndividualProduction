@@ -24,7 +24,7 @@ class C2D6Polygon;
 class CTitle : public CObject
 {
 private:
-
+	
 public:
 	CTitle();
 	~CTitle() override;
@@ -37,6 +37,7 @@ public:
 private:
 	CUI *m_pUi;
 	C2D6Polygon* m_p2D4Polygon;
+
 };
 
 #endif

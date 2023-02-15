@@ -17,6 +17,7 @@
 // 前方宣言
 //*****************************************************************************
 class C2D6Polygon;
+class CStatGauge;
 
 //*****************************************************************************
 // クラス定義
@@ -29,7 +30,7 @@ private:
 	static const float INIT_WIDTH;
 	static const int MAX_GAUGE = 100;
 	static const int AUTOMATIC_DECREASE = 1;
-	static const int COUNTER_MAX = 60;
+	static const int COUNTER_MAX = 30;
 public:
 	CAdrenaline_Gauge();
 	~CAdrenaline_Gauge() override;
@@ -43,6 +44,7 @@ public:
 	void AddGauge(int nAdd);
 
 private:
+	CStatGauge* m_pAdrenaline_Gauge;
 	C2D6Polygon* m_pGauge;
 	D3DXVECTOR3 m_Pos;
 	int m_nGauge;
