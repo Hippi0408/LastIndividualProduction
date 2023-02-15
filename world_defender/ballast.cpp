@@ -91,6 +91,8 @@ void CBallast::Update()
 
 	//親位置の更新
 	AddParentPos(m_ParentPosMove);
+
+
 	
 	//親クラスの更新
 	C3DObject::Update();

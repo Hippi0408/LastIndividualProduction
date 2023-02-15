@@ -339,6 +339,8 @@ void CEnemy_Boss::SetMotionModel()
 
 	SetMotionNum(cRead.ReadMotion("data/MOTION/motionboss.txt"));
 
+	CMotionParts::SetLight(GetLight(), GetMotionNum());
+
 	CMotionParts::AllSetObject_Type_List(GetMotionNum(), OBJ_ENEMY);
 }
 

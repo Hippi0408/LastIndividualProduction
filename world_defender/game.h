@@ -67,6 +67,7 @@ private:
 	CBallast_Manager* m_pBallastManager;
 	CMesh_Cylinder* m_pMesh_Cylinder;
 	CTime* m_pTime;
+	D3DXVECTOR3 m_LightVec;
 	int m_nRoundCnt;
 	int m_nRoundCntMax;
 	bool m_bRoundCamera;

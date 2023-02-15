@@ -75,21 +75,27 @@ HRESULT CGame::Init()
 		return -1;
 	}
 
+	m_LightVec = m_pLight->GetLightVec();
+
 	
 	CRead cRead;
 
 	m_pPlayer = new CPlayer;
+	m_pPlayer->SetLight(m_LightVec);
 	if (FAILED(m_pPlayer->Init()))
 	{
 		return -1;
 	}
-	m_pPlayer->SetLight(m_pLight->GetLightVec());
+	
 
 	m_pEnmeyManager = new CEnemy_Manager;
+	m_pEnmeyManager->SetLight(m_LightVec);
 	if (FAILED(m_pEnmeyManager->Init()))
 	{
 		return -1;
 	}
+	
+
 	EnemyInitData EnemyInitData;
 
 	EnemyInitData.fmove = 10.0f;
@@ -337,6 +343,9 @@ void CGame::CreateBallastManager(CMeshfield * pMeshfield)
 	{
 		assert(false);
 	}
+
+	//ライトベクトル
+	m_pBallastManager->SetLight(m_LightVec);
 
 	//メッシュフィールドの情報から必要な数値の取得
 	m_pBallastManager->MeshfieldSet(pMeshfield);

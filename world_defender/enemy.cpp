@@ -95,11 +95,15 @@ void CEnemy::Uninit()
 //*****************************************************************************
 void CEnemy::Update()
 {
+	D3DXVECTOR3 pos = GetPos();
+	CMotionParts::AllSetShadowPos(D3DXVECTOR3(pos.x, 2.0f, pos.z), GetMotionNum());
 
 	//親クラスの更新
 	CMovable_Obj::Update();
+	
+	
 
-
+	
 #ifdef _DEBUG
 	//サイコキネシスエリアの更新（Posあり）
 	m_pPsychokinesis_Area->Update(GetPos());

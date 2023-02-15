@@ -64,14 +64,20 @@ public:
 	void CreateEnemy(EnemyInitData enemyinitdata);
 
 	bool EnemyCollision(D3DXVECTOR3 pos, float fRadius);
-	bool PlayerCollision(D3DXVECTOR3 pos, float fRadius);
+	bool PlayerCollision(D3DXVECTOR3 pos, float fRadius,D3DXVECTOR3* Add);
 	void EnemyOnEnemyCollision(CEnemy* pTargetEnemy);
+
+	//ライトの方向VecのSet,Get
+	void SetLight(D3DXVECTOR3 vec) { m_Light = vec; }
+	D3DXVECTOR3 GetLight() { return m_Light; }
+
 private:
 
 	//エネミーのリスト
 	std::list<CEnemy*> m_EnemyList;
 
 	int m_nEnemySmasllfish;
+	D3DXVECTOR3 m_Light;		//ライトの向き
 };
 
 #endif

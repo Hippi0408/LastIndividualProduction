@@ -955,6 +955,10 @@ int CMotionParts::CopyMotionModel(int nModelNum)
 		//基本情報の保存
 		pMotionParts->Set3DObject(nModelPattern, pos, rot);
 
+		D3DXVECTOR3 vec = pTargetMotionParts->GetLightVec();
+		//影用設定
+		pMotionParts->SetLightVec(vec);
+
 		//親の設定(親が存在するなら)
 		if (nPartsNum > 0)
 		{

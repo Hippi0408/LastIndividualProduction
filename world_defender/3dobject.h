@@ -92,6 +92,7 @@ public:
 	void AddPos(D3DXVECTOR3 add) { m_Model.pos += add; }
 	void AddRot(D3DXVECTOR3 add) { m_Model.rot += add; }
 	void SetSize(float fSize) { m_fSize = fSize; }
+	D3DXVECTOR3 GetLightVec() { return m_LightVec; }
 	void SetLightVec(D3DXVECTOR3 LightVec) { m_LightVec = LightVec; }
 	void SetShadowPos(D3DXVECTOR3 shadowpos) { m_ShadowPos = shadowpos; }
 	D3DXVECTOR3 GetWorldPos();
@@ -134,7 +135,7 @@ private:
 	Model m_Model;
 	float m_fSize;//ÉTÉCÉY
 	D3DXVECTOR3 m_LightVec = D3DXVECTOR3(0.0f, 0.0f, 0.0f); 
-	D3DXVECTOR3 m_ShadowPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	D3DXVECTOR3 m_ShadowPos = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 	Object_Type_List m_Object_Type_List;
 	D3DXCOLOR m_Color;
 	D3DXCOLOR m_ColorChange;

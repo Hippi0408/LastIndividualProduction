@@ -188,6 +188,9 @@ void CBallast_Manager::SetBallast(int nNumber, Object_Data Data)
 	//”¼Œaİ’è
 	pBallast->SetRadius();
 
+	//‰e‚Ìİ’è
+	pBallast->SetLightVec(m_Light);
+
 	//ƒŠƒXƒg‚ÉŠ¢âIî•ñ‚ğ’Ç‰Á
 	m_BallastMapData[nNumber].push_back(pBallast);
 }
@@ -449,13 +452,16 @@ void CBallast_Manager::SetBallastAcquired(D3DXVECTOR3 vec, D3DXVECTOR3 pos, D3DX
 	D3DXVec3Normalize(&Vec,&Vec);
 
 	//‚Á”ò‚Ô•ûŒü‚Ìİ’è
-	pBallastAcquired->SetVec(Vec);
+	pBallastAcquired->SetVec(Vec);                                                                                                                      
 
 	//–@üİ’è
 	pBallastAcquired->SetNormal();
 
 	//”¼Œaİ’è
 	pBallastAcquired->SetRadius();
+
+	//‰e‚Ìİ’è
+	pBallastAcquired->SetLightVec(m_Light);
 
 	//ƒŠƒXƒg‚ÉŠ¢âIî•ñ‚ğ’Ç‰Á
 	m_BallastMapData[nNumber].push_back(pBallastAcquired);

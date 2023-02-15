@@ -70,6 +70,10 @@ public:
 	//リスト内の入れ替え
 	void ReplacementList(CBallast* pBallast, int nNext);
 
+	//ライトの方向VecのSet,Get
+	void SetLight(D3DXVECTOR3 vec) { m_Light = vec; }
+	D3DXVECTOR3 GetLight() { return m_Light; }
+
 
 private:
 	std::map<int, std::list<CBallast*>> m_BallastMapData;		//マップ上のオブジェクトをリストで管理する変数
@@ -78,6 +82,7 @@ private:
 	CMeshfield *m_pMeshfieldCopy;								//メッシュフィールドポインタのコピー（このコピーは解放をしない）
 	int m_nMeshfieldNumMax;										//メッシュのマスの数の最大
 	int m_nBallast_Acquired_Model;
+	D3DXVECTOR3 m_Light;		//ライトの向き
 };
 
 #endif

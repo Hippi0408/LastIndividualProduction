@@ -45,6 +45,8 @@ HRESULT CEnemy_Manager::Init()
 
 	CMotionParts::UnUpdateDraw(m_nEnemySmasllfish);
 
+	CMotionParts::SetLight(GetLight(), m_nEnemySmasllfish);
+
 	return S_OK;
 }
 
@@ -175,6 +177,9 @@ void CEnemy_Manager::CreateEnemy(EnemyInitData enemyinitdata)
 		break;
 	}
 	
+	//影の設定
+	pEnemy->SetLight(m_Light);
+
 	//初期化
 	if (FAILED(pEnemy->Init()))
 	{
@@ -274,7 +279,7 @@ bool CEnemy_Manager::EnemyCollision(D3DXVECTOR3 pos, float fRadius)
 //*****************************************************************************
 // プレイヤーとのの当たり判定処理
 //*****************************************************************************
-bool CEnemy_Manager::PlayerCollision(D3DXVECTOR3 pos, float fRadius)
+bool CEnemy_Manager::PlayerCollision(D3DXVECTOR3 pos, float fRadius, D3DXVECTOR3* Add)
 {
 	//イテレーターループ
 	for (auto itr = m_EnemyList.begin(); itr != m_EnemyList.end();)
@@ -299,6 +304,13 @@ bool CEnemy_Manager::PlayerCollision(D3DXVECTOR3 pos, float fRadius)
 		//上記の結果がtrue
 		if (bHit)
 		{
+			D3DXVECTOR3 vec = pos - pEnemy->GetPos();
+
+			//vec.y = 0.0f;
+
+			D3DXVec3Normalize(&vec, &vec);
+			*Add = vec;
+
 			//処理を抜ける
 			return true;
 		}

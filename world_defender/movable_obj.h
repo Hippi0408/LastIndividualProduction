@@ -50,8 +50,9 @@ public:
 	int GetMotionNum() { return m_nMotionNum; }
 	void SetMotionNum(int nMotionNum) { m_nMotionNum = nMotionNum; }
 
-	//ライトの方向VecのSet
+	//ライトの方向VecのSet,Get
 	void SetLight(D3DXVECTOR3 vec) { m_Light = vec; }
+	D3DXVECTOR3 GetLight() { return m_Light; }
 
 	//ライフのGet、Set、Add
 	int GetLife() { return m_nLife; }

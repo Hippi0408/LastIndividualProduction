@@ -94,6 +94,9 @@ HRESULT CPlayer::Init()
 
 	CMotionParts::SettingParent(m_nMotionNum1, GetMotionNum());
 
+	CMotionParts::SetLight(GetLight(), GetMotionNum());
+	CMotionParts::SetLight(GetLight(), m_nMotionNum1);
+
 
 	//サイコキネシスエリアの情報の確保
 	m_pPsychokinesis_Area = new CPsychokinesis_Area;
@@ -168,22 +171,19 @@ void CPlayer::Update()
 	//親クラスの更新
 	CMovable_Obj::Update();
 
-	//ダメージ中は動けない
-	if (!m_bHit)
-	{
-		// 当たり判定系処理
-		Collision();
-	}
+	// 当たり判定系処理
+	Collision();
 
+	//ダメージ中は動けない
 	if (!m_bHit)
 	{
 		//移動の処理の更新
 		Move();
 	}
-	
+
 	// モーション処理
 	Motion();
-	
+
 	//無敵時間の更新
 	if (m_bHit)
 	{
@@ -198,7 +198,7 @@ void CPlayer::Update()
 			m_bHit = false;
 		}
 	}
-	
+
 	//現在のプレイヤーの位置の取得
 	D3DXVECTOR3 pos = GetPos();
 
@@ -206,7 +206,7 @@ void CPlayer::Update()
 	m_pPsychokinesis_Area->Update(pos);
 
 	//サイコキネシスの更新
-	m_pPsychokinesis->Update(m_nMapGrid,pos, GetRot(), m_CameraVec, m_pPsychokinesis_Area->GetRadius(), m_pPsychokinesis_Area->GetSizeTop());
+	m_pPsychokinesis->Update(m_nMapGrid, pos, GetRot(), m_CameraVec, m_pPsychokinesis_Area->GetRadius(), m_pPsychokinesis_Area->GetSizeTop());
 
 	//アドレナリンゲージ更新処理
 	m_pAdrenaline_Gauge->Update();
@@ -218,11 +218,10 @@ void CPlayer::Update()
 	}
 
 
-	//現在は使われていない（影の判定）
-	/*if (groundpos != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
-	{
-	CMotionParts::AllSetShadowPos(groundpos, GetMotionNum());
-	}*/
+	
+	CMotionParts::AllSetShadowPos(D3DXVECTOR3(pos.x, 2.0f, pos.z), GetMotionNum());
+	CMotionParts::AllSetShadowPos(D3DXVECTOR3(pos.x,2.0f, pos.z), m_nMotionNum1);
+
 }
 
 //*****************************************************************************
@@ -436,6 +435,12 @@ void CPlayer::Collision()
 	SetPos(Add);
 
 
+	if (m_bHit)
+	{
+		return;
+	}
+
+
 	//-------------------------------------------------------
 	// エネミーとの当たり判定
 	//-------------------------------------------------------
@@ -443,8 +448,9 @@ void CPlayer::Collision()
 	//エネミーマネージャーの取得
 	CEnemy_Manager* pEnemyManager = pGame->GetEnemy_Manager();
 
+	D3DXVECTOR3 KnockBack = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	//判定
-	m_bHit = pEnemyManager->PlayerCollision(GetPos(),GetRadius());
+	m_bHit = pEnemyManager->PlayerCollision(GetPos(),GetRadius(),&KnockBack);
 
 	//ノックバックの発生
 	if (!m_bHit)
@@ -456,18 +462,11 @@ void CPlayer::Collision()
 	//ノックバック
 	//-------------------------------------------------------
 
-	//移動量
-	D3DXVECTOR3 MoveVec = GetMove();
-
-	//移動量の逆ベクトル
-	MoveVec *= -1.0f;
-	D3DXVec3Normalize(&MoveVec, &MoveVec);
-
-	//移動方向ベクトルにノックバック用移動量を掛ける
-	MoveVec *= KNOCK_BACK;
+	//方向ベクトルにノックバック用移動量を掛ける
+	KnockBack *= KNOCK_BACK;
 
 	//移動量の設定
-	SetMove(MoveVec);
+	SetMove(KnockBack);
 
 	//無敵時間の発生
 	m_nInvincibleTime = INVINCIBLE_TIME;
