@@ -16,7 +16,9 @@
 //*****************************************************************************
 CCamera::CCamera()
 {
-	
+	m_nVibration = 1;
+	m_nVibrationCntMax = 0;
+	m_nVibrationCnt = 0;
 }
 
 //*****************************************************************************
@@ -54,6 +56,7 @@ void CCamera::Update()
 	if (m_nVibrationCnt < m_nVibrationCntMax)
 	{
 		m_nVibrationCnt++;
+
 		m_AddVibration.x = (float)(rand() % m_nVibration);
 		m_AddVibration.y = (float)(rand() % m_nVibration);
 		m_AddVibration.z = (float)(rand() % m_nVibration);
@@ -97,7 +100,7 @@ void CCamera::SetCamera()
 	D3DXMatrixPerspectiveFovLH(&m_mtxProjection,
 		D3DXToRadian(45.0f),//視野角
 		(float)SCREEN_WIDTH / (float)SCREEN_HEIGHT,//アスペクト比
-		10.0f,//どこからどこまでカメラで表示するか
+		40.0f,//どこからどこまでカメラで表示するか
 		60000.0f);
 
 	//プロジェクションマトリックスの設定
@@ -115,7 +118,7 @@ float CCamera::GetRot()
 
 void CCamera::SetVibration(int nVibrationCntMax, int nVibration)
 {
-	m_nVibration = nVibration;
+	m_nVibration = nVibration + 1;
 
 	m_nVibrationCntMax = nVibrationCntMax;
 

@@ -18,6 +18,7 @@
 // 前方宣言
 //*****************************************************************************
 class CMeshfield;
+class CBallast_Manager;
 
 //*****************************************************************************
 // クラス定義
@@ -29,7 +30,7 @@ public:
 
 	CRead();
 	~CRead();
-	CMeshfield *ReadMap(char *sFilePath);
+	CMeshfield *ReadMap(char *sFilePath , CBallast_Manager* pBallast_Manager);
 	int ReadXFile(char *sXFilePath);
 	int ReadMotion(char *sXFilePath);
 private:

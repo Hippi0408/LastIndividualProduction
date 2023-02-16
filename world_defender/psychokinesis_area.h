@@ -42,7 +42,7 @@ public:
 	void Draw() override;//•`‰æˆ—
 
 	void SetRadius(float fRadius) { m_fRadius = fRadius; }
-	float GetRadius() { return m_fRadius; }
+	float GetRadius() { return m_fRadius + RADIUS_INIT; }
 	float GetSizeTop() { return m_fSizeTop; }
 	
 	void RateCalculation(float fRate);

@@ -41,8 +41,6 @@ public:
 	void Update() override;
 	void Draw() override;
 
-	void CreateBallastManager(CMeshfield* pMeshfield);
-
 	CCamera* GetCamera() { return m_pCamera; }
 	CCamera* GetCameraRound() { return m_pCameraRound; }
 	CMeshfield* GetMeshfield() { return m_pMeshfieldBG; }

@@ -14,6 +14,8 @@
 #include "player.h"
 #include "input.h"
 #include "convenience_function.h"
+#include "tutorial.h"
+#include <assert.h>
 
 const float CTpsCamera::DISTANCE_MAX = 3500.0f;
 const D3DXVECTOR3 CTpsCamera::RANGE_WITH_PLAYER_V = D3DXVECTOR3(100.0f, 0.0f, -500.0f);
@@ -74,20 +76,6 @@ void CTpsCamera::Update()
 	D3DXVECTOR3 MouseMove;
 	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f,0.0f,0.0f);
 
-	if (pInput->Trigger(DIK_P))
-	{
-		m_VPos += m_CameraVec * DISTANCE_MAX;
-
-		//m_VPos.y += 50.0f;
-	}
-	else if (pInput->Trigger(DIK_O))
-	{
-		m_VPos -= m_CameraVec * DISTANCE_MAX;
-		//m_VPos.y -= 50.0f;
-	}
-
-
-
 	MouseMove = pInput->GetMouseMove();
 
 	MouseMove = D3DXVECTOR3(MouseMove.y, MouseMove.x, 0.0f);
@@ -118,10 +106,42 @@ void CTpsCamera::Update()
 	m_Rot.y = rot.y;
 	m_Rot.z = rot.z;
 
-	//ゲームオブジェクトの取得
-	CGame* pGame = (CGame*)GetManager()->GetGameObject();
-	//プレイヤーオブジェクトの取得
-	CPlayer* pPlayer = pGame->GetPlayer();
+	//マネージャーからプレイヤーの情報の取得
+	CManager* pManager = GetManager();
+
+	//プレイヤーの取得
+	CPlayer* pPlayer = nullptr;
+
+	CTutorial* pTutorial = nullptr;
+	CGame* pGame = nullptr;
+
+	switch (pManager->GetCurrentMode())
+	{
+	case TYPE_TUTORIAL:
+
+		//チュートリアルの取得
+		pTutorial = (CTutorial*)pManager->GetGameObject();
+
+		//プレイヤーの取得
+		pPlayer = pTutorial->GetPlayer();
+		break;
+
+	case TYPE_GAME:
+
+		//ゲームの取得
+		pGame = (CGame*)pManager->GetGameObject();
+
+		//プレイヤーの取得
+		pPlayer = pGame->GetPlayer();
+		break;
+
+	case TYPE_TITLE:
+	case TYPE_RESULT:
+	default:
+		assert(false);
+		break;
+	}
+
 	D3DXMATRIX mtxRot, mtxTrans,mtxworld;		//計算用のマトリックス
 	D3DXVECTOR3 PlPos = pPlayer->GetPos();
 

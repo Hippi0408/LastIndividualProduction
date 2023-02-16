@@ -13,6 +13,7 @@
 #include "read.h"
 #include "texture.h"
 #include "game.h"
+#include "tutorial.h"
 #include "tps_camera.h"
 #include "meshfield.h"
 #include "motion_parts.h"
@@ -24,6 +25,7 @@
 #include "enemy_manager.h"
 #include "adrenaline_gauge.h"
 #include "tps_camera.h"
+#include <assert.h>
 
 const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f); 
 const float CPlayer::PLAYER_GRAVITY = 2.0f;
@@ -207,10 +209,44 @@ void CPlayer::Update()
 	m_pAdrenaline_Gauge->Update();
 
 
-	//マネージャーからTPSカメラの取得
+	//マネージャーの取得
 	CManager *pManager = GetManager();
-	CGame* pGame = (CGame*)pManager->GetGameObject();
-	CTpsCamera* pTpsCamera = (CTpsCamera*)pGame->GetCamera();
+
+	//TPSカメラのポインタ
+	CTpsCamera* pTpsCamera = nullptr;
+
+	//チュートリアルのポインタ
+	CTutorial* pTutorial = nullptr;
+
+	//ゲームのポインタ
+	CGame* pGame = nullptr;
+
+	switch (pManager->GetCurrentMode())
+	{
+	case TYPE_TUTORIAL:
+
+		//チュートリアルの取得
+		pTutorial = (CTutorial*)pManager->GetGameObject();
+
+		//TPSカメラの取得
+		pTpsCamera = (CTpsCamera*)pTutorial->GetCamera();
+		break;
+
+	case TYPE_GAME:
+
+		//ゲームの取得
+		pGame = (CGame*)pManager->GetGameObject();
+
+		//TPSカメラの取得
+		pTpsCamera = (CTpsCamera*)pGame->GetCamera();
+		break;
+
+	case TYPE_TITLE:
+	case TYPE_RESULT:
+	default:
+		assert(false);
+		break;
+	}
 
 
 	pTpsCamera->RateCalculation(m_pAdrenaline_Gauge->GetRateCalculation());
@@ -258,12 +294,45 @@ void CPlayer::Move()
 	//入力デバイスの取得
 	CInput *pInput = CInput::GetKey();
 
-	//マネージャーからゲームオブジェクトの取得
+	//マネージャーの取得
 	CManager *pManager = GetManager();
-	CGame* pGame = (CGame*)pManager->GetGameObject();
 
-	//カメラの情報
-	CTpsCamera* pTpsCamera = (CTpsCamera*)pGame->GetCamera();
+	//TPSカメラのポインタ
+	CTpsCamera* pTpsCamera = nullptr;
+
+	//チュートリアルのポインタ
+	CTutorial* pTutorial = nullptr;
+
+	//ゲームのポインタ
+	CGame* pGame = nullptr;
+
+	switch (pManager->GetCurrentMode())
+	{
+	case TYPE_TUTORIAL:
+
+		//チュートリアルの取得
+		pTutorial = (CTutorial*)pManager->GetGameObject();
+
+		//TPSカメラの取得
+		pTpsCamera = (CTpsCamera*)pTutorial->GetCamera();
+		break;
+
+	case TYPE_GAME:
+
+		//ゲームの取得
+		pGame = (CGame*)pManager->GetGameObject();
+
+		//TPSカメラの取得
+		pTpsCamera = (CTpsCamera*)pGame->GetCamera();
+		break;
+
+	case TYPE_TITLE:
+	case TYPE_RESULT:
+	default:
+		assert(false);
+		break;
+	}
+
 
 	//カメラのベクトルの保存
 	m_CameraVec = pTpsCamera->GetCameraVec();
@@ -358,9 +427,60 @@ void CPlayer::Move()
 //*****************************************************************************
 void CPlayer::Collision()
 {
-	//マネージャーからゲームオブジェクトの取得
+	//マネージャーの取得
 	CManager *pManager = GetManager();
-	CGame* pGame = (CGame*)pManager->GetGameObject();
+
+	//床のポインタ
+	CMeshfield* pMeshfield = nullptr;
+
+	//瓦礫マネージャーのポインタ
+	CBallast_Manager* pBallast_Manager = nullptr;
+
+	//エネミーマネージャーのポインタ
+	CEnemy_Manager* pEnemy_Manager = nullptr;
+
+	//チュートリアルのポインタ
+	CTutorial* pTutorial = nullptr;
+
+	//ゲームのポインタ
+	CGame* pGame = nullptr;
+
+	switch (pManager->GetCurrentMode())
+	{
+	case TYPE_TUTORIAL:
+
+		//チュートリアルの取得
+		pTutorial = (CTutorial*)pManager->GetGameObject();
+
+		//床の取得
+		pMeshfield = pTutorial->GetMeshfield();
+		//エネミーマネージャーの取得
+		pEnemy_Manager = pTutorial->GetEnemy_Manager();
+		//瓦礫マネージャーの取得
+		pBallast_Manager = pTutorial->GetBallast_Manager();
+		break;
+
+	case TYPE_GAME:
+
+		//ゲームの取得
+		pGame = (CGame*)pManager->GetGameObject();
+
+		//床の取得
+		pMeshfield = pGame->GetMeshfield();
+		//エネミーマネージャーの取得
+		pEnemy_Manager = pGame->GetEnemy_Manager();
+		//瓦礫マネージャーの取得
+		pBallast_Manager = pGame->GetBallast_Manager();
+		break;
+
+	case TYPE_TITLE:
+	case TYPE_RESULT:
+	default:
+		assert(false);
+		break;
+	}
+
+
 
 	//現在のプレイヤーの位置
 	D3DXVECTOR3 pos = GetPos();
@@ -373,7 +493,7 @@ void CPlayer::Collision()
 	D3DXVECTOR3 groundpos;
 
 	//プレイヤーがいる床の高さ
-	groundpos = pGame->GetMeshfield()->Collision(pos);
+	groundpos = pMeshfield->Collision(pos);
 
 	//プレイヤーがいる床の高さがプレイヤーより上だったら
 	if (pos.y <= groundpos.y)
@@ -407,10 +527,10 @@ void CPlayer::Collision()
 
 
 	//マップ上のどこに居るか
-	m_nMapGrid = pGame->GetMeshfield()->CheckPosLocation(pos);
+	m_nMapGrid = pMeshfield->CheckPosLocation(pos);
 
 	//マップの奥行にメッシュ数
-	int nDepthGrid = pGame->GetMeshfield()->GetMeshZ();
+	int nDepthGrid = pMeshfield->GetMeshZ();
 
 	//当たり判定をチェックするメッシュ
 	int aMapGrid[CHECK_RANGE];
@@ -433,7 +553,7 @@ void CPlayer::Collision()
 	for (int nCnt = 0; nCnt < CHECK_RANGE; nCnt++)
 	{
 		//瓦礫の当たり判定
-		Add = pGame->GetBallast_Manager()->CollisionBallast(aMapGrid[nCnt], GetPos(), GetOldPos(), PLAYER_SIZE_MAX, PLAYER_SIZE_MIN);
+		Add = pBallast_Manager->CollisionBallast(aMapGrid[nCnt], GetPos(), GetOldPos(), PLAYER_SIZE_MAX, PLAYER_SIZE_MIN);
 
 		if (Add != GetPos())
 		{
@@ -459,12 +579,9 @@ void CPlayer::Collision()
 	// エネミーとの当たり判定
 	//-------------------------------------------------------
 
-	//エネミーマネージャーの取得
-	CEnemy_Manager* pEnemyManager = pGame->GetEnemy_Manager();
-
 	D3DXVECTOR3 KnockBack = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	//判定
-	m_bHit = pEnemyManager->PlayerCollision(GetPos(),GetRadius(),&KnockBack);
+	m_bHit = pEnemy_Manager->PlayerCollision(GetPos(),GetRadius(),&KnockBack);
 
 	//ノックバックの発生
 	if (!m_bHit)
@@ -494,10 +611,44 @@ void CPlayer::Motion()
 	//入力デバイスの取得
 	CInput *pInput = CInput::GetKey();
 
-	//マネージャーからカメラの取得
+	//マネージャーの取得
 	CManager *pManager = GetManager();
-	CGame* pGame = (CGame*)pManager->GetGameObject();
-	CTpsCamera* pTpsCamera = (CTpsCamera*)pGame->GetCamera();
+
+	//TPSカメラのポインタ
+	CTpsCamera* pTpsCamera = nullptr;
+
+	//チュートリアルのポインタ
+	CTutorial* pTutorial = nullptr;
+
+	//ゲームのポインタ
+	CGame* pGame = nullptr;
+
+	switch (pManager->GetCurrentMode())
+	{
+	case TYPE_TUTORIAL:
+
+		//チュートリアルの取得
+		pTutorial = (CTutorial*)pManager->GetGameObject();
+
+		//TPSカメラの取得
+		pTpsCamera = (CTpsCamera*)pTutorial->GetCamera();
+		break;
+
+	case TYPE_GAME:
+
+		//ゲームの取得
+		pGame = (CGame*)pManager->GetGameObject();
+
+		//TPSカメラの取得
+		pTpsCamera = (CTpsCamera*)pGame->GetCamera();
+		break;
+
+	case TYPE_TITLE:
+	case TYPE_RESULT:
+	default:
+		assert(false);
+		break;
+	}
 
 	//カメラの向き（Y軸のみ）
 	float rotY = pTpsCamera->GetRot();

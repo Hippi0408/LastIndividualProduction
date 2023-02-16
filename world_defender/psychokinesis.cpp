@@ -18,6 +18,7 @@
 #include <time.h>
 #include "convenience_function.h"
 #include "meshfield.h"
+#include "tutorial.h"
 
 const float CPsychokinesis::BALLAST_MOVE = 0.01f;
 
@@ -128,15 +129,56 @@ void CPsychokinesis::Update(int nPlMap, D3DXVECTOR3 pos, D3DXVECTOR3 rot,  D3DXV
 	//更新処理
 	Update();
 
-	//マネージャーからゲームオブジェクトの取得
+	//マネージャーの取得
 	CManager *pManager = GetManager();
-	CGame* pGame = (CGame*)pManager->GetGameObject();
 
-	//ゲームオブジェクトから瓦礫マネージャーの取得
-	CBallast_Manager* pBallast_Manager = pGame->GetBallast_Manager();
+	//床のポインタ
+	CMeshfield* pMeshfield = nullptr;
+
+	//瓦礫マネージャーのポインタ
+	CBallast_Manager* pBallast_Manager = nullptr;
+
+	//チュートリアルのポインタ
+	CTutorial* pTutorial = nullptr;
+
+	//ゲームのポインタ
+	CGame* pGame = nullptr;
+
+	switch (pManager->GetCurrentMode())
+	{
+	case TYPE_TUTORIAL:
+
+		//チュートリアルの取得
+		pTutorial = (CTutorial*)pManager->GetGameObject();
+
+		//床の取得
+		pMeshfield = pTutorial->GetMeshfield();
+
+		//瓦礫マネージャーの取得
+		pBallast_Manager = pTutorial->GetBallast_Manager();
+		break;
+
+	case TYPE_GAME:
+
+		//ゲームの取得
+		pGame = (CGame*)pManager->GetGameObject();
+
+		//床の取得
+		pMeshfield = pGame->GetMeshfield();
+	
+		//瓦礫マネージャーの取得
+		pBallast_Manager = pGame->GetBallast_Manager();
+		break;
+
+	case TYPE_TITLE:
+	case TYPE_RESULT:
+	default:
+		assert(false);
+		break;
+	}
 
 	//マップの奥行にメッシュ数
-	int nDepthGrid = pGame->GetMeshfield()->GetMeshZ();
+	int nDepthGrid = pMeshfield->GetMeshZ();
 
 	//当たり判定をチェックするメッシュ
 	int aMapGrid[9];
@@ -244,12 +286,46 @@ void CPsychokinesis::Psychokinesis()
 	//瓦礫のポインタ
 	CBallast* pBallast = nullptr;
 
-	//マネージャーからゲームオブジェクトの取得
+	//マネージャーの取得
 	CManager *pManager = GetManager();
-	CGame* pGame = (CGame*)pManager->GetGameObject();
 
-	//ゲームオブジェクトから瓦礫マネージャーの取得
-	CBallast_Manager* pBallast_Manager = pGame->GetBallast_Manager();
+	//瓦礫マネージャーのポインタ
+	CBallast_Manager* pBallast_Manager = nullptr;
+
+	//チュートリアルのポインタ
+	CTutorial* pTutorial = nullptr;
+
+	//ゲームのポインタ
+	CGame* pGame = nullptr;
+
+	switch (pManager->GetCurrentMode())
+	{
+	case TYPE_TUTORIAL:
+
+		//チュートリアルの取得
+		pTutorial = (CTutorial*)pManager->GetGameObject();
+
+		//瓦礫マネージャーの取得
+		pBallast_Manager = pTutorial->GetBallast_Manager();
+		break;
+
+	case TYPE_GAME:
+
+		//ゲームの取得
+		pGame = (CGame*)pManager->GetGameObject();
+
+		//瓦礫マネージャーの取得
+		pBallast_Manager = pGame->GetBallast_Manager();
+		break;
+
+	case TYPE_TITLE:
+	case TYPE_RESULT:
+	default:
+		assert(false);
+		break;
+	}
+
+
 
 	//瓦礫マネージャーから対象の瓦礫ポインタの取得
 	pBallast = pBallast_Manager->CheckCircleCollision(m_PlPos, m_fRadius);

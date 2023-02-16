@@ -55,7 +55,7 @@ HRESULT CLight::Init(void)
 	m_alight[3].Diffuse = D3DXCOLOR(0.5f, 0.5f, 0.5f, 0.5f);
 
 	//ƒ‰ƒCƒg‚ÌˆÊ’u
-	m_alight[0].Position = D3DXVECTOR3(0.0f, 200.0f, 500.0f);
+	m_alight[0].Position = D3DXVECTOR3(0.0f, 200.0f, 100.0f);
 	m_alight[1].Position = D3DXVECTOR3(0.0f, 200.0f, -500.0f);
 	m_alight[2].Position = D3DXVECTOR3(500.0f, 200.0f, 0.0f);
 	m_alight[3].Position = D3DXVECTOR3(-500.0f, 200.0f, 0.0f);

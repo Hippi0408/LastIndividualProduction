@@ -33,17 +33,10 @@ CRead::~CRead()
 }
 
 //*****************************************************************************
-// マップTetの読み込み
+// マップの読み込み
 //*****************************************************************************
-CMeshfield *CRead::ReadMap(char * sFilePath)
+CMeshfield * CRead::ReadMap(char * sFilePath, CBallast_Manager* pBallast_Manager)
 {
-	//マネージャーの取得
-	CManager* pManager = GetManager();
-
-	//ゲームの取得
-	CGame* pGame = (CGame*)pManager->GetGameObject();
-
-
 	//メッシュフィールド用のポインタ宣言
 	CMeshfield *pMeshfield = nullptr;
 
@@ -55,7 +48,7 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 	char cBff[LINE_MAX_READING_LENGTH];		//一行分読み取るための変数
 	char cBffHead[LINE_MAX_READING_LENGTH];	//頭の文字を読み取るための変数
 
-	//メッシュフィールド
+											//メッシュフィールド
 	pMeshfield = new CMeshfield;
 
 	//初期化
@@ -91,8 +84,8 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 		if (strcmp(&cBffHead[0], "TEXTURE_FILENAME") == 0)
 		{//テクスチャの読み込み
 
-			//テクスチャパスを読み取るための変数
-			char cBffPath[LINE_MAX_READING_LENGTH];	
+		 //テクスチャパスを読み取るための変数
+			char cBffPath[LINE_MAX_READING_LENGTH];
 			//文字列の分析
 			sscanf(cBff, "%s = %s", &cBffHead, &cBffPath);
 			//テクスチャの読み込み
@@ -101,7 +94,7 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 		else if (strcmp(&cBffHead[0], "NUM_MODEL") == 0)
 		{//モデルの読み込み数
 
-			//モデル番号の配列ポインタのNULLチェック
+		 //モデル番号の配列ポインタのNULLチェック
 			if (pModelIndex != nullptr)
 			{
 				assert(false);
@@ -115,7 +108,7 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 		else if (strcmp(&cBffHead[0], "MODEL_FILENAME") == 0)
 		{//モデルファイルの読み込み
 
-			//モデル番号の配列ポインタのNULLチェック
+		 //モデル番号の配列ポインタのNULLチェック
 			if (pModelIndex == nullptr)
 			{
 				assert(false);
@@ -142,7 +135,7 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 		else if (strcmp(&cBffHead[0], "FIELDSET") == 0)
 		{//地面の設定
 
-			//文字列の読み取りループ処理
+		 //文字列の読み取りループ処理
 			while (fgets(cBff, LINE_MAX_READING_LENGTH, pFile) != nullptr)
 			{
 				//文字列の分析
@@ -151,7 +144,7 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 				if (strcmp(&cBffHead[0], "POS") == 0)
 				{//Posの設定
 
-					//Posの一時保存
+				 //Posの一時保存
 					D3DXVECTOR3 pos;
 
 					//文字列の分析
@@ -163,7 +156,7 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 				else if (strcmp(&cBffHead[0], "ROT") == 0)
 				{//Rotの設定
 
-					//Rotの一時保存
+				 //Rotの一時保存
 					D3DXVECTOR3 rot;
 
 					//文字列の分析
@@ -175,7 +168,7 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 				else if (strcmp(&cBffHead[0], "COLOR") == 0)
 				{//Colorの設定
 
-					//Colorの一時保存
+				 //Colorの一時保存
 					D3DXCOLOR Color;
 
 					//文字列の分析
@@ -187,8 +180,8 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 				else if (strcmp(&cBffHead[0], "SIZE") == 0)
 				{//SIZEの設定
 
-					//SIZEの一時保存
-					float fSizeX ,fSizeZ;
+				 //SIZEの一時保存
+					float fSizeX, fSizeZ;
 
 					//文字列の分析
 					sscanf(cBff, "%s = %f %f", &cBffHead, &fSizeX, &fSizeZ);
@@ -200,7 +193,7 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 				else if (strcmp(&cBffHead[0], "DIVISION") == 0)
 				{//DIVISIONの設定
 
-					//DIVISIONの一時保存
+				 //DIVISIONの一時保存
 					int nMeshX, nMeshZ;
 
 					//文字列の分析
@@ -216,8 +209,8 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 					//メッシュ情報の設定
 					pMeshfield->SetMeshfield(MeshData);
 
-					//瓦礫マネージャーの生成
-					pGame->CreateBallastManager(pMeshfield);
+					//メッシュフィールドの情報から必要な数値の取得
+					pBallast_Manager->MeshfieldSet(pMeshfield);
 
 					break;
 				}
@@ -231,17 +224,14 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 		else if (strcmp(&cBffHead[0], "MODELSET") == 0)
 		{//モデルの設定
 
-			//３DOBJ情報の一時保管場所
+		 //３DOBJ情報の一時保管場所
 			Object_Data Data;
 			ZeroMemory(&Data, sizeof(Data));
-
-			//瓦礫マネージャーの取得
-			CBallast_Manager* pBallast_Manager = pGame->GetBallast_Manager();
 
 			//文字列の読み取りループ処理
 			while (fgets(cBff, LINE_MAX_READING_LENGTH, pFile) != nullptr)
 			{
-				
+
 
 				//文字列の分析
 				sscanf(cBff, "%s", &cBffHead);
@@ -252,7 +242,7 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 					int nPattn = 0;
 
 					//文字列の分析
-					sscanf(cBff, "%s = %d", &cBffHead,&nPattn);
+					sscanf(cBff, "%s = %d", &cBffHead, &nPattn);
 
 					Data.nPattn = pModelIndex[nPattn];
 
@@ -260,7 +250,7 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 				else if (strcmp(&cBffHead[0], "POS") == 0)
 				{//POSの設定
 
-					//Pos一時保管場所
+				 //Pos一時保管場所
 					D3DXVECTOR3 pos;
 
 					//文字列の分析
@@ -272,7 +262,7 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 				else if (strcmp(&cBffHead[0], "ROT") == 0)
 				{//ROTの設定
 
-					//Rot一時保管場所
+				 //Rot一時保管場所
 					D3DXVECTOR3 rot;
 
 					//文字列の分析
@@ -284,7 +274,7 @@ CMeshfield *CRead::ReadMap(char * sFilePath)
 				else if (strcmp(&cBffHead[0], "END_MODELSET") == 0)
 				{//モデルの設定の終わり
 
-					//このオブジェクトがメッシュのどこに居るかを調べる用
+				 //このオブジェクトがメッシュのどこに居るかを調べる用
 					int nPosLocation = 0;
 
 					//引く数のPosがどのマスに居るかを返す

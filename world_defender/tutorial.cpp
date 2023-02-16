@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// game.cpp
+// tutorial.cpp
 // Author : koduna hirohito
 //
 //=============================================================================
@@ -9,7 +9,7 @@
 // インクルード
 //*****************************************************************************
 #include "manager.h"
-#include "game.h"
+#include "tutorial.h"
 #include "input.h"
 #include "texture.h"
 #include "camera.h"
@@ -18,7 +18,6 @@
 #include "player.h"
 #include "enemy.h"
 #include "enemy_manager.h"
-#include "billboard.h"
 #include "motion_parts.h"
 #include "tps_camera.h"
 #include "read.h"
@@ -27,13 +26,11 @@
 #include "mesh_cylinder.h"
 #include "sound.h"
 #include "gauge.h"
-#include "camera_round.h"
-#include "time.h"
 
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
-CGame::CGame()
+CTutorial::CTutorial()
 {
 	m_bGameEnd = false;
 }
@@ -41,14 +38,14 @@ CGame::CGame()
 //*****************************************************************************
 // デストラクタ
 //*****************************************************************************
-CGame::~CGame()
+CTutorial::~CTutorial()
 {
 }
 
 //*****************************************************************************
 // 初期化
 //*****************************************************************************
-HRESULT CGame::Init()
+HRESULT CTutorial::Init()
 {
 
 	//サウンド停止
@@ -62,12 +59,7 @@ HRESULT CGame::Init()
 	{
 		return -1;
 	}
-	m_pCameraRound = new CCamera_Round;
-	if (FAILED(m_pCameraRound->Init()))
-	{
-		return -1;
-	}
-
+	
 	//ライト
 	m_pLight = new CLight;
 	if (FAILED(m_pLight->Init()))
@@ -77,8 +69,8 @@ HRESULT CGame::Init()
 
 	m_LightVec = m_pLight->GetLightVec();
 
-	
-	
+
+
 
 	m_pPlayer = new CPlayer;
 	m_pPlayer->SetLight(m_LightVec);
@@ -86,7 +78,7 @@ HRESULT CGame::Init()
 	{
 		return -1;
 	}
-	
+
 
 	m_pEnmeyManager = new CEnemy_Manager;
 	m_pEnmeyManager->SetLight(m_LightVec);
@@ -94,19 +86,18 @@ HRESULT CGame::Init()
 	{
 		return -1;
 	}
-	
+
 
 	EnemyInitData EnemyInitData;
 
 	EnemyInitData.fmove = 10.0f;
-	EnemyInitData.pos = D3DXVECTOR3(0.0f,0.0f, 9000.0f);
+	EnemyInitData.pos = D3DXVECTOR3(0.0f, 0.0f, 9000.0f);
 	EnemyInitData.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	EnemyInitData.type = ENEMY_02;
+	EnemyInitData.type = ENEMY_01;
 
 	m_pEnmeyManager->CreateEnemy(EnemyInitData);
 
 	EnemyInitData.pos = D3DXVECTOR3(500.0f, 0.0f, 1600.0f);
-	EnemyInitData.type = ENEMY_01;
 
 	m_pEnmeyManager->CreateEnemy(EnemyInitData);
 
@@ -126,7 +117,7 @@ HRESULT CGame::Init()
 
 	CRead cRead;
 	//BG3D
-	m_pMeshfieldBG = cRead.ReadMap("data/MAPTXT/map.txt",m_pBallastManager);
+	m_pMeshfieldBG = cRead.ReadMap("data/MAPTXT/map.txt", m_pBallastManager);
 
 	m_pMesh_Cylinder = new CMesh_Cylinder;
 	if (FAILED(m_pMesh_Cylinder->Init()))
@@ -141,17 +132,11 @@ HRESULT CGame::Init()
 	Mesh_Cylinder_Structure.nPolygonX = 30;
 	Mesh_Cylinder_Structure.nPolygonY = 1;
 	Mesh_Cylinder_Structure.nTextureNum = 0;
-	Mesh_Cylinder_Structure.ParentPos = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	Mesh_Cylinder_Structure.ParentPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	Mesh_Cylinder_Structure.ColorMax = D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f);
 	Mesh_Cylinder_Structure.ColorLowest = D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f);
 
 	m_pMesh_Cylinder->SetMesh_Cylinder(Mesh_Cylinder_Structure);
-
-	m_pTime = new CTime;
-	if (FAILED(m_pTime->Init(3600)))
-	{
-		return -1;
-	}
 
 	//入力デバイスの取得
 	CInput *pInput = CInput::GetKey();
@@ -166,7 +151,7 @@ HRESULT CGame::Init()
 //*****************************************************************************
 // 終了処理
 //*****************************************************************************
-void CGame::Uninit()
+void CTutorial::Uninit()
 {
 	//サウンド
 	StopSound();
@@ -178,13 +163,7 @@ void CGame::Uninit()
 		delete m_pCamera;
 		m_pCamera = nullptr;
 	}
-	if (m_pCameraRound != nullptr)
-	{
-		m_pCameraRound->Uninit();
-		delete m_pCameraRound;
-		m_pCameraRound = nullptr;
-	}
-
+	
 	//ライト
 	if (m_pLight != nullptr)
 	{
@@ -231,13 +210,6 @@ void CGame::Uninit()
 		m_pMesh_Cylinder = nullptr;
 	}
 
-	if (m_pTime != nullptr)
-	{
-		m_pTime->Uninit();
-		delete m_pTime;
-		m_pTime = nullptr;
-	}
-
 	C3DObject::UninitAllModel();
 
 	CMotionParts::ALLUninit();
@@ -248,31 +220,17 @@ void CGame::Uninit()
 //*****************************************************************************
 // 更新処理
 //*****************************************************************************
-void CGame::Update()
+void CTutorial::Update()
 {
+	if (m_bGameEnd)
+	{
+		return;
+	}
 
 	m_pMesh_Cylinder->Update(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
 	//カメラの更新
-	if(m_bRoundCamera)
-	{
-		m_pCameraRound->Update();
-	}
-	else
-	{
-		m_pCamera->Update();
-	}
-
-	//周回カメラ用のカウントチェック
-	if (m_nRoundCnt > m_nRoundCntMax)
-	{
-		m_bRoundCamera = false;
-		m_pTime->SetTimeUpdate(true);
-	}
-	else
-	{
-		m_nRoundCnt++;
-	}
+	m_pCamera->Update();
 
 	m_pEnmeyManager->Update();
 
@@ -280,11 +238,10 @@ void CGame::Update()
 	if (!m_bGameEnd)
 	{
 		m_pPlayer->Update();
-		m_pTime->Update();
 	}
 
 	m_pBallastManager->Update();
-	
+
 	CInput *pInput = CInput::GetKey();
 
 	CMotionParts::ALLUpdate();
@@ -295,31 +252,17 @@ void CGame::Update()
 		//画面内のカーソルの復活
 		pInput->SetCursorErase(false);
 		CManager * pManager = GetManager();
-		pManager->NextMode(TYPE_RESULT);
-	}
-
-	if (m_pTime->CheckTime())
-	{
-		m_bGameEnd = true;
-		CManager * pManager = GetManager();
-		pManager->NextMode(TYPE_RESULT);
+		pManager->NextMode(TYPE_TITLE);
 	}
 }
 
 //*****************************************************************************
 // 描画処理
 //*****************************************************************************
-void CGame::Draw()
+void CTutorial::Draw()
 {
 	//カメラの更新
-	if (m_bRoundCamera)
-	{
-		m_pCameraRound->SetCamera();
-	}
-	else
-	{
-		m_pCamera->SetCamera();
-	}
+	m_pCamera->SetCamera();
 
 	m_pMesh_Cylinder->Draw();
 
@@ -331,70 +274,9 @@ void CGame::Draw()
 
 	m_pEnmeyManager->Draw();
 
-	if (!m_bRoundCamera)
-	{
-		//ゲージ
-		CGauge::AllDraw();
+	//ゲージ
+	CGauge::AllDraw();
 
-		m_pPlayer->Draw();
+	m_pPlayer->Draw();
 
-		m_pTime->Draw();
-	}
-
-}
-
-//*****************************************************************************
-// 周回カメラの開始
-//*****************************************************************************
-void CGame::SetRoundCamera(int nRoundCntMax)
-{
-	// 周回カメラの開始
-	m_bRoundCamera = true;
-
-	// 周回カメラの最大カウントを保存
-	m_nRoundCntMax = nRoundCntMax;
-
-	// 周回カメラのカウントの初期化
-	m_nRoundCnt = 0;
-}
-
-//*****************************************************************************
-// 周回カメラのPosRの設定
-//*****************************************************************************
-void CGame::SetRoundCameraPosR(D3DXVECTOR3 posR)
-{
-	m_pCameraRound->SetPosR(posR);
-}
-
-//*****************************************************************************
-// カメラの振動設定
-//*****************************************************************************
-void CGame::SetVibration(int nVibrationMax,int nVibration)
-{
-	//カメラの振動設定
-	if (m_bRoundCamera)
-	{
-		m_pCameraRound->SetVibration(nVibrationMax, nVibration);
-	}
-	else
-	{
-		m_pCamera->SetVibration(nVibrationMax, nVibration);
-	}
-}
-
-//*****************************************************************************
-// 振動があるかどうか
-//*****************************************************************************
-bool CGame::CheckVibration()
-{
-	//カメラの振動チェック
-	if (m_bRoundCamera)
-	{
-		return m_pCameraRound->CheckVibration();
-	}
-	else
-	{
-		return m_pCamera->CheckVibration();
-	}
-	return false;
 }

@@ -19,6 +19,8 @@
 #include "convenience_function.h"
 #include "enemy_manager.h"
 #include "ballast_manager.h"
+#include <assert.h>
+#include "tutorial.h"
 
 const D3DXVECTOR3 CEnemy_SmallFish::INIT_POS = D3DXVECTOR3(1000.0f, 0.0f, -0.0f);
 const float CEnemy_SmallFish::MOVE_INERTIA = 5.0f;
@@ -103,11 +105,64 @@ void CEnemy_SmallFish::Update()
 
 	//マネージャーからプレイヤーの情報の取得
 	CManager* pManager = GetManager();
-	CGame* pGame = (CGame*)pManager->GetGameObject();
-	CPlayer* pPlayer = pGame->GetPlayer();
 
+	//プレイヤーの取得
+	CPlayer* pPlayer = nullptr;
+
+	//エネミーマネージャーの取得
+	CEnemy_Manager* pEnemy_Manager = nullptr;
+
+	//瓦礫マネージャーの取得
+	CBallast_Manager* pBallast_Manager = nullptr;
+
+	//メッシュフィールドの取得
+	CMeshfield* pMeshfield = nullptr;
+
+	CTutorial* pTutorial = nullptr;
+	CGame* pGame = nullptr;
+
+	switch (pManager->GetCurrentMode())
+	{
+	case TYPE_TUTORIAL:
+
+		//チュートリアルの取得
+		pTutorial = (CTutorial*)pManager->GetGameObject();
+
+		//プレイヤーの取得
+		pPlayer = pTutorial->GetPlayer();
+		//エネミーマネージャーの取得
+		pEnemy_Manager = pTutorial->GetEnemy_Manager();
+		//瓦礫マネージャーの取得
+		pBallast_Manager = pTutorial->GetBallast_Manager();
+		//メッシュフィールドの取得
+		pMeshfield = pTutorial->GetMeshfield();
+		break;
+
+	case TYPE_GAME:
+
+		//ゲームの取得
+		pGame = (CGame*)pManager->GetGameObject();
+
+		//プレイヤーの取得
+		pPlayer = pGame->GetPlayer();
+		//エネミーマネージャーの取得
+		pEnemy_Manager = pGame->GetEnemy_Manager();
+		//瓦礫マネージャーの取得
+		pBallast_Manager = pGame->GetBallast_Manager();
+		//メッシュフィールドの取得
+		pMeshfield = pGame->GetMeshfield();
+		break;
+
+	case TYPE_TITLE:
+	case TYPE_RESULT:
+	default:
+		assert(false);
+		break;
+	}
+	
 	//プレイヤーの位置
 	D3DXVECTOR3 PLpos = pPlayer->GetPos();
+	
 
 	//索敵範囲にいるかどうか
 	if (CConvenience_Function::CircleCollision(pos, SEARCH_RANGE, PLpos, 0.0f))
@@ -129,8 +184,6 @@ void CEnemy_SmallFish::Update()
 	
 
 
-	//エネミーマネージャーの取得
-	CEnemy_Manager* pEnemy_Manager = pGame->GetEnemy_Manager();
 
 	//当たり判定(他のエネミーとの)
 	pEnemy_Manager->EnemyOnEnemyCollision(this);
@@ -143,14 +196,11 @@ void CEnemy_SmallFish::Update()
 	// 瓦礫との当たり判定
 	//-------------------------------------------------------
 
-	//瓦礫マネージャーの取得
-	CBallast_Manager* pBallast_Manager = pGame->GetBallast_Manager();
-
 	//マップ上のどこに居るか
-	int nMapGrid = pGame->GetMeshfield()->CheckPosLocation(pos);
+	int nMapGrid = pMeshfield->CheckPosLocation(pos);
 
 	//マップの奥行にメッシュ数
-	int nDepthGrid = pGame->GetMeshfield()->GetMeshZ();
+	int nDepthGrid = pMeshfield->GetMeshZ();
 
 	//当たり判定をチェックするメッシュ
 	int aMapGrid[CHECK_RANGE];

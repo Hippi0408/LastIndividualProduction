@@ -26,6 +26,7 @@ class CFade;
 enum MODE_TYPE
 {
 	TYPE_TITLE = 0,
+	TYPE_TUTORIAL,
 	TYPE_GAME,
 	TYPE_RESULT,
 	TYPE_MAX
@@ -58,9 +59,10 @@ public:
 	bool IsChangingMode() { return m_bChange; }
 	int GetAirframe() { return m_nAirframe; }
 	void SetAirframe(int nAirframe) { m_nAirframe = nAirframe; }
-
+	MODE_TYPE GetCurrentMode() { return m_Mode; }
 private:
 	MODE_TYPE m_Mode;
+	MODE_TYPE m_NextMode;
 	bool m_bChange;
 	CRenderer *m_pRenderer;
 	CObject *m_pGame;

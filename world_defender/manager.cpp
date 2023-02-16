@@ -10,6 +10,7 @@
 //*****************************************************************************
 #include "manager.h"
 #include "renderer.h"
+#include "tutorial.h"
 #include "game.h"
 #include "title.h"
 #include "result.h"
@@ -49,6 +50,7 @@ HRESULT CManager::Init(HINSTANCE hInstance,HWND hWnd, bool bWindow)
 
 	m_bChange = false;
 	m_Mode = TYPE_TITLE;
+	m_NextMode = m_Mode;
 	CTexture::Create();
 
 	m_pInput = CInput::Create();
@@ -132,6 +134,7 @@ void CManager::Update()
 		if (m_pFade->CurrentFadeState())
 		{
 			m_bChange = false;
+			m_Mode = m_NextMode;
 			ChangeMode(m_Mode);
 		}
 	}
@@ -189,6 +192,9 @@ void CManager::ChangeMode(MODE_TYPE type)
 	case TYPE_TITLE:
 		m_pGame = new CTitle;
 		break;
+	case TYPE_TUTORIAL:
+		m_pGame = new CTutorial;
+		break;
 	case TYPE_GAME:
 		m_pGame = new CGame;
 		break;
@@ -215,5 +221,5 @@ void CManager::NextMode(MODE_TYPE type,int nFadeCnt)
 {
 	m_nFadeCnt = nFadeCnt;
 	m_bChange = true;
-	m_Mode = type;
+	m_NextMode = type;
 }
