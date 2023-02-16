@@ -26,6 +26,7 @@
 #include "mesh_cylinder.h"
 #include "sound.h"
 #include "gauge.h"
+#include "adrenaline_item.h"
 
 //*****************************************************************************
 // コンストラクタ
@@ -144,6 +145,13 @@ HRESULT CTutorial::Init()
 	//画面内のカーソルを消す
 	pInput->SetCursorErase(true);
 
+	//アイテム初期化
+	if (FAILED(CAdrenalineItem::AllInit()))
+	{
+		return -1;
+	}
+
+	CAdrenalineItem::AllSetLightVec(m_LightVec);
 
 	return S_OK;
 }
@@ -210,11 +218,15 @@ void CTutorial::Uninit()
 		m_pMesh_Cylinder = nullptr;
 	}
 
+	CAdrenalineItem::AllUninit();
+
 	C3DObject::UninitAllModel();
 
 	CMotionParts::ALLUninit();
 
 	CGauge::AllUninit();
+
+	
 }
 
 //*****************************************************************************
@@ -246,6 +258,8 @@ void CTutorial::Update()
 
 	CMotionParts::ALLUpdate();
 
+	CAdrenalineItem::AllUpdate();
+
 	if (pInput->Trigger(KEY_DECISION))
 	{
 		m_bGameEnd = true;
@@ -273,6 +287,8 @@ void CTutorial::Draw()
 	m_pBallastManager->Draw();
 
 	m_pEnmeyManager->Draw();
+
+	CAdrenalineItem::AllDraw();
 
 	//ゲージ
 	CGauge::AllDraw();

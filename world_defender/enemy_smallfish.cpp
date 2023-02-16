@@ -21,6 +21,7 @@
 #include "ballast_manager.h"
 #include <assert.h>
 #include "tutorial.h"
+#include "adrenaline_item.h"
 
 const D3DXVECTOR3 CEnemy_SmallFish::INIT_POS = D3DXVECTOR3(1000.0f, 0.0f, -0.0f);
 const float CEnemy_SmallFish::MOVE_INERTIA = 5.0f;
@@ -266,6 +267,7 @@ bool CEnemy_SmallFish::IsUnused()
 {
 	if (CMovable_Obj::CheckLife())
 	{
+		CAdrenalineItem::DropAdrenalineItem(GetPos());
 		return true;
 	}
 

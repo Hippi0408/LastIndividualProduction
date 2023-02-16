@@ -14,6 +14,9 @@
 #include "game.h"
 #include "meshfield.h"
 #include "ballast_manager.h"
+#include "tutorial.h"
+#include <assert.h>
+
 
 const float CBallast_Acquired::GRAVITY = -0.5f;
 const float CBallast_Acquired::MOVE_ATTENUATION = 0.1f;
@@ -46,15 +49,52 @@ void CBallast_Acquired::Update()
 		D3DXVECTOR3 pos = GetParentPos();
 		SetParentPos(D3DXVECTOR3(pos.x, 0.0f, pos.z));
 
+		//マネージャーからプレイヤーの情報の取得
 		CManager* pManager = GetManager();
-		CGame* pGame = (CGame*)pManager->GetGameObject();
-		CMeshfield* pMeshfield = pGame->GetMeshfield();
+
+		//瓦礫マネージャーの取得
+		CBallast_Manager* pBallast_Manager = nullptr;
+
+		//メッシュフィールドの取得
+		CMeshfield* pMeshfield = nullptr;
+
+		CTutorial* pTutorial = nullptr;
+		CGame* pGame = nullptr;
+
+		switch (pManager->GetCurrentMode())
+		{
+		case TYPE_TUTORIAL:
+
+			//チュートリアルの取得
+			pTutorial = (CTutorial*)pManager->GetGameObject();
+			//瓦礫マネージャーの取得
+			pBallast_Manager = pTutorial->GetBallast_Manager();
+			//メッシュフィールドの取得
+			pMeshfield = pTutorial->GetMeshfield();
+			break;
+
+		case TYPE_GAME:
+
+			//ゲームの取得
+			pGame = (CGame*)pManager->GetGameObject();
+			//瓦礫マネージャーの取得
+			pBallast_Manager = pGame->GetBallast_Manager();
+			//メッシュフィールドの取得
+			pMeshfield = pGame->GetMeshfield();
+			break;
+
+		case TYPE_TITLE:
+		case TYPE_RESULT:
+		default:
+			assert(false);
+			break;
+		}
+
+
 		//マップチップの番号
 		int nMap = pMeshfield->CheckPosLocation(GetParentPos());
 		//上記の保存
 		SetListNumber(nMap);
-
-		CBallast_Manager* pBallast_Manager = pGame->GetBallast_Manager();
 
 		//リストの入れ替え
 		pBallast_Manager->ReplacementList(this, nMap);

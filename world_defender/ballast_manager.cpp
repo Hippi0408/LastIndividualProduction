@@ -19,6 +19,7 @@
 #include "read.h"
 #include "ballast_acquired.h"
 #include "sound.h"
+#include "tutorial.h"
 
 const float CBallast_Manager::MAP_MAX = 15000.0f;
 const D3DXVECTOR3 CBallast_Manager::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -88,8 +89,29 @@ void CBallast_Manager::Uninit()
 //*****************************************************************************
 void CBallast_Manager::Update()
 {
-	//エネミーとの当たり判定
-	CollisionEnemy();
+	//マネージャーからプレイヤーの情報の取得
+	CManager* pManager = GetManager();
+
+	//エネミーマネージャーの取得
+	CEnemy_Manager* pEnemy_Manager = nullptr;
+
+	switch (pManager->GetCurrentMode())
+	{
+	case TYPE_TUTORIAL:
+	case TYPE_GAME:
+		//エネミーとの当たり判定
+		CollisionEnemy();
+		break;
+
+	case TYPE_TITLE:
+	case TYPE_RESULT:
+		break;
+	default:
+		assert(false);
+		break;
+	}
+
+	
 
 	//リストの更新
 	for (int nCnt = 0; nCnt < m_nMeshfieldNumMax; nCnt++)
@@ -345,10 +367,39 @@ D3DXVECTOR3 CBallast_Manager::CollisionBallast(int nMapGrid, D3DXVECTOR3 pos, D3
 //*****************************************************************************
 void CBallast_Manager::CollisionEnemy()
 {
-	//マネージャーからエネミーマネージャーの取得
-	CManager *pManager = GetManager();
-	CGame* pGame = (CGame*)pManager->GetGameObject();
-	CEnemy_Manager* pEnemy_Manager = pGame->GetEnemy_Manager();
+	//マネージャーからプレイヤーの情報の取得
+	CManager* pManager = GetManager();
+
+	//エネミーマネージャーの取得
+	CEnemy_Manager* pEnemy_Manager = nullptr;
+
+	CTutorial* pTutorial = nullptr;
+	CGame* pGame = nullptr;
+
+	switch (pManager->GetCurrentMode())
+	{
+	case TYPE_TUTORIAL:
+
+		//チュートリアルの取得
+		pTutorial = (CTutorial*)pManager->GetGameObject();
+		//エネミーマネージャーの取得
+		pEnemy_Manager = pTutorial->GetEnemy_Manager();
+		break;
+
+	case TYPE_GAME:
+
+		//ゲームの取得
+		pGame = (CGame*)pManager->GetGameObject();
+		//エネミーマネージャーの取得
+		pEnemy_Manager = pGame->GetEnemy_Manager();
+		break;
+
+	case TYPE_TITLE:
+	case TYPE_RESULT:
+	default:
+		assert(false);
+		break;
+	}
 
 	//イテレーターループ
 	for (auto itr = m_FloatingBallstList.begin(); itr != m_FloatingBallstList.end();)

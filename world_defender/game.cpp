@@ -29,6 +29,7 @@
 #include "gauge.h"
 #include "camera_round.h"
 #include "time.h"
+#include "adrenaline_item.h"
 
 //*****************************************************************************
 // コンストラクタ
@@ -159,6 +160,14 @@ HRESULT CGame::Init()
 	//画面内のカーソルを消す
 	pInput->SetCursorErase(true);
 
+	//アイテム初期化
+	if (FAILED(CAdrenalineItem::AllInit()))
+	{
+		return -1;
+	}
+
+	CAdrenalineItem::AllSetLightVec(m_LightVec);
+
 
 	return S_OK;
 }
@@ -238,6 +247,8 @@ void CGame::Uninit()
 		m_pTime = nullptr;
 	}
 
+	CAdrenalineItem::AllUninit();
+
 	C3DObject::UninitAllModel();
 
 	CMotionParts::ALLUninit();
@@ -287,6 +298,8 @@ void CGame::Update()
 	
 	CInput *pInput = CInput::GetKey();
 
+	CAdrenalineItem::AllUpdate();
+
 	CMotionParts::ALLUpdate();
 
 	if (pInput->Trigger(KEY_DECISION))
@@ -330,6 +343,8 @@ void CGame::Draw()
 	m_pBallastManager->Draw();
 
 	m_pEnmeyManager->Draw();
+
+	CAdrenalineItem::AllDraw();
 
 	if (!m_bRoundCamera)
 	{
