@@ -170,82 +170,8 @@ void CEnemy_Boss::Update()
 	//マネージャーからゲームの情報取得
 	CGame* pGame = (CGame*)pManager->GetGameObject();
 
-	//地面との当たり判定用
-	D3DXVECTOR3 pos, groundpos;
-
 	//位置を取得
-	pos = GetPos();
-
-	//立っている地面の高さを取得
-	groundpos = pGame->GetMeshfield()->Collision(pos);
-
-	//現在の高さと比較
-	if (pos.y < groundpos.y)
-	{
-		//高さの変更
-		pos.y = groundpos.y;
-		SetPos(pos);
-	}
-
-	//入力デバイスの取得
-	CInput *pInput = CInput::GetKey();
-
-	//移動量の一時保管
-	D3DXVECTOR3 move = GetMove();
-
-	//Move倍率
-	float fMove = 50.0f;
-
-	//視点移動
-	if (pInput->Press(DIK_UP))
-	{//上キーが押された
-		if (pInput->Press(DIK_LEFT))
-		{
-			move.x = -sinf(D3DX_PI * 0.75f) * fMove;
-			move.z = -cosf(D3DX_PI * 0.75f) * fMove;
-		}
-		else if (pInput->Press(DIK_RIGHT))
-		{
-			move.x = -sinf(D3DX_PI * -0.75f) * fMove;
-			move.z = -cosf(D3DX_PI * -0.75f) * fMove;
-		}
-		else
-		{
-			move.x = sinf(0.0f) * fMove;
-			move.z = cosf(0.0f) * fMove;
-		}
-	}
-	else if (pInput->Press(DIK_DOWN))
-	{//下キーが押された
-		if (pInput->Press(DIK_LEFT))
-		{
-			move.x = -sinf(D3DX_PI * 0.25f) * fMove;
-			move.z = -cosf(D3DX_PI * 0.25f) * fMove;
-		}
-		else if (pInput->Press(DIK_RIGHT))
-		{
-			move.x = -sinf(D3DX_PI * -0.25f) * fMove;
-			move.z = -cosf(D3DX_PI * -0.25f) * fMove;
-		}
-		else
-		{
-			move.x = sinf(D3DX_PI) * fMove;
-			move.z = cosf(D3DX_PI) * fMove;
-		}
-	}
-	else if (pInput->Press(DIK_LEFT))
-	{//左キーが押された
-		move.x = sinf(D3DX_PI * -0.5f) * fMove;
-		move.z = cosf(D3DX_PI * -0.5f) * fMove;
-	}
-	else if (pInput->Press(DIK_RIGHT))
-	{//右キーが押された
-		move.x = sinf(D3DX_PI * 0.5f) * fMove;
-		move.z = cosf(D3DX_PI * 0.5f) * fMove;
-	}
-
-	//移動量を保管
-	SetMove(move);
+	D3DXVECTOR3 pos = GetPos();
 
 	//周回カメラのposRの設定
 	pGame->SetRoundCameraPosR(pos);
@@ -256,20 +182,13 @@ void CEnemy_Boss::Update()
 		m_bAppearanceMotion = true;
 		CMotionParts::MoveMotionModel(GetMotionNum(), 3, &GetPos(), &GetRot());
 	}
-	else if (pInput->Press(KEY_MOVE))
-	{//移動用
-		CMotionParts::MoveMotionModel(GetMotionNum(), 1, &GetPos(), &GetRot());
-	}
 	else
 	{//ニュートラルモーション用
 		CMotionParts::MoveMotionModel(GetMotionNum(), 0, &GetPos(), &GetRot());
 	}
 
 	//動いていなかったら以下の処理を無視する
-	if (!pInput->Press(DIK_UP) &&
-		!pInput->Press(DIK_DOWN) &&
-		!pInput->Press(DIK_LEFT) &&
-		!pInput->Press(DIK_RIGHT))
+	if (true)
 	{
 		return;
 	}

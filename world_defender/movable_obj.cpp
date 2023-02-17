@@ -58,7 +58,7 @@ void CMovable_Obj::Update()
 	//移動量に完成の追加
 	m_Move.x += (0.0f - m_Move.x) * GetMoveInertia();
 	m_Move.z += (0.0f - m_Move.z) * GetMoveInertia();
-	m_Move.y += (0.0f - m_Move.y) * GetJumpMoveInertia();
+	m_Move.y += (m_Move.y) * GetJumpMoveInertia();
 
 
 	//移動ベクトルの更新

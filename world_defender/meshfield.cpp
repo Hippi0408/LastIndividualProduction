@@ -420,6 +420,24 @@ int CMeshfield::CheckPosLocation(D3DXVECTOR3 pos)
 		}
 
 		top0 = pVtx[pIdx[0]].pos + MeshfieldPos;
+
+		{
+			D3DXVECTOR3 CheckDistance = top0 - pos;
+
+			if (D3DXVec3LengthSq(&CheckDistance) > 1500.0f * 1500.0f)
+			{
+				pIdx++;
+
+				//マスの数はポリゴン2枚で１ずつ進む
+				if ((nPolygon + 1) % 2 == 0)
+				{
+					nLocation++;
+				}
+
+				continue;
+			}
+		}
+
 		top1 = pVtx[pIdx[1]].pos + MeshfieldPos;
 		top2 = pVtx[pIdx[2]].pos + MeshfieldPos;
 

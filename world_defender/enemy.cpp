@@ -24,7 +24,7 @@
 
 const D3DXVECTOR3 CEnemy::INIT_POS = D3DXVECTOR3(1000.0f, 0.0f, -0.0f); 
 const float CEnemy::MOVE_INERTIA = 0.1f; 
-const float CEnemy::JUMP_INERTIA = 0.1f;
+const float CEnemy::JUMP_INERTIA = 0.01f;
 const float CEnemy::INIT_RADIUS = 1600.0f;
 //*****************************************************************************
 // コンストラクタ
@@ -97,6 +97,26 @@ void CEnemy::Update()
 {
 	D3DXVECTOR3 pos = GetPos();
 	CMotionParts::AllSetShadowPos(D3DXVECTOR3(pos.x, 2.0f, pos.z), GetMotionNum());
+
+	D3DXVECTOR3 move = GetMove();
+
+
+	if (pos.y < 0.0f)
+	{
+		move.y = 0.0f;
+		pos.y = 0.0f;
+
+		SetPos(pos);
+
+	}
+	else if(pos.y > 0.0f)
+	{
+		move.y += m_fMovingDistance;
+	}
+	
+	
+	SetMove(move);
+
 
 	//親クラスの更新
 	CMovable_Obj::Update();

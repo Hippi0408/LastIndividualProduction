@@ -30,6 +30,7 @@
 #include "camera_round.h"
 #include "time.h"
 #include "adrenaline_item.h"
+#include "ufo.h"
 
 //*****************************************************************************
 // コンストラクタ
@@ -106,14 +107,6 @@ HRESULT CGame::Init()
 
 	m_pEnmeyManager->CreateEnemy(EnemyInitData);
 
-	EnemyInitData.pos = D3DXVECTOR3(500.0f, 0.0f, 1600.0f);
-	EnemyInitData.type = ENEMY_01;
-
-	m_pEnmeyManager->CreateEnemy(EnemyInitData);
-
-	EnemyInitData.pos = D3DXVECTOR3(500.0f, 0.0f, 1500.0f);
-	m_pEnmeyManager->CreateEnemy(EnemyInitData);
-
 	//瓦礫マネージャーの生成
 	m_pBallastManager = new CBallast_Manager;
 
@@ -167,6 +160,22 @@ HRESULT CGame::Init()
 	}
 
 	CAdrenalineItem::AllSetLightVec(m_LightVec);
+
+	//UFOの生成
+	m_pUfo = new CUfo;
+
+	//UFOの初期化
+	if (FAILED(m_pUfo->Init()))
+	{
+		return -1;
+	}
+
+	//影の設定
+	m_pUfo->SetLightVec(m_LightVec);
+
+	//細かい設定
+	m_pUfo->Set3DObject(cRead.ReadXFile("data/MODEL/UFO.x"), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+
 
 
 	return S_OK;
@@ -247,6 +256,13 @@ void CGame::Uninit()
 		m_pTime = nullptr;
 	}
 
+	if (m_pUfo != nullptr)
+	{
+		m_pUfo->Uninit();
+		delete m_pUfo;
+		m_pUfo = nullptr;
+	}
+
 	CAdrenalineItem::AllUninit();
 
 	C3DObject::UninitAllModel();
@@ -295,6 +311,8 @@ void CGame::Update()
 	}
 
 	m_pBallastManager->Update();
+
+	m_pUfo->Update();
 	
 	CInput *pInput = CInput::GetKey();
 
@@ -343,6 +361,8 @@ void CGame::Draw()
 	m_pBallastManager->Draw();
 
 	m_pEnmeyManager->Draw();
+
+	m_pUfo->Draw();
 
 	CAdrenalineItem::AllDraw();
 

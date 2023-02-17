@@ -197,6 +197,8 @@ void CEnemy_Manager::CreateEnemy(EnemyInitData enemyinitdata)
 
 	//リストにエネミー情報を追加
 	m_EnemyList.push_back(pEnemy);
+
+	pEnemy->Update();
 }
 
 //*****************************************************************************

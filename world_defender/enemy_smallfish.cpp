@@ -86,7 +86,6 @@ HRESULT CEnemy_SmallFish::Init()
 void CEnemy_SmallFish::Uninit()
 {
 	//モーション
-	//CMotionParts::UnUpdateDraw();
 	CMotionParts::DestructionMotionModel(GetMotionNum());
 
 	//親クラスの終了処理
@@ -98,6 +97,7 @@ void CEnemy_SmallFish::Uninit()
 //*****************************************************************************
 void CEnemy_SmallFish::Update()
 {
+	//CMotionParts::UnUpdateDraw(GetMotionNum(),false,false);
 	//親クラスの更新処理
 	CEnemy::Update();
 
@@ -163,7 +163,6 @@ void CEnemy_SmallFish::Update()
 	
 	//プレイヤーの位置
 	D3DXVECTOR3 PLpos = pPlayer->GetPos();
-	
 
 	//索敵範囲にいるかどうか
 	if (CConvenience_Function::CircleCollision(pos, SEARCH_RANGE, PLpos, 0.0f))
@@ -171,11 +170,13 @@ void CEnemy_SmallFish::Update()
 		//プレイヤーの方向へのベクトル
 		D3DXVECTOR3 vec = CConvenience_Function::PointOrientationVectorGeneration(PLpos, pos);
 
+		vec *= MOVE_INERTIA;
+
 		//Y方向をなくす
-		vec.y = 0.0f;
+		vec.y = GetMove().y;
 
 		//プレイヤーに近づく
-		SetMove(vec * MOVE_INERTIA);
+		SetMove(vec);
 	}
 	else
 	{
@@ -314,6 +315,11 @@ void CEnemy_SmallFish::RandomMove()
 
 	D3DXVec3Normalize(&vec,&vec);
 
+	vec *= MOVE_INERTIA;
 
-	SetMove(MOVE_INERTIA * vec);
+	//vec.y = GetMove().y;
+
+	vec.y = -2.0f;
+
+	SetMove(vec);
 }
