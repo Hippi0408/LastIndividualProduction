@@ -233,9 +233,8 @@ bool CAdrenalineItem::PlayerCollision(D3DXVECTOR3 pos)
 			continue;
 		}
 
-
 		//”»’è
-		bool bHit = CConvenience_Function::CircleCollision(pAdrenalineItem->GetPos(), RADIUS, pos, 0.0f);
+		bool bHit = CConvenience_Function::CircleCollision(pAdrenalineItem->GetParentPos(), RADIUS, pos, 0.0f);
 
 		//ã‹L‚ÌŒ‹‰Ê‚ªtrue
 		if (bHit)

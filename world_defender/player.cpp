@@ -26,6 +26,7 @@
 #include "adrenaline_gauge.h"
 #include "tps_camera.h"
 #include <assert.h>
+#include "adrenaline_item.h"
 
 const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f); 
 const float CPlayer::PLAYER_GRAVITY = 2.0f;
@@ -567,6 +568,15 @@ void CPlayer::Collision()
 
 	//瓦礫との当たり判定
 	SetPos(Add);
+
+	//アドレナリンアイテムの取得
+	bool bGet = CAdrenalineItem::PlayerCollision(GetPos());
+
+	//取得していた場合
+	if (bGet)
+	{
+		m_pAdrenaline_Gauge->AddGauge(10);
+	}
 
 
 	if (m_bHit)

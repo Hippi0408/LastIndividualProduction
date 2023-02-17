@@ -200,6 +200,7 @@
     <ClCompile Include="title.cpp" />
     <ClCompile Include="tps_camera.cpp" />
     <ClCompile Include="tutorial.cpp" />
+    <ClCompile Include="ufo.cpp" />
     <ClCompile Include="ui.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -255,6 +256,7 @@
     <ClInclude Include="title.h" />
     <ClInclude Include="tps_camera.h" />
     <ClInclude Include="tutorial.h" />
+    <ClInclude Include="ufo.h" />
     <ClInclude Include="ui.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
