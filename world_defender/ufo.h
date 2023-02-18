@@ -26,7 +26,7 @@ private:
 	static const float POP_RANGE;
 	static const float MOVING_DISTANCE;
 	static const float POP_POS_Y;
-	static const int POP_INTERVAL_MAX = 300;
+	static const int POP_INTERVAL_MAX = 120;
 public:
 	CUfo();
 	~CUfo() override;

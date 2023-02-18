@@ -29,6 +29,7 @@ private:
 	static const float MOVE_INERTIA;
 	static const float JUMP_INERTIA;
 	static const float INIT_RADIUS;
+	static const int RANDOM_MOVE_CNT_MAX = 5 * 60;
 	
 public:
 	CEnemy_Boss();
@@ -44,6 +45,9 @@ public:
 
 	void AddLife(int nAdd) override;
 
+	// ƒ‰ƒ“ƒ_ƒ€s“®
+	void RandomMove();
+
 	//Šµ«‚ÌGet
 	float GetMoveInertia() override { return MOVE_INERTIA; }
 
@@ -53,6 +57,7 @@ public:
 private:
 	CStatGauge *m_pLife;
 	bool m_bAppearanceMotion;
+	int m_nRandomMoveCnt;
 };
 
 #endif

@@ -74,9 +74,12 @@ public:
 	void SetLight(D3DXVECTOR3 vec) { m_Light = vec; }
 	D3DXVECTOR3 GetLight() { return m_Light; }
 
+	//リストの個数分確保
+	void CreateBallastListData(int nDataNum);
 
 private:
-	std::map<int, std::list<CBallast*>> m_BallastMapData;		//マップ上のオブジェクトをリストで管理する変数
+	std::list<CBallast*>* m_pBallastListData;		//マップ上のオブジェクトをリストで管理する変数
+	int m_nBallastListDataMax;						//上記の変数のMax
 	std::list<CBallast*> m_FloatingBallstList;					//浮遊状態の瓦礫
 	int m_nPlListNumber;
 	CMeshfield *m_pMeshfieldCopy;								//メッシュフィールドポインタのコピー（このコピーは解放をしない）

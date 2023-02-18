@@ -142,7 +142,7 @@ HRESULT CGame::Init()
 	m_pMesh_Cylinder->SetMesh_Cylinder(Mesh_Cylinder_Structure);
 
 	m_pTime = new CTime;
-	if (FAILED(m_pTime->Init(3600)))
+	if (FAILED(m_pTime->Init(7200)))
 	{
 		return -1;
 	}

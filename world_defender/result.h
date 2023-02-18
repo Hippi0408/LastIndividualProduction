@@ -15,7 +15,12 @@
 //*****************************************************************************
 // 前方宣言
 //*****************************************************************************
-class CUI;
+class CCamera;
+class CLight;
+class C3DPolygon;
+class CMeshfield;
+class CBallast_Manager;
+class CMesh_Cylinder;
 
 //*****************************************************************************
 // クラス定義
@@ -32,8 +37,12 @@ public:
 	void Draw() override;
 
 private:
-	CUI *m_pUi;
-	
+	CCamera* m_pCameraRound;
+	CLight* m_pLight;
+	CMeshfield* m_pMeshfieldBG;
+	CBallast_Manager* m_pBallastManager;
+	CMesh_Cylinder* m_pMesh_Cylinder;
+	D3DXVECTOR3 m_LightVec;
 };
 
 #endif

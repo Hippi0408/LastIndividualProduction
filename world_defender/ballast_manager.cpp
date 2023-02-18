@@ -45,6 +45,8 @@ CBallast_Manager::~CBallast_Manager()
 //*****************************************************************************
 HRESULT CBallast_Manager::Init()
 {
+	m_pBallastListData = nullptr;
+	m_nBallastListDataMax = 0;
 	m_nPlListNumber = 0;
 	m_nMeshfieldNumMax = 0;
 	m_pMeshfieldCopy = nullptr;
@@ -61,14 +63,14 @@ HRESULT CBallast_Manager::Init()
 void CBallast_Manager::Uninit()
 {
 	//リストの解放
-	for (int nCnt = 0; nCnt < m_nMeshfieldNumMax; nCnt++)
+	for (int nCnt = 0; nCnt < m_nBallastListDataMax; nCnt++)
 	{
 		//イテレーターループ
-		for (auto itr = m_BallastMapData[nCnt].begin(); itr != m_BallastMapData[nCnt].end();)
+		for (auto itr = m_pBallastListData[nCnt].begin(); itr != m_pBallastListData[nCnt].end();)
 		{
 			//イテレーターから瓦礫のポインタの代入
 			CBallast* pBallast = *itr;
-			
+
 			//瓦礫ポインタの解放
 			if (pBallast != nullptr)
 			{
@@ -79,9 +81,13 @@ void CBallast_Manager::Uninit()
 			}
 
 			//次のイテレーターの代入、現在のイテレーターを破棄
-			itr = m_BallastMapData[nCnt].erase(itr);
+			itr = m_pBallastListData[nCnt].erase(itr);
 		}
 	}
+
+	//瓦礫全体ポインタの解放
+	delete[] m_pBallastListData;
+	m_pBallastListData = nullptr;
 }
 
 //*****************************************************************************
@@ -114,10 +120,10 @@ void CBallast_Manager::Update()
 	
 
 	//リストの更新
-	for (int nCnt = 0; nCnt < m_nMeshfieldNumMax; nCnt++)
+	for (int nCnt = 0; nCnt < m_nBallastListDataMax; nCnt++)
 	{
 		//イテレーターループ
-		for (auto itr = m_BallastMapData[nCnt].begin(); itr != m_BallastMapData[nCnt].end(); )
+		for (auto itr = m_pBallastListData[nCnt].begin(); itr != m_pBallastListData[nCnt].end(); )
 		{
 			//イテレーターから瓦礫のポインタの代入
 			CBallast* pBallast = *itr;
@@ -154,7 +160,7 @@ void CBallast_Manager::Update()
 			pBallast = nullptr;
 
 			//次のイテレーターの代入、現在のイテレーターを破棄
-			itr = m_BallastMapData[nCnt].erase(itr);
+			itr = m_pBallastListData[nCnt].erase(itr);
 		}
 	}
 }
@@ -168,7 +174,7 @@ void CBallast_Manager::Draw()
 	for (int nCnt = 0; nCnt < m_nMeshfieldNumMax; nCnt++)
 	{
 		//イテレーターループ
-		for (auto itr = m_BallastMapData[nCnt].begin(); itr != m_BallastMapData[nCnt].end(); itr++)
+		for (auto itr = m_pBallastListData[nCnt].begin(); itr != m_pBallastListData[nCnt].end(); itr++)
 		{
 			//イテレーターから瓦礫のポインタの代入
 			CBallast* pBallast = *itr;
@@ -214,7 +220,7 @@ void CBallast_Manager::SetBallast(int nNumber, Object_Data Data)
 	pBallast->SetLightVec(m_Light);
 
 	//リストに瓦礫情報を追加
-	m_BallastMapData[nNumber].push_back(pBallast);
+	m_pBallastListData[nNumber].push_back(pBallast);
 }
 
 //*****************************************************************************
@@ -245,7 +251,7 @@ CBallast * CBallast_Manager::CheckCircleCollision(D3DXVECTOR3 pos, float fRadius
 	for (int nCnt = 0; nCnt < m_nMeshfieldNumMax; nCnt++)
 	{
 		//イテレーターループ
-		for (auto itr = m_BallastMapData[nCnt].begin(); itr != m_BallastMapData[nCnt].end(); itr++)
+		for (auto itr = m_pBallastListData[nCnt].begin(); itr != m_pBallastListData[nCnt].end(); itr++)
 		{
 			//イテレーターから瓦礫のポインタの代入
 			CBallast* pBallast = *itr;
@@ -279,8 +285,13 @@ CBallast * CBallast_Manager::CheckCircleCollision(D3DXVECTOR3 pos, float fRadius
 //*****************************************************************************
 void CBallast_Manager::WithinRangeColor(int nMapGrid, D3DXVECTOR3 pos, float fRadius)
 {
+	if (nMapGrid < 0 || nMapGrid >= m_nBallastListDataMax)
+	{
+		return;
+	}
+
 	//イテレーターループ
-	for (auto itr = m_BallastMapData[nMapGrid].begin(); itr != m_BallastMapData[nMapGrid].end(); itr++)
+	for (auto itr = m_pBallastListData[nMapGrid].begin(); itr != m_pBallastListData[nMapGrid].end(); itr++)
 	{
 		//変数宣言
 		D3DXVECTOR3 Extrusion = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -322,8 +333,13 @@ D3DXVECTOR3 CBallast_Manager::CollisionBallast(int nMapGrid, D3DXVECTOR3 pos, D3
 {
 	D3DXVECTOR3 Add = pos;
 
+	if (nMapGrid < 0 || nMapGrid >= m_nBallastListDataMax)
+	{
+		return Add;
+	}
+
 	//イテレーターループ
-	for (auto itr = m_BallastMapData[nMapGrid].begin(); itr != m_BallastMapData[nMapGrid].end(); itr++)
+	for (auto itr = m_pBallastListData[nMapGrid].begin(); itr != m_pBallastListData[nMapGrid].end(); itr++)
 	{
 		//変数宣言
 		D3DXVECTOR3 Extrusion = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -515,7 +531,7 @@ void CBallast_Manager::SetBallastAcquired(D3DXVECTOR3 vec, D3DXVECTOR3 pos, D3DX
 	pBallastAcquired->SetLightVec(m_Light);
 
 	//リストに瓦礫情報を追加
-	m_BallastMapData[nNumber].push_back(pBallastAcquired);
+	m_pBallastListData[nNumber].push_back(pBallastAcquired);
 
 }
 
@@ -533,7 +549,7 @@ void CBallast_Manager::ReplacementList(CBallast * pBallast, int nNext)
 	}
 
 	//イテレーターループ
-	for (auto itr = m_BallastMapData[nLastNum].begin(); itr != m_BallastMapData[nLastNum].end(); itr++)
+	for (auto itr = m_pBallastListData[nLastNum].begin(); itr != m_pBallastListData[nLastNum].end(); itr++)
 	{
 		//イテレーターから瓦礫のポインタの代入
 		CBallast* pballast = *itr;
@@ -560,6 +576,18 @@ void CBallast_Manager::ReplacementList(CBallast * pBallast, int nNext)
 
 
 	//リストに瓦礫情報を追加
-	m_BallastMapData[nNext].push_back(pBallast);
+	m_pBallastListData[nNext].push_back(pBallast);
+}
+
+//*****************************************************************************
+//リストの個数分確保
+//*****************************************************************************
+void CBallast_Manager::CreateBallastListData(int nDataNum)
+{
+	//データの確保
+	m_pBallastListData = new std::list<CBallast*>[nDataNum];
+
+	//Maxの保存
+	m_nBallastListDataMax = nDataNum;
 }
 

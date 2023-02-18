@@ -317,8 +317,6 @@ void CEnemy_SmallFish::RandomMove()
 
 	vec *= MOVE_INERTIA;
 
-	//vec.y = GetMove().y;
-
 	vec.y = -2.0f;
 
 	SetMove(vec);

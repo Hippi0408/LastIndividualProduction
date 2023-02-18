@@ -10,11 +10,16 @@
 //*****************************************************************************
 #include "main.h"
 #include "result.h"
-#include "ui.h"
-#include "texture.h"
 #include "input.h"
-#include "manager.h"
+#include "texture.h"
+#include "ui.h"
 #include "sound.h"
+#include <assert.h>
+#include "camera_round.h"
+#include "light.h"
+#include "ballast_manager.h"
+#include "read.h"
+#include "mesh_cylinder.h"
 
 //*****************************************************************************
 // コンストラクタ
@@ -38,27 +43,55 @@ HRESULT CResult::Init()
 	//サウンド
 	PlaySound(SOUND_LABEL_BGM_RESULT);
 
-	//nullptr
-	m_pUi = nullptr;
+	
+	//カメラ
+	m_pCameraRound = new CCamera_Round;
+	if (FAILED(m_pCameraRound->Init()))
+	{
+		return -1;
+	}
+	//ライト
+	m_pLight = new CLight;
+	if (FAILED(m_pLight->Init()))
+	{
+		return -1;
+	}
+	m_LightVec = m_pLight->GetLightVec();
 
-	//GetUiData
-	m_pUi = new CUI;
+	//瓦礫マネージャーの生成
+	m_pBallastManager = new CBallast_Manager;
 
-	//UiInit
-	if (FAILED(m_pUi->Init()))
+	//初期化
+	if (FAILED(m_pBallastManager->Init()))
+	{
+		assert(false);
+	}
+
+	m_pBallastManager->SetLight(m_LightVec);
+
+	CRead cRead;
+	//BG3D
+	m_pMeshfieldBG = cRead.ReadMap("data/MAPTXT/map.txt", m_pBallastManager);
+
+	m_pMesh_Cylinder = new CMesh_Cylinder;
+	if (FAILED(m_pMesh_Cylinder->Init()))
 	{
 		return -1;
 	}
 
-	//GetUiPointer
-	C2DPolygon *pPolygon = m_pUi->CreateUi(1);
+	Mesh_Cylinder_Structure Mesh_Cylinder_Structure;
 
-	//SetUiData
-	int nIndex = CTexture::LoadTexture("data/TEXTURE/リザルト.png");
-	pPolygon[0].SetTextIndex(nIndex);
-	pPolygon[0].SetPos(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0.0f));
-	pPolygon[0].SetDiagonalLine(200.0f, 200.0f);
-	pPolygon[0].SetPolygon();
+	Mesh_Cylinder_Structure.fRadius = 30000.0f;
+	Mesh_Cylinder_Structure.fSizeYTop = 100000.0f;
+	Mesh_Cylinder_Structure.nPolygonX = 30;
+	Mesh_Cylinder_Structure.nPolygonY = 1;
+	Mesh_Cylinder_Structure.nTextureNum = 0;
+	Mesh_Cylinder_Structure.ParentPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	Mesh_Cylinder_Structure.ColorMax = D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f);
+	Mesh_Cylinder_Structure.ColorLowest = D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f);
+
+	m_pMesh_Cylinder->SetMesh_Cylinder(Mesh_Cylinder_Structure);
+
 	return S_OK;
 }
 
@@ -70,14 +103,46 @@ void CResult::Uninit()
 	//サウンド
 	StopSound();
 
-	//UiRelease
-	if (m_pUi != nullptr)
+	//カメラ
+	if (m_pCameraRound != nullptr)
 	{
-		//UiUninit
-		m_pUi->Uninit();
-		delete m_pUi;
-		m_pUi = nullptr;
+		m_pCameraRound->Uninit();
+		delete m_pCameraRound;
+		m_pCameraRound = nullptr;
 	}
+
+	//ライト
+	if (m_pLight != nullptr)
+	{
+		m_pLight->Uninit();
+		delete m_pLight;
+		m_pLight = nullptr;
+	}
+
+	//瓦礫マネージャー
+	if (m_pBallastManager != nullptr)
+	{
+		m_pBallastManager->Uninit();
+		delete m_pBallastManager;
+		m_pBallastManager = nullptr;
+	}
+
+	//メッシュフィールド
+	if (m_pMeshfieldBG != nullptr)
+	{
+		m_pMeshfieldBG->Uninit();
+		delete m_pMeshfieldBG;
+		m_pMeshfieldBG = nullptr;
+	}
+
+	if (m_pMesh_Cylinder != nullptr)
+	{
+		m_pMesh_Cylinder->Uninit();
+		delete m_pMesh_Cylinder;
+		m_pMesh_Cylinder = nullptr;
+	}
+
+	C3DObject::UninitAllModel();
 }
 
 //*****************************************************************************
@@ -85,8 +150,9 @@ void CResult::Uninit()
 //*****************************************************************************
 void CResult::Update()
 {
-	//UiUpdate
-	m_pUi->Update();
+	m_pCameraRound->Update();
+
+	m_pBallastManager->Update();
 
 	//GetInput
 	CInput *pInput = CInput::GetKey();
@@ -104,6 +170,13 @@ void CResult::Update()
 //*****************************************************************************
 void CResult::Draw()
 {
-	//UiDraw
-	m_pUi->Draw();
+	//カメラ
+	m_pCameraRound->SetCamera();
+
+	m_pMesh_Cylinder->Draw();
+
+	m_pMeshfieldBG->Draw();
+
+	m_pBallastManager->Draw();
+
 }

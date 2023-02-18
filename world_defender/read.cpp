@@ -209,6 +209,9 @@ CMeshfield * CRead::ReadMap(char * sFilePath, CBallast_Manager* pBallast_Manager
 					//メッシュ情報の設定
 					pMeshfield->SetMeshfield(MeshData);
 
+					//データの生成
+					pBallast_Manager->CreateBallastListData(pMeshfield->GetMeshfieldNumMax());
+
 					//メッシュフィールドの情報から必要な数値の取得
 					pBallast_Manager->MeshfieldSet(pMeshfield);
 

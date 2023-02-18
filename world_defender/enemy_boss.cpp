@@ -23,7 +23,7 @@
 #include "player.h"
 
 const D3DXVECTOR3 CEnemy_Boss::INIT_POS = D3DXVECTOR3(1000.0f, 0.0f, -0.0f);
-const float CEnemy_Boss::MOVE_INERTIA = 0.1f;
+const float CEnemy_Boss::MOVE_INERTIA = 4.0f;
 const float CEnemy_Boss::JUMP_INERTIA = 0.1f;
 const float CEnemy_Boss::INIT_RADIUS = 1600.0f;
 //*****************************************************************************
@@ -161,6 +161,9 @@ void CEnemy_Boss::Update()
 
 	}
 
+	//ランダム行動
+	RandomMove();
+
 	//親クラスの更新
 	CEnemy::Update();
 
@@ -186,6 +189,15 @@ void CEnemy_Boss::Update()
 	{//ニュートラルモーション用
 		CMotionParts::MoveMotionModel(GetMotionNum(), 0, &GetPos(), &GetRot());
 	}
+
+	//エネミーのrot
+	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	D3DXVECTOR3 MoveVec = GetMoveVec();
+	rot.y = atan2f(MoveVec.x, MoveVec.z) - D3DX_PI;
+
+	//rot設定
+	SetRot(rot);
+
 
 	//動いていなかったら以下の処理を無視する
 	if (true)
@@ -271,4 +283,39 @@ void CEnemy_Boss::AddLife(int nAdd)
 	CMovable_Obj::AddLife(nAdd);
 
 	m_pLife->SetStatGauge(nAdd);
+}
+
+//*****************************************************************************
+// ランダム行動
+//*****************************************************************************
+void CEnemy_Boss::RandomMove()
+{
+	if (m_nRandomMoveCnt > 0)
+	{
+		m_nRandomMoveCnt--;
+
+		D3DXVECTOR3 moveVec = GetMoveVec();
+
+		SetMove(MOVE_INERTIA * moveVec);
+
+		return;
+	}
+
+	m_nRandomMoveCnt = rand() % RANDOM_MOVE_CNT_MAX;
+
+	float fAngle = D3DXToRadian(rand() % 360);
+
+	D3DXVECTOR3 vec = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	vec.x = cosf(fAngle);
+	vec.z = sinf(fAngle);
+	vec.y = 0.0f;
+
+	D3DXVec3Normalize(&vec, &vec);
+
+	vec *= MOVE_INERTIA;
+
+	vec.y = -2.0f;
+
+	SetMove(vec);
 }
