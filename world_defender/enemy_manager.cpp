@@ -19,6 +19,8 @@
 
 const float CEnemy_Manager::RADIUS_TYPE[] = { 40.0f ,30.0f ,20.0f ,10.0f ,0.0f };
 const int CEnemy_Manager::DAMAGE_TYPE[] = { 40 ,30 ,20 ,10 ,0 };
+const float CEnemy_Manager::INIT_POP_LOWEST_RANGE = 1000.0f;
+const float CEnemy_Manager::INIT_POP_RANDOM_ADDITION_WIDTH = 1000.0f;
 
 //*****************************************************************************
 // コンストラクタ
@@ -141,10 +143,9 @@ void CEnemy_Manager::Draw()
 			continue;
 		}
 
-		//エネミーの更新処理
+		//エネミーの描画処理
 		pEnemy->Draw();
 
-		
 		//イテレーターを進める
 		itr++;
 	}
@@ -199,6 +200,36 @@ void CEnemy_Manager::CreateEnemy(EnemyInitData enemyinitdata)
 	m_EnemyList.push_back(pEnemy);
 
 	pEnemy->Update();
+}
+
+//*****************************************************************************
+// 初期配置処理
+//*****************************************************************************
+void CEnemy_Manager::InitPopEnemy()
+{
+	//エネミーの情報の設定
+	EnemyInitData EnemyInitData;
+	EnemyInitData.fmove = -50.0f;
+	EnemyInitData.pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	EnemyInitData.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	EnemyInitData.type = ENEMY_01;
+
+	//初期スポーン
+	for (int nCnt = 0; nCnt < INIT_POP_ENEMY_MUN; nCnt++)
+	{
+		//ランダムな角度
+		float fAngle = D3DXToRadian(rand() % 360);
+
+		//ランダムな加算幅の生成
+		float fAdditionWidth = (float)(rand() % (int)INIT_POP_RANDOM_ADDITION_WIDTH);
+
+		//ランダムな位置の保存
+		EnemyInitData.pos.x = cosf(fAngle) * (INIT_POP_LOWEST_RANGE + fAdditionWidth);
+		EnemyInitData.pos.z = sinf(fAngle) * (INIT_POP_LOWEST_RANGE + fAdditionWidth);
+
+		//生成
+		CreateEnemy(EnemyInitData);
+	}
 }
 
 //*****************************************************************************
@@ -270,6 +301,8 @@ bool CEnemy_Manager::EnemyCollision(D3DXVECTOR3 pos, float fRadius)
 			
 		}
 
+		//ここには来てはいけない
+		assert(false);
 		//イテレーターを進める
 		itr++;
 	}
@@ -404,7 +437,4 @@ void CEnemy_Manager::EnemyOnEnemyCollision(CEnemy * pTargetEnemy)
 		//処理を抜ける
 		return;
 	}
-
-
-
 }

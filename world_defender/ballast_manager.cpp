@@ -117,8 +117,6 @@ void CBallast_Manager::Update()
 		break;
 	}
 
-	
-
 	//リストの更新
 	for (int nCnt = 0; nCnt < m_nBallastListDataMax; nCnt++)
 	{
@@ -137,7 +135,7 @@ void CBallast_Manager::Update()
 			//使用状態かどうか
 			if (pBallast->GetUse())
 			{
-				D3DXVECTOR3 pos = pBallast->GetWorldPos();
+				D3DXVECTOR3 pos = pBallast->GetPos() + pBallast->GetParentPos();
 				//エリア外にあるかどうか
 				if (CConvenience_Function::CircleCollision(D3DXVECTOR3(0.0f,0.0f,0.0f), MAP_MAX, pos, 0.0f))
 				{
@@ -163,6 +161,8 @@ void CBallast_Manager::Update()
 			itr = m_pBallastListData[nCnt].erase(itr);
 		}
 	}
+
+	
 }
 
 //*****************************************************************************
@@ -194,6 +194,11 @@ void CBallast_Manager::Draw()
 //*****************************************************************************
 void CBallast_Manager::SetBallast(int nNumber, Object_Data Data)
 {
+	if (nNumber < 0 || nNumber >= m_nBallastListDataMax)
+	{
+		return;
+	}
+
 	//瓦礫クラスの生成
 	CBallast* pBallast = new CBallast;
 
@@ -262,13 +267,20 @@ CBallast * CBallast_Manager::CheckCircleCollision(D3DXVECTOR3 pos, float fRadius
 				assert(false);
 			}
 
+			//使用状態かどうか
+			if (!pBallast->GetUse())
+			{
+				//処理を無視する
+				continue;
+			}
+
 			//浮遊状態かどうか
 			if (pBallast->GetFloating())
 			{
 				continue;
 			}
 
-			//サイコキネシスエリアにあるかどうかpBallast->GetVtxMax().x
+			//サイコキネシスエリアにあるかどうか
 			if (CConvenience_Function::CircleCollision(pos,fRadius, pBallast->GetParentPos(), 0.0f))
 			{
 				return pBallast;
@@ -304,6 +316,14 @@ void CBallast_Manager::WithinRangeColor(int nMapGrid, D3DXVECTOR3 pos, float fRa
 		{
 			assert(false);
 		}
+
+		//使用状態かどうか
+		if (!pBallast->GetUse())
+		{
+			//処理を無視する
+			continue;
+		}
+
 
 		//浮遊状態かどうか
 		if (pBallast->GetFloating())
@@ -341,9 +361,6 @@ D3DXVECTOR3 CBallast_Manager::CollisionBallast(int nMapGrid, D3DXVECTOR3 pos, D3
 	//イテレーターループ
 	for (auto itr = m_pBallastListData[nMapGrid].begin(); itr != m_pBallastListData[nMapGrid].end(); itr++)
 	{
-		//変数宣言
-		D3DXVECTOR3 Extrusion = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-
 		//イテレーターから瓦礫のポインタの代入
 		CBallast* pBallast = *itr;
 
@@ -358,6 +375,9 @@ D3DXVECTOR3 CBallast_Manager::CollisionBallast(int nMapGrid, D3DXVECTOR3 pos, D3
 		{
 			continue;
 		}
+
+		//変数宣言
+		D3DXVECTOR3 Extrusion = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 		//押し出し判定
 		Extrusion = pBallast->ConclusionCollision(pos, oldpos, max, min);
@@ -429,8 +449,18 @@ void CBallast_Manager::CollisionEnemy()
 			assert(false);
 		}
 
+		//使用状態かどうか
+		if (!pBallast->GetUse())
+		{
+			//イテレーターを進める
+			itr++;
+
+			//処理を無視する
+			continue;
+		}
+
 		//浮遊状態かどうか
-		if (!pBallast->GetFloating())
+		if (pBallast->GetFloating())
 		{
 			//イテレーターを進める
 			itr++;
@@ -440,7 +470,7 @@ void CBallast_Manager::CollisionEnemy()
 		}
 
 		//判定
-		bool bHit = pEnemy_Manager->EnemyCollision(pBallast->GetWorldPos(), pBallast->GetRadius());
+		bool bHit = pEnemy_Manager->EnemyCollision(pBallast->GetPos() + pBallast->GetParentPos(), pBallast->GetRadius());
 
 		if (!bHit)
 		{
@@ -458,7 +488,7 @@ void CBallast_Manager::CollisionEnemy()
 
 		D3DXVec3Normalize(&vec, &vec);
 
-		SetBallastAcquired(vec, pBallast->GetWorldPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+		SetBallastAcquired(vec, pBallast->GetParentPos() + pBallast->GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
 		//瓦礫の使用状態を変更
 		pBallast->SetUse(false);
@@ -501,6 +531,11 @@ void CBallast_Manager::SetBallastAcquired(D3DXVECTOR3 vec, D3DXVECTOR3 pos, D3DX
 	
 	//マップチップの位置確認
 	nNumber = m_pMeshfieldCopy->CheckPosLocation(pos);
+
+	if (nNumber < 0 || nNumber >= m_nBallastListDataMax)
+	{
+		return;
+	}
 
 	//メッシュ内の位置（番号）
 	pBallastAcquired->SetListNumber(nNumber);
@@ -549,7 +584,7 @@ void CBallast_Manager::ReplacementList(CBallast * pBallast, int nNext)
 	}
 
 	//イテレーターループ
-	for (auto itr = m_pBallastListData[nLastNum].begin(); itr != m_pBallastListData[nLastNum].end(); itr++)
+	for (auto itr = m_pBallastListData[nLastNum].begin(); itr != m_pBallastListData[nLastNum].end();)
 	{
 		//イテレーターから瓦礫のポインタの代入
 		CBallast* pballast = *itr;
@@ -561,19 +596,18 @@ void CBallast_Manager::ReplacementList(CBallast * pBallast, int nNext)
 		}
 
 		//指定のポインタかどうか
-		if (pBallast != pballast)
+		if (pBallast == pballast)
 		{
-			//イテレーターを進める
-			itr++;
+			//次のイテレーターの代入、現在のイテレーターを破棄
+			itr = m_pBallastListData[nLastNum].erase(itr);
 
-			//処理を無視する
-			continue;
+			//処理を抜ける
+			break;
 		}
-	
-		//次のイテレーターの代入、現在のイテレーターを破棄
-		itr = m_FloatingBallstList.erase(itr);
-	}
 
+		//イテレーターを進める
+		itr++;
+	}
 
 	//リストに瓦礫情報を追加
 	m_pBallastListData[nNext].push_back(pBallast);

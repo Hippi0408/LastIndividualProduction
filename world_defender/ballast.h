@@ -70,9 +70,6 @@ public:
 
 	//ìñÇΩÇËîªíË(Ç‹Ç∆Çﬂ)
 	D3DXVECTOR3 ConclusionCollision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, D3DXVECTOR3 max, D3DXVECTOR3 min);
-
-	//ïÇóVèÛë‘Ç©Ç«Ç§Ç©
-	bool CheckFloating() { return m_bFloating; }
 	
 private:
 	D3DXVECTOR3 m_PositionWithPlayer;

@@ -54,11 +54,8 @@ HRESULT CPsychokinesis::Init()
 //*****************************************************************************
 void CPsychokinesis::Uninit()
 {
-	for (auto itr = m_BallastCopyList.begin(); itr != m_BallastCopyList.end();)
-	{
-		//次のイテレーターの代入、現在のイテレーターを破棄
-		itr = m_BallastCopyList.erase(itr);
-	}
+	//全要素の削除
+	m_BallastCopyList.clear();
 }
 
 //*****************************************************************************
@@ -240,7 +237,6 @@ void CPsychokinesis::SetFloating()
 		D3DXVECTOR3 Add = D3DXVECTOR3(0.0f, sinf((float)nTime) * 2.0f, 0.0f);
 		pBallast->AddPositionWithPlayer(Add);
 
-
 		//一時保管場所
 		D3DXVECTOR3 Pos, Rot, DestPos, move, PositionWithPlayer;
 
@@ -274,7 +270,6 @@ void CPsychokinesis::SetFloating()
 
 		//プレイヤーの位置の登録
 		pBallast->SetParentPos(m_PlPos);
-
 	}
 }
 
@@ -429,12 +424,13 @@ void CPsychokinesis::PsychokinesisAttack()
 			//移動量の設定
 			pBallast->SetPosMove(Move);
 
+			//浮遊状態の設定
+			pBallast->SetFloating(false);
+
 		}
 
 		//次のイテレーターの代入、現在のイテレーターを破棄
 		itr = m_BallastCopyList.erase(itr);
-
-		break;
 
 	}
 }

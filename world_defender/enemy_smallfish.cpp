@@ -27,7 +27,7 @@ const D3DXVECTOR3 CEnemy_SmallFish::INIT_POS = D3DXVECTOR3(1000.0f, 0.0f, -0.0f)
 const float CEnemy_SmallFish::MOVE_INERTIA = 5.0f;
 const float CEnemy_SmallFish::JUMP_INERTIA = 0.1f; 
 const float CEnemy_SmallFish::INIT_RADIUS = 100.0f;
-const float CEnemy_SmallFish::SEARCH_RANGE = 1000.0f;
+const float CEnemy_SmallFish::SEARCH_RANGE = 1500.0f;
 const D3DXVECTOR3 CEnemy_SmallFish::ENEMY_SIZE_MAX = D3DXVECTOR3(INIT_RADIUS, INIT_RADIUS, INIT_RADIUS);
 const D3DXVECTOR3 CEnemy_SmallFish::ENEMY_SIZE_MIN = D3DXVECTOR3(-INIT_RADIUS, 0.0f, -INIT_RADIUS);
 //*****************************************************************************
@@ -98,11 +98,12 @@ void CEnemy_SmallFish::Uninit()
 void CEnemy_SmallFish::Update()
 {
 	//CMotionParts::UnUpdateDraw(GetMotionNum(),false,false);
-	//親クラスの更新処理
-	CEnemy::Update();
 
 	//自身の位置
 	D3DXVECTOR3 pos = GetPos();
+
+	//親クラスの更新処理
+	CEnemy::Update();
 
 	//マネージャーからプレイヤーの情報の取得
 	CManager* pManager = GetManager();
@@ -163,6 +164,9 @@ void CEnemy_SmallFish::Update()
 	
 	//プレイヤーの位置
 	D3DXVECTOR3 PLpos = pPlayer->GetPos();
+
+	//自身の位置
+	pos = GetPos();
 
 	//索敵範囲にいるかどうか
 	if (CConvenience_Function::CircleCollision(pos, SEARCH_RANGE, PLpos, 0.0f))

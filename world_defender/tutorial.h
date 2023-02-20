@@ -17,7 +17,7 @@
 //*****************************************************************************
 class CCamera;
 class CLight;
-class C3DPolygon;
+class C2DPolygon;
 class CMeshfield;
 class CPlayer;
 class CBallast_Manager;
@@ -57,6 +57,7 @@ private:
 	CBallast_Manager* m_pBallastManager;
 	CMesh_Cylinder* m_pMesh_Cylinder;
 	CUfo* m_pUfo;
+	C2DPolygon* m_pUi;
 	D3DXVECTOR3 m_LightVec;
 	bool m_bGameEnd;
 };

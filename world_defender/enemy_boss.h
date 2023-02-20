@@ -30,6 +30,7 @@ private:
 	static const float JUMP_INERTIA;
 	static const float INIT_RADIUS;
 	static const int RANDOM_MOVE_CNT_MAX = 5 * 60;
+	static const int IMMOBILE_TIME = 300;
 	
 public:
 	CEnemy_Boss();
@@ -58,6 +59,7 @@ private:
 	CStatGauge *m_pLife;
 	bool m_bAppearanceMotion;
 	int m_nRandomMoveCnt;
+	int m_nImmobileTime;
 };
 
 #endif

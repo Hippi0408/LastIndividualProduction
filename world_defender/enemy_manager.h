@@ -52,6 +52,10 @@ private:
 	static const int DAMAGE_TYPE_MAX = 5;
 	static const float RADIUS_TYPE[DAMAGE_TYPE_MAX];
 	static const int DAMAGE_TYPE[DAMAGE_TYPE_MAX];
+	static const int INIT_POP_ENEMY_MUN = 20;
+	static const float INIT_POP_LOWEST_RANGE;
+	static const float INIT_POP_RANDOM_ADDITION_WIDTH;
+
 public:
 	CEnemy_Manager();
 	~CEnemy_Manager() override;
@@ -62,6 +66,8 @@ public:
 	void Draw() override;
 
 	void CreateEnemy(EnemyInitData enemyinitdata);
+
+	void InitPopEnemy();
 
 	bool EnemyCollision(D3DXVECTOR3 pos, float fRadius);
 	bool PlayerCollision(D3DXVECTOR3 pos, float fRadius,D3DXVECTOR3* Add);

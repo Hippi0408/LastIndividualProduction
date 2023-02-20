@@ -22,7 +22,7 @@
 class CUfo : public C3DObject
 {
 private:
-	static const int MOVE_COUNTER_MAX = 600;
+	static const int MOVE_COUNTER_MAX = 120;
 	static const float POP_RANGE;
 	static const float MOVING_DISTANCE;
 	static const float POP_POS_Y;

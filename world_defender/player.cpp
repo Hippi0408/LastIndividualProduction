@@ -578,12 +578,10 @@ void CPlayer::Collision()
 		m_pAdrenaline_Gauge->AddGauge(10);
 	}
 
-
 	if (m_bHit)
 	{
 		return;
 	}
-
 
 	//-------------------------------------------------------
 	// エネミーとの当たり判定

@@ -28,6 +28,7 @@
 #include "gauge.h"
 #include "adrenaline_item.h"
 #include "ufo.h"
+#include "2dpolygon.h"
 
 //*****************************************************************************
 // コンストラクタ
@@ -152,7 +153,23 @@ HRESULT CTutorial::Init()
 	//細かい設定
 	m_pUfo->Set3DObject(cRead.ReadXFile("data/MODEL/UFO.x"), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
+	//初期エネミー生成
+	m_pEnmeyManager->InitPopEnemy();
 
+	//UI
+	m_pUi = new C2DPolygon;
+
+	//UIの初期化
+	if (FAILED(m_pUi->Init()))
+	{
+		return -1;
+	}
+
+	int nIndex = CTexture::LoadTexture("data/TEXTURE/チュートリアルUI.png");
+	m_pUi->SetTextIndex(nIndex);
+	m_pUi->SetPos(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0.0f));
+	m_pUi->SetDiagonalLine(SCREEN_WIDTH, SCREEN_HEIGHT);
+	m_pUi->SetPolygon();
 
 	return S_OK;
 }
@@ -225,6 +242,14 @@ void CTutorial::Uninit()
 		delete m_pUfo;
 		m_pUfo = nullptr;
 	}
+
+	if (m_pUi != nullptr)
+	{
+		m_pUi->Uninit();
+		delete m_pUi;
+		m_pUi = nullptr;
+	}
+
 
 	CAdrenalineItem::AllUninit();
 
@@ -306,5 +331,7 @@ void CTutorial::Draw()
 	CGauge::AllDraw();
 
 	m_pPlayer->Draw();
+
+	m_pUi->Draw();
 
 }

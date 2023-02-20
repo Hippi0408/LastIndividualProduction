@@ -240,29 +240,21 @@ bool CAdrenalineItem::PlayerCollision(D3DXVECTOR3 pos)
 		if (bHit)
 		{
 			//アイテムポインタの解放
-			if (pAdrenalineItem != nullptr)
-			{
-				//終了処理
-				pAdrenalineItem->Uninit();
-				delete pAdrenalineItem;
-				pAdrenalineItem = nullptr;
+			//次のイテレーターの代入、現在のイテレーターを破棄
+			itr = m_AdrenalineItemList.erase(itr);
 
-				//次のイテレーターの代入、現在のイテレーターを破棄
-				itr = m_AdrenalineItemList.erase(itr);
-			}
+			//終了処理
+			pAdrenalineItem->Uninit();
+			delete pAdrenalineItem;
+			pAdrenalineItem = nullptr;
+
 			//処理を抜ける
 			return true;
 		}
-		else
-		{
-			//イテレーターを進める
-			itr++;
-		}
 
-		//以下の処理を無視する
-		continue;
+		//イテレーターを進める
+		itr++;
 	}
 
 	return false;
 }
-

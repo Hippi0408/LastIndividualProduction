@@ -199,7 +199,7 @@ void CTime::Update()
 
 	D3DXCOLOR WarningColor = m_pWarningBorder->GetColor();
 
-	WarningColor.a = 1.0 - m_pTimeGauge->GetRatio();
+	WarningColor.a = 1.0f - m_pTimeGauge->GetRatio();
 
 	m_pWarningBorder->SetColor(WarningColor);
 

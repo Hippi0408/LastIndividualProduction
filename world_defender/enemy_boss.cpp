@@ -35,6 +35,7 @@ CEnemy_Boss::CEnemy_Boss()
 	CMovable_Obj::SetRadius(INIT_RADIUS);
 	m_pLife = nullptr;
 	m_bAppearanceMotion = false;
+	m_nImmobileTime = 0;
 }
 
 //*****************************************************************************
@@ -190,15 +191,6 @@ void CEnemy_Boss::Update()
 		CMotionParts::MoveMotionModel(GetMotionNum(), 0, &GetPos(), &GetRot());
 	}
 
-	//エネミーのrot
-	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	D3DXVECTOR3 MoveVec = GetMoveVec();
-	rot.y = atan2f(MoveVec.x, MoveVec.z) - D3DX_PI;
-
-	//rot設定
-	SetRot(rot);
-
-
 	//動いていなかったら以下の処理を無視する
 	if (true)
 	{
@@ -290,6 +282,13 @@ void CEnemy_Boss::AddLife(int nAdd)
 //*****************************************************************************
 void CEnemy_Boss::RandomMove()
 {
+	if (m_nImmobileTime < IMMOBILE_TIME)
+	{
+		m_nImmobileTime++;
+		return;
+	}
+
+
 	if (m_nRandomMoveCnt > 0)
 	{
 		m_nRandomMoveCnt--;
@@ -318,4 +317,12 @@ void CEnemy_Boss::RandomMove()
 	vec.y = -2.0f;
 
 	SetMove(vec);
+
+	//エネミーのrot
+	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	D3DXVECTOR3 MoveVec = GetMoveVec();
+	rot.y = atan2f(MoveVec.x, MoveVec.z) - D3DX_PI;
+
+	//rot設定
+	SetRot(rot);
 }

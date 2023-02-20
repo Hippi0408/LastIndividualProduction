@@ -176,7 +176,8 @@ HRESULT CGame::Init()
 	//細かい設定
 	m_pUfo->Set3DObject(cRead.ReadXFile("data/MODEL/UFO.x"), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
-
+	//初期エネミー生成
+	m_pEnmeyManager->InitPopEnemy();
 
 	return S_OK;
 }

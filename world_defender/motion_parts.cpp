@@ -345,7 +345,6 @@ void CMotionParts::AllNextMotionPosition(int nMotionNum, bool bUnUpdate)
 
 		}
 
-		
 		//イテレーターを進める
 		itr++;
 	}
@@ -408,8 +407,6 @@ void CMotionParts::UnUpdateDraw(int nMotionNum, bool bUnUpdate, bool bDraw)
 			pMotionParts->SetBoolDraw(bDraw);
 
 		}
-
-		
 
 		//イテレーターを進める
 		itr++;
@@ -528,8 +525,6 @@ void CMotionParts::ALLDraw()
 		//モーションパーツの更新処理
 		pMotionParts->Draw();
 
-
-
 		//イテレーターを進める
 		itr++;
 	}
@@ -604,7 +599,6 @@ CMotionParts * CMotionParts::GetMotionPartsPointer(int nMotionNum, int nPartsNum
 		{
 			return pMotionParts;
 		}
-
 
 		//イテレーターを進める
 		itr++;
@@ -873,8 +867,6 @@ void CMotionParts::SettingParent(int nChildren, int nParent)
 		itr++;
 	}
 
-
-
 	if (pMotionPartsChildren == nullptr || pMotionPartsParent == nullptr)
 	{
 		return;
@@ -884,8 +876,6 @@ void CMotionParts::SettingParent(int nChildren, int nParent)
 	{
 		pMotionPartsChildren->SetMotionParent(pMotionPartsParent);
 	}
-
-
 }
 
 //*****************************************************************************
@@ -1074,7 +1064,6 @@ int CMotionParts::CopyMotionModel(int nModelNum)
 //*****************************************************************************
 void CMotionParts::DestructionMotionModel(int nModelNum)
 {
-
 	//イテレーターループ
 	for (auto itr = m_MotionPartslist.begin(); itr != m_MotionPartslist.end();)
 	{
@@ -1104,8 +1093,6 @@ void CMotionParts::DestructionMotionModel(int nModelNum)
 
 		//次のイテレーターの代入、現在のイテレーターを破棄
 		itr = m_MotionPartslist.erase(itr);
-
-		
 	}
 		
 
