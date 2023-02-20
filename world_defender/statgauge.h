@@ -58,6 +58,7 @@ public:
 	void Update();
 	void Draw();
 
+	int GetValue() { return m_nValue; }
 	void SetValue(int nStatGauge) { m_nValue = nStatGauge; }
 	void CreateStatBar(SStatGauge SStatGauge);
 

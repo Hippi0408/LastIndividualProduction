@@ -42,6 +42,8 @@ public:
 
 	bool CheckTime(int nTime = 0);
 
+	int GetTime();
+
 	void SetTimeUpdate(bool bUpdate) { m_bUpdate = bUpdate; }
 private:
 	C2DPolygon* m_pCrayfish;

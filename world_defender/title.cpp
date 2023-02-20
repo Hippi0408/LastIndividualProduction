@@ -71,7 +71,7 @@ HRESULT CTitle::Init()
 	nIndex = CTexture::LoadTexture("data/TEXTURE/Pressthekey.png");
 	pPolygon[1].SetTextIndex(nIndex);
 	pPolygon[1].SetPos(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f +  200.0f, 0.0f));
-	pPolygon[1].SetDiagonalLine(300.0f, 200.0f); 
+	pPolygon[1].SetDiagonalLine(500.0f, 300.0f); 
 	pPolygon[1].SetFlashing(INT_MAX);
 	pPolygon[1].SetFadeSpeed(0.01f);
 	pPolygon[1].SetPolygon();

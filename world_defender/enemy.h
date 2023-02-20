@@ -19,12 +19,14 @@
 class CPsychokinesis_Area;
 #endif // _DEBUG
 
+enum ENEMY_TYPE;
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
 class CEnemy : public CMovable_Obj
 {
 private:
+	
 	static const int INIT_LIFE = 1;
 	static const D3DXVECTOR3 INIT_POS;
 	static const float MOVE_INERTIA;
@@ -52,8 +54,12 @@ public:
 	//ジャンプ慣性のGet
 	virtual float GetJumpMoveInertia() override { return JUMP_INERTIA; }
 
+	void SetType(ENEMY_TYPE type) { m_Type = type; }
+	ENEMY_TYPE GetType() { return m_Type; }
+
 private:
 	float m_fMovingDistance;
+	ENEMY_TYPE m_Type;
 
 #ifdef _DEBUG
 	CPsychokinesis_Area* m_pPsychokinesis_Area;

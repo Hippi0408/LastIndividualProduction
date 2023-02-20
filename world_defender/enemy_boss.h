@@ -23,7 +23,7 @@ class CStatGauge;
 class CEnemy_Boss : public CEnemy
 {
 private:
-	static const int INIT_LIFE = 1000;
+	static const int INIT_LIFE = 2000;
 	static const int MOVE_VIBRATION = 5;
 	static const D3DXVECTOR3 INIT_POS;
 	static const float MOVE_INERTIA;

@@ -150,6 +150,9 @@ void CEnemy_Boss::Update()
 			//ゲームエンドフラグを立てる
 			pGame->GameEnd();
 
+			//タイムをマネージャーに更新確認＆保存
+			pGame->TimeHighScoreConfirmation();
+
 			//死亡モーションの再生
 			CMotionParts::MoveMotionModel(GetMotionNum(), 4, &GetPos(), &GetRot(), true);
 

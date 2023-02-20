@@ -28,7 +28,8 @@ CManager::CManager()
 	m_pInput = nullptr;
 	m_pRenderer = nullptr;
 	m_pFade = nullptr;
-	m_nScore = 0;
+	m_nScore = 120;
+	m_nScoreOld = 120;
 	m_nFadeCnt = 0;
 	m_nAirframe = 0;
 }
@@ -222,4 +223,14 @@ void CManager::NextMode(MODE_TYPE type,int nFadeCnt)
 	m_nFadeCnt = nFadeCnt;
 	m_bChange = true;
 	m_NextMode = type;
+}
+
+//*****************************************************************************
+// スコアの更新
+//*****************************************************************************
+void CManager::SetScore(int nScore)
+{
+	m_nScoreOld = m_nScore;
+
+	m_nScore = nScore;
 }

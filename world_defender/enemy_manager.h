@@ -55,7 +55,7 @@ private:
 	static const int INIT_POP_ENEMY_MUN = 20;
 	static const float INIT_POP_LOWEST_RANGE;
 	static const float INIT_POP_RANDOM_ADDITION_WIDTH;
-
+	static const int IMMOBILE_TIME = 300; 
 public:
 	CEnemy_Manager();
 	~CEnemy_Manager() override;
@@ -84,6 +84,7 @@ private:
 
 	int m_nEnemySmasllfish;
 	D3DXVECTOR3 m_Light;		//ƒ‰ƒCƒg‚ÌŒü‚«
+	int m_nImmobileTime;
 };
 
 #endif

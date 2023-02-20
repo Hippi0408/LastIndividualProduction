@@ -17,6 +17,7 @@
 #include "input.h"
 #include "object_type_list.h"
 #include "convenience_function.h"
+#include "enemy_manager.h"
 
 #ifdef _DEBUG
 #include "psychokinesis_area.h"
@@ -33,6 +34,7 @@ CEnemy::CEnemy()
 {
 	CMovable_Obj::SetLife(INIT_LIFE);
 	CMovable_Obj::SetRadius(INIT_RADIUS);
+	m_Type = ENEMY_00;
 }
 
 //*****************************************************************************

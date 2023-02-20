@@ -142,7 +142,7 @@ HRESULT CGame::Init()
 	m_pMesh_Cylinder->SetMesh_Cylinder(Mesh_Cylinder_Structure);
 
 	m_pTime = new CTime;
-	if (FAILED(m_pTime->Init(7200)))
+	if (FAILED(m_pTime->Init(TIME_MAX)))
 	{
 		return -1;
 	}
@@ -433,4 +433,16 @@ bool CGame::CheckVibration()
 		return m_pCamera->CheckVibration();
 	}
 	return false;
+}
+
+//*****************************************************************************
+// タイムのハイスコア確認
+//*****************************************************************************
+void CGame::TimeHighScoreConfirmation()
+{
+	int nScore = (int)(TIME_MAX - m_pTime->GetTime()) / 60;
+
+	CManager * pManager = GetManager();
+
+	pManager->SetScore(nScore);
 }

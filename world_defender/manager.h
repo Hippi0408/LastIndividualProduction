@@ -54,8 +54,12 @@ public:
 	void SetGemeObject(CObject *Object) {m_pGame = Object;}
 	void ChangeMode(MODE_TYPE type);
 	void NextMode(MODE_TYPE type, int nFadeCnt = 0);
-	void SetScore(int nScore) { m_nScore = nScore; }
+
+
+	int GetScoreOld() { return m_nScoreOld; }
+	void SetScore(int nScore);
 	int GetScore() { return m_nScore; }
+
 	bool IsChangingMode() { return m_bChange; }
 	int GetAirframe() { return m_nAirframe; }
 	void SetAirframe(int nAirframe) { m_nAirframe = nAirframe; }
@@ -68,6 +72,7 @@ private:
 	CObject *m_pGame;
 	CInput *m_pInput;
 	CFade *m_pFade;
+	int m_nScoreOld;
 	int m_nScore;
 	int m_nFadeCnt;
 	int m_nAirframe;

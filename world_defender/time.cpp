@@ -221,3 +221,8 @@ bool CTime::CheckTime(int nTime)
 {
 	return m_pTimeGauge->ValueCheck(nTime);
 }
+
+int CTime::GetTime()
+{
+	return m_pTimeGauge->GetValue();
+}

@@ -27,6 +27,7 @@ const float CEnemy_Manager::INIT_POP_RANDOM_ADDITION_WIDTH = 1000.0f;
 //*****************************************************************************
 CEnemy_Manager::CEnemy_Manager()
 {
+	m_nImmobileTime = 0;
 }
 
 //*****************************************************************************
@@ -82,6 +83,11 @@ void CEnemy_Manager::Uninit()
 //*****************************************************************************
 void CEnemy_Manager::Update()
 {
+	if (m_nImmobileTime < IMMOBILE_TIME)
+	{
+		m_nImmobileTime++;
+	}
+
 	//イテレーターループ
 	for (auto itr = m_EnemyList.begin(); itr != m_EnemyList.end();)
 	{
@@ -96,6 +102,18 @@ void CEnemy_Manager::Update()
 
 			//以下の処理を無視する
 			continue;
+		}
+
+		if (m_nImmobileTime < IMMOBILE_TIME)
+		{
+			if (pEnemy->GetType() == ENEMY_01)
+			{
+				//イテレーターを進める
+				itr++;
+
+				//以下の処理を無視する
+				continue;
+			}
 		}
 
 		//エネミーの更新処理
@@ -198,6 +216,8 @@ void CEnemy_Manager::CreateEnemy(EnemyInitData enemyinitdata)
 
 	//リストにエネミー情報を追加
 	m_EnemyList.push_back(pEnemy);
+
+	pEnemy->SetType(enemyinitdata.type);
 
 	pEnemy->Update();
 }

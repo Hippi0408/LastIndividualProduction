@@ -32,7 +32,7 @@ class CUfo;
 class CGame : public CObject
 {
 private:
-	
+	static const int TIME_MAX = 7200;
 public:
 	CGame();
 	~CGame() override;
@@ -56,6 +56,9 @@ public:
 	bool CheckVibration();
 
 	void GameEnd() { m_bGameEnd = true; }
+
+	void TimeHighScoreConfirmation();
+
 private:
 	CCamera* m_pCameraRound;
 	CCamera* m_pCamera;
