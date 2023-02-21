@@ -186,6 +186,7 @@
     <ClCompile Include="mesh_cylinder.cpp" />
     <ClCompile Include="motion_parts.cpp" />
     <ClCompile Include="movable_obj.cpp" />
+    <ClCompile Include="number.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="psychokinesis.cpp" />
@@ -240,6 +241,7 @@
     <ClInclude Include="mesh_cylinder.h" />
     <ClInclude Include="motion_parts.h" />
     <ClInclude Include="movable_obj.h" />
+    <ClInclude Include="number.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="object_type_list.h" />
     <ClInclude Include="player.h" />

@@ -17,16 +17,19 @@
 //*****************************************************************************
 class CCamera;
 class CLight;
-class C3DPolygon;
+class C2DPolygon;
 class CMeshfield;
 class CBallast_Manager;
 class CMesh_Cylinder;
+class CNumber;
 
 //*****************************************************************************
 // ƒNƒ‰ƒX’è‹`
 //*****************************************************************************
 class CResult : public CObject
 {
+private:
+	static const float SCORE_SIZE;
 public:
 	CResult();
 	~CResult() override;
@@ -43,6 +46,15 @@ private:
 	CBallast_Manager* m_pBallastManager;
 	CMesh_Cylinder* m_pMesh_Cylinder;
 	D3DXVECTOR3 m_LightVec;
+
+	CNumber* m_pNewScore;
+	CNumber* m_pOldScore;
+
+	C2DPolygon* m_pNew;
+	C2DPolygon* m_pOld;
+
+	C2DPolygon* m_pRankingName;
+
 };
 
 #endif

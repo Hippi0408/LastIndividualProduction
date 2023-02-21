@@ -147,12 +147,6 @@ HRESULT CGame::Init()
 		return -1;
 	}
 
-	//入力デバイスの取得
-	CInput *pInput = CInput::GetKey();
-
-	//画面内のカーソルを消す
-	pInput->SetCursorErase(true);
-
 	//アイテム初期化
 	if (FAILED(CAdrenalineItem::AllInit()))
 	{
@@ -321,19 +315,20 @@ void CGame::Update()
 
 	CMotionParts::ALLUpdate();
 
-	if (pInput->Trigger(KEY_DECISION))
-	{
-		m_bGameEnd = true;
-		//画面内のカーソルの復活
-		pInput->SetCursorErase(false);
-		CManager * pManager = GetManager();
-		pManager->NextMode(TYPE_RESULT);
-	}
+	//if (pInput->Trigger(KEY_DECISION))
+	//{
+	//	m_bGameEnd = true;
+	//	//画面内のカーソルの復活
+	//	pInput->SetCursorErase(false);
+	//	CManager * pManager = GetManager();
+	//	pManager->NextMode(TYPE_RESULT);
+	//}
 
 	if (m_pTime->CheckTime())
 	{
 		m_bGameEnd = true;
 		CManager * pManager = GetManager();
+		pManager->SetScore(999);
 		pManager->NextMode(TYPE_RESULT);
 	}
 }

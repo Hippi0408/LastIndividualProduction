@@ -57,6 +57,7 @@ public:
 
 
 	int GetScoreOld() { return m_nScoreOld; }
+	void SetScoreOld(int nScore) { m_nScoreOld = nScore; }
 	void SetScore(int nScore);
 	int GetScore() { return m_nScore; }
 

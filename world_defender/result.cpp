@@ -12,7 +12,6 @@
 #include "result.h"
 #include "input.h"
 #include "texture.h"
-#include "ui.h"
 #include "sound.h"
 #include <assert.h>
 #include "camera_round.h"
@@ -20,7 +19,10 @@
 #include "ballast_manager.h"
 #include "read.h"
 #include "mesh_cylinder.h"
+#include "number.h"
+#include "2dpolygon.h"
 
+const float CResult::SCORE_SIZE = 250.0f;
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
@@ -92,6 +94,99 @@ HRESULT CResult::Init()
 
 	m_pMesh_Cylinder->SetMesh_Cylinder(Mesh_Cylinder_Structure);
 
+
+	CManager* pManager = GetManager();
+
+	int nNewScore = pManager->GetScore();
+	int nOldScore = pManager->GetScoreOld();
+
+	if (nNewScore < nOldScore)
+	{
+		pManager->SetScoreOld(nNewScore);
+	}
+
+
+	m_pNewScore = new CNumber;
+
+	if (FAILED(m_pNewScore->Init()))
+	{
+		return -1;
+	}
+
+	m_pNewScore->SetNumber(D3DXVECTOR3(700.0f, 700.0f, 0.0f), 3, SCORE_SIZE, nNewScore);
+
+	m_pOldScore = new CNumber;
+
+	if (FAILED(m_pOldScore->Init()))
+	{
+		return -1;
+	}
+
+	m_pOldScore->SetNumber(D3DXVECTOR3(700.0f, 400.0f, 0.0f), 3, SCORE_SIZE, nOldScore);
+
+
+	m_pOld = new C2DPolygon;
+
+	if (FAILED(m_pOld->Init()))
+	{
+		return -1;
+	}
+
+	int nIndex = CTexture::LoadTexture("data/TEXTURE/今までの記録.png");
+	m_pOld->SetTextIndex(nIndex);
+	m_pOld->SetPos(D3DXVECTOR3(200.0f, 400.0f, 0.0f));
+	m_pOld->SetDiagonalLine(200.0f, 200.0f);
+	m_pOld->SetPolygon();
+
+	if (nNewScore > 900)
+	{
+		m_pNew = new C2DPolygon;
+
+		if (FAILED(m_pNew->Init()))
+		{
+			return -1;
+		}
+
+		nIndex = CTexture::LoadTexture("data/TEXTURE/タイムオーバー.png");
+		m_pNew->SetTextIndex(nIndex);
+		m_pNew->SetPos(D3DXVECTOR3(200.0f, 700.0f, 0.0f));
+		m_pNew->SetDiagonalLine(200.0f, 200.0f);
+		m_pNew->SetPolygon();
+	}
+	else if (nNewScore < nOldScore)
+	{
+		m_pNew = new C2DPolygon;
+
+		if (FAILED(m_pNew->Init()))
+		{
+			return -1;
+		}
+
+		nIndex = CTexture::LoadTexture("data/TEXTURE/記録更新.png");
+		m_pNew->SetTextIndex(nIndex);
+		m_pNew->SetPos(D3DXVECTOR3(200.0f, 700.0f, 0.0f));
+		m_pNew->SetDiagonalLine(200.0f, 200.0f);
+		m_pNew->SetFlashing(INT_MAX);
+		m_pNew->SetFadeSpeed(0.01f);
+		m_pNew->SetPolygon();
+	}
+
+
+	m_pRankingName = new C2DPolygon;
+
+	if (FAILED(m_pRankingName->Init()))
+	{
+		return -1;
+	}
+
+	nIndex = CTexture::LoadTexture("data/TEXTURE/倒すまでにかかった秒数.png");
+	m_pRankingName->SetTextIndex(nIndex);
+	m_pRankingName->SetPos(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 200.0f, 0.0f));
+	m_pRankingName->SetDiagonalLine(500.0f, 500.0f);
+	m_pRankingName->SetPolygon();
+
+
+
 	return S_OK;
 }
 
@@ -142,7 +237,42 @@ void CResult::Uninit()
 		m_pMesh_Cylinder = nullptr;
 	}
 
-	C3DObject::UninitAllModel();
+	if (m_pNewScore != nullptr)
+	{
+		m_pNewScore->Uninit();
+		delete m_pNewScore;
+		m_pNewScore = nullptr;
+	}
+
+	if (m_pOldScore != nullptr)
+	{
+		m_pOldScore->Uninit();
+		delete m_pOldScore;
+		m_pOldScore = nullptr;
+	}
+
+	if (m_pNew != nullptr)
+	{
+		m_pNew->Uninit();
+		delete m_pNew;
+		m_pNew = nullptr;
+	}
+
+	if (m_pOld != nullptr)
+	{
+		m_pOld->Uninit();
+		delete m_pOld;
+		m_pOld = nullptr;
+	}
+
+	if (m_pRankingName != nullptr)
+	{
+		m_pRankingName->Uninit();
+		delete m_pRankingName;
+		m_pRankingName = nullptr;
+	}
+
+	C3DObject::UninitAllModel(); 
 }
 
 //*****************************************************************************
@@ -153,6 +283,16 @@ void CResult::Update()
 	m_pCameraRound->Update();
 
 	m_pBallastManager->Update();
+
+	if (m_pOld != nullptr)
+	{
+		m_pOld->Update();
+	}
+
+	if (m_pNew != nullptr)
+	{
+		m_pNew->Update();
+	}
 
 	//GetInput
 	CInput *pInput = CInput::GetKey();
@@ -178,5 +318,21 @@ void CResult::Draw()
 	m_pMeshfieldBG->Draw();
 
 	m_pBallastManager->Draw();
+
+	m_pNewScore->Draw();
+
+	m_pOldScore->Draw();
+
+	if (m_pOld != nullptr)
+	{
+		m_pOld->Draw();
+	}
+
+	if (m_pNew != nullptr)
+	{
+		m_pNew->Draw();
+	}
+
+	m_pRankingName->Draw();
 
 }

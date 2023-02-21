@@ -263,21 +263,21 @@ D3DXVECTOR3 CInputMouse::GetMouseMove(void)
 //=============================================================================
 void CInputMouse::MouseCursorErase()
 {
-	//画面内時にカーソルを消すかどうか
-	if (!m_bCursorErase)
-	{
-		return;
-	}
+	////画面内時にカーソルを消すかどうか
+	//if (!m_bCursorErase)
+	//{
+	//	return;
+	//}
 
-	//カーソルの位置
-	D3DXVECTOR3 pos = GetMouseCursor();
+	////カーソルの位置
+	//D3DXVECTOR3 pos = GetMouseCursor();
 
-	//画面内
-	if (pos.x > 0.0f && pos.x < m_fWidthWnd && pos.y > 0.0f && pos.y < m_fHeightWnd)
-	{
-		ShowCursor(false);
-	}
+	////画面内
+	//if (pos.x > 0.0f && pos.x < m_fWidthWnd && pos.y > 0.0f && pos.y < m_fHeightWnd)
+	//{
+	//	ShowCursor(m_bCursorErase);
+	//}
 
 	//画面外
-	ShowCursor(true);
+	ShowCursor(m_bCursorErase);
 }

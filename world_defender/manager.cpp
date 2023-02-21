@@ -230,7 +230,5 @@ void CManager::NextMode(MODE_TYPE type,int nFadeCnt)
 //*****************************************************************************
 void CManager::SetScore(int nScore)
 {
-	m_nScoreOld = m_nScore;
-
 	m_nScore = nScore;
 }

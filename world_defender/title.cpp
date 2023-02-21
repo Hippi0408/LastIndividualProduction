@@ -162,6 +162,11 @@ HRESULT CTitle::Init()
 
 	m_pMesh_Cylinder->SetMesh_Cylinder(Mesh_Cylinder_Structure);
 
+	//入力デバイスの取得
+	CInput *pInput = CInput::GetKey();
+
+	//画面内のカーソルを消す
+	pInput->SetCursorErase(false);
 
 	return S_OK;
 }
