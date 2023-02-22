@@ -759,8 +759,6 @@ void C3DObject::SetColor(D3DXCOLOR colorMax, D3DXCOLOR colorMin, float fAttenuat
 	m_ColorMin = colorMin;
 	m_fAttenuationColor = fAttenuation;
 	m_ColorChange = colorMax - colorMin;
-
-
 }
 
 //*****************************************************************************

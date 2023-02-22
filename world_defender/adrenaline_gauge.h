@@ -30,7 +30,7 @@ private:
 	static const float INIT_WIDTH;
 	static const int MAX_GAUGE = 100;
 	static const int AUTOMATIC_DECREASE = 1;
-	static const int COUNTER_MAX = 30;
+	static const int COUNTER_MAX = 100;
 public:
 	CAdrenaline_Gauge();
 	~CAdrenaline_Gauge() override;
@@ -44,6 +44,8 @@ public:
 	void AddGauge(int nAdd);
 
 	float GetRateCalculation();
+
+	int GetGaugeValue() { return m_nGauge; }
 
 private:
 	CStatGauge* m_pAdrenaline_Gauge;

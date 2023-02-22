@@ -27,8 +27,10 @@ const float CPsychokinesis::BALLAST_MOVE = 0.01f;
 //*****************************************************************************
 CPsychokinesis::CPsychokinesis()
 {
+	m_nCurrentFloatingNumber = 0;
 	m_nCoolTime = 0;
 	m_fRadius = 0.0f;
+	m_nAdrenalineValue = 0;
 	m_PlPos = D3DXVECTOR3();
 	m_CameraVec = D3DXVECTOR3();
 }
@@ -103,8 +105,11 @@ void CPsychokinesis::Update()
 //*****************************************************************************
 // 更新処理(位置、向き、カメラのVec、半径更新、出現位置)
 //*****************************************************************************
-void CPsychokinesis::Update(int nPlMap, D3DXVECTOR3 pos, D3DXVECTOR3 rot,  D3DXVECTOR3 CameraVec, float fRadius, float fFloatingHeight)
+void CPsychokinesis::Update(int nPlMap, D3DXVECTOR3 pos, D3DXVECTOR3 rot,  D3DXVECTOR3 CameraVec, float fRadius, float fFloatingHeight, int nAdrenalineValue)
 {
+	//アドレナリンの値の保存
+	m_nAdrenalineValue = nAdrenalineValue;
+
 	//カメラのベクトル
 	m_CameraVec = CameraVec;
 
@@ -194,8 +199,7 @@ void CPsychokinesis::Update(int nPlMap, D3DXVECTOR3 pos, D3DXVECTOR3 rot,  D3DXV
 	//指定範囲の瓦礫の当たり判定
 	for (int nCnt = 0; nCnt < 9; nCnt++)
 	{
-
-		pBallast_Manager->WithinRangeColor(aMapGrid[nCnt], pos, fRadius);
+		pBallast_Manager->WithinRangeColor(aMapGrid[nCnt], pos, fRadius, m_nAdrenalineValue);
 	}
 }
 
@@ -278,6 +282,12 @@ void CPsychokinesis::SetFloating()
 //*****************************************************************************
 void CPsychokinesis::Psychokinesis()
 {
+	//浮遊可能数
+	if (m_nCurrentFloatingNumber > (int)m_nAdrenalineValue * 0.1f)
+	{
+		return;
+	}
+
 	//瓦礫のポインタ
 	CBallast* pBallast = nullptr;
 
@@ -320,16 +330,17 @@ void CPsychokinesis::Psychokinesis()
 		break;
 	}
 
-
-
 	//瓦礫マネージャーから対象の瓦礫ポインタの取得
-	pBallast = pBallast_Manager->CheckCircleCollision(m_PlPos, m_fRadius);
+	pBallast = pBallast_Manager->CheckCircleCollision(m_PlPos, m_fRadius, m_nAdrenalineValue);
 
 	//NULLチェック
 	if (pBallast == nullptr)
 	{
 		return;
 	}
+
+	//浮遊数の増加
+	m_nCurrentFloatingNumber++;
 
 	//一時保管場所
 	D3DXVECTOR3 Pos, DestPos, move;
@@ -432,6 +443,14 @@ void CPsychokinesis::PsychokinesisAttack()
 		//次のイテレーターの代入、現在のイテレーターを破棄
 		itr = m_BallastCopyList.erase(itr);
 
+		//浮遊数の減少
+		m_nCurrentFloatingNumber--;
+	}
+
+	//浮遊数の調整
+	if (m_nCurrentFloatingNumber < 0)
+	{
+		m_nCurrentFloatingNumber = 0;
 	}
 }
 

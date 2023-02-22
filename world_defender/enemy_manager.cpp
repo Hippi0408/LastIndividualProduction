@@ -19,7 +19,7 @@
 
 const float CEnemy_Manager::RADIUS_TYPE[] = { 40.0f ,30.0f ,20.0f ,10.0f ,0.0f };
 const int CEnemy_Manager::DAMAGE_TYPE[] = { 40 ,30 ,20 ,10 ,0 };
-const float CEnemy_Manager::INIT_POP_LOWEST_RANGE = 1000.0f;
+const float CEnemy_Manager::INIT_POP_LOWEST_RANGE = 1500.0f;
 const float CEnemy_Manager::INIT_POP_RANDOM_ADDITION_WIDTH = 1000.0f;
 
 //*****************************************************************************

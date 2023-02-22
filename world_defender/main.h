@@ -30,7 +30,7 @@ namespace
 	// ウインドウのクラス名
 	LPCTSTR CLASS_NAME = _T("AppClass");
 	// ウインドウのキャプション名
-	LPCTSTR WINDOW_NAME = _T("materialcode");
+	LPCTSTR WINDOW_NAME = _T("WorldDefencer");
 }
 
 // スクリーンの幅

@@ -67,6 +67,8 @@ public:
 	float GetRadius() { return m_fRadius; }
 	//半径の設定
 	void SetRadius();
+	//サイズポイントの取得
+	int GetSizePoint() { return m_nSizePoint; }
 
 	//当たり判定(まとめ)
 	D3DXVECTOR3 ConclusionCollision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, D3DXVECTOR3 max, D3DXVECTOR3 min);
@@ -80,6 +82,7 @@ private:
 	bool m_bUse;
 	bool m_bFloating;
 	float m_fRadius;
+	int m_nSizePoint;
 	
 };
 

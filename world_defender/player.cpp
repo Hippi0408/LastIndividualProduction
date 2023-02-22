@@ -258,16 +258,13 @@ void CPlayer::Update()
 	m_pPsychokinesis_Area->Update(pos);
 
 	//サイコキネシスの更新
-	m_pPsychokinesis->Update(m_nMapGrid, pos, GetRot(), m_CameraVec, m_pPsychokinesis_Area->GetRadius(), m_pPsychokinesis_Area->GetSizeTop());
+	m_pPsychokinesis->Update(m_nMapGrid, pos, GetRot(), m_CameraVec, m_pPsychokinesis_Area->GetRadius(), m_pPsychokinesis_Area->GetSizeTop(), m_pAdrenaline_Gauge->GetGaugeValue() + 20);
 
-	
-
-
-	if (pInput->Trigger(DIK_T))
+	/*if (pInput->Trigger(DIK_T))
 	{
 		m_pAdrenaline_Gauge->AddGauge(10);
 	}
-
+*/
 
 	
 	CMotionParts::AllSetShadowPos(D3DXVECTOR3(pos.x, 2.0f, pos.z), GetMotionNum());

@@ -37,6 +37,7 @@ CBallast::~CBallast()
 //*****************************************************************************
 HRESULT CBallast::Init()
 {
+	m_nSizePoint = 0;
 
 	//使用する
 	m_bUse = true;
@@ -94,7 +95,6 @@ void CBallast::Update()
 
 	//親クラスの更新
 	C3DObject::Update();
-
 }
 
 //*****************************************************************************
@@ -133,6 +133,16 @@ void CBallast::SetRadius()
 
 	//対角線から半径の生成
 	m_fRadius = fDiagonalLine / 2.0f;
+
+	//サイズポイントの計算
+	m_nSizePoint = (int)m_fRadius / 10.0f;
+
+	//サイズポイントの調整
+	if (m_nSizePoint > 100)
+	{
+		m_nSizePoint = 100;
+	}
+
 
 }
 

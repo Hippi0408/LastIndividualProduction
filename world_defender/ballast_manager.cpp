@@ -23,7 +23,7 @@
 
 const float CBallast_Manager::MAP_MAX = 15000.0f;
 const D3DXVECTOR3 CBallast_Manager::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-const float CBallast_Manager::BASE_RADIUS_PER_RUBBLE_ONE = 250.0f;
+const float CBallast_Manager::BASE_RADIUS_PER_RUBBLE_ONE = 300.0f;
 
 //*****************************************************************************
 // コンストラクタ
@@ -190,6 +190,8 @@ void CBallast_Manager::Draw()
 			{
 				//描画処理
 				pBallast->Draw();
+
+				//pBallast->SetWithinRangeColor(false);
 			}
 		}
 	}
@@ -256,7 +258,7 @@ void CBallast_Manager::MeshfieldSet(CMeshfield* pMeshfield)
 //*****************************************************************************
 //サイコキネシスエリアにあったらそのオブジェクトのポインタを返す
 //*****************************************************************************
-CBallast * CBallast_Manager::CheckCircleCollision(D3DXVECTOR3 pos, float fRadius)
+CBallast * CBallast_Manager::CheckCircleCollision(D3DXVECTOR3 pos, float fRadius, int nAdrenaline)
 {
 	//リストの更新
 	for (int nCnt = 0; nCnt < m_nMeshfieldNumMax; nCnt++)
@@ -286,6 +288,16 @@ CBallast * CBallast_Manager::CheckCircleCollision(D3DXVECTOR3 pos, float fRadius
 				continue;
 			}
 
+			//サイズポイントの取得
+			int nSizePoint = pBallast->GetSizePoint();
+			
+			//その物を浮かせれるかどうか
+			if (nSizePoint > nAdrenaline)
+			{
+				//処理を無視する
+				continue;
+			}
+
 			//サイコキネシスエリアにあるかどうか
 			if (CConvenience_Function::CircleCollision(pos,fRadius, pBallast->GetParentPos(), 0.0f))
 			{
@@ -301,7 +313,7 @@ CBallast * CBallast_Manager::CheckCircleCollision(D3DXVECTOR3 pos, float fRadius
 //*****************************************************************************
 //サイコキネシスエリアにあったらそのオブジェクトの色を変える
 //*****************************************************************************
-void CBallast_Manager::WithinRangeColor(int nMapGrid, D3DXVECTOR3 pos, float fRadius)
+void CBallast_Manager::WithinRangeColor(int nMapGrid, D3DXVECTOR3 pos, float fRadius, int nAdrenaline)
 {
 	if (nMapGrid < 0 || nMapGrid >= m_nBallastListDataMax)
 	{
@@ -330,11 +342,20 @@ void CBallast_Manager::WithinRangeColor(int nMapGrid, D3DXVECTOR3 pos, float fRa
 			continue;
 		}
 
-
 		//浮遊状態かどうか
 		if (pBallast->GetFloating())
 		{
+			continue;
+		}
+
+		//サイズポイントの取得
+		int nSizePoint = pBallast->GetSizePoint();
+
+		//その物を浮かせれるかどうか
+		if (nSizePoint > nAdrenaline)
+		{
 			pBallast->SetWithinRangeColor(false);
+			//処理を無視する
 			continue;
 		}
 
@@ -348,7 +369,6 @@ void CBallast_Manager::WithinRangeColor(int nMapGrid, D3DXVECTOR3 pos, float fRa
 		{
 			pBallast->SetWithinRangeColor(false);
 		}
-
 	}
 }
 
@@ -513,6 +533,8 @@ void CBallast_Manager::SetFloatingBallst(CBallast * pBallast)
 {
 	//リストに瓦礫情報を追加
 	m_FloatingBallstList.push_back(pBallast);
+
+	pBallast->SetWithinRangeColor(false);
 }
 
 //*****************************************************************************

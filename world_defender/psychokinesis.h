@@ -37,7 +37,7 @@ public:
 	HRESULT Init() override;
 	void Uninit() override;
 	void Update() override;
-	void Update(int nPlMap, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 CameraVec, float fRadius, float fFloatingHeight);
+	void Update(int nPlMap, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 CameraVec, float fRadius, float fFloatingHeight,int nAdrenalineValue);
 	void Draw() override;
 
 	void SetFloating();
@@ -54,8 +54,10 @@ private:
 	float m_fFloatingHeight;
 	float m_fRadius;
 	int m_nCoolTime;
+	int m_nAdrenalineValue;
 	D3DXVECTOR3 m_CameraVec;
 	D3DXVECTOR3 m_PositionWithPlayer;
+	int m_nCurrentFloatingNumber;
 	
 	std::list<CBallast*> m_BallastCopyList;//サイコキネシスで浮かせてる物体のリスト（コピーなので解放しない）
 	CBallast* m_pBallastCopy;			
