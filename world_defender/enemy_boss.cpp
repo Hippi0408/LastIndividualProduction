@@ -21,6 +21,7 @@
 #include "statgauge.h"
 #include "camera.h"
 #include "player.h"
+#include "sound.h"
 
 const D3DXVECTOR3 CEnemy_Boss::INIT_POS = D3DXVECTOR3(1000.0f, 0.0f, -0.0f);
 const float CEnemy_Boss::MOVE_INERTIA = 4.0f;
@@ -132,6 +133,9 @@ void CEnemy_Boss::Update()
 		//死亡チェック
 		if (m_pLife->ValueCheck())
 		{
+			//サウンド
+			PlaySound(SOUND_LABEL_SE_SHOUT);
+
 			//マネージャーの情報を取得
 			CManager * pManager = GetManager();
 
@@ -186,6 +190,8 @@ void CEnemy_Boss::Update()
 	//モーションの再生
 	if (pGame->CheckVibration() && !m_bAppearanceMotion)
 	{//登場シーン用
+		//サウンド
+		PlaySound(SOUND_LABEL_SE_SHOUT);
 		m_bAppearanceMotion = true;
 		CMotionParts::MoveMotionModel(GetMotionNum(), 3, &GetPos(), &GetRot());
 	}
@@ -328,4 +334,8 @@ void CEnemy_Boss::RandomMove()
 
 	//rot設定
 	SetRot(rot);
+}
+
+void CEnemy_Boss::KnockBack(D3DXVECTOR3 vec)
+{
 }

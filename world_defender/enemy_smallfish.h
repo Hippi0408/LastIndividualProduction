@@ -55,6 +55,8 @@ public:
 	//ƒWƒƒƒ“ƒvŠµ«‚ÌGet
 	float GetJumpMoveInertia() override { return JUMP_INERTIA; }
 
+	void KnockBack(D3DXVECTOR3 vec) override;
+
 private:
 	int m_nRandomMoveCnt;
 };

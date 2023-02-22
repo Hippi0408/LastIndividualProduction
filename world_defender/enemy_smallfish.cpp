@@ -325,3 +325,12 @@ void CEnemy_SmallFish::RandomMove()
 
 	SetMove(vec);
 }
+
+void CEnemy_SmallFish::KnockBack(D3DXVECTOR3 vec)
+{
+	//方向ベクトルにノックバック用移動量を掛ける
+	D3DXVECTOR3 KnockBack = vec * 200.0f;
+
+	//移動量の設定
+	SetMove(KnockBack);
+}

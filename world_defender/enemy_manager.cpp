@@ -366,6 +366,8 @@ bool CEnemy_Manager::PlayerCollision(D3DXVECTOR3 pos, float fRadius, D3DXVECTOR3
 			D3DXVec3Normalize(&vec, &vec);
 			*Add = vec;
 
+			pEnemy->KnockBack(vec * -1.0f);
+
 			//ˆ—‚ğ”²‚¯‚é
 			return true;
 		}

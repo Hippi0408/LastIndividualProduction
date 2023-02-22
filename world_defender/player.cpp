@@ -27,6 +27,7 @@
 #include "tps_camera.h"
 #include <assert.h>
 #include "adrenaline_item.h"
+#include "sound.h"
 
 const D3DXVECTOR3 CPlayer::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f); 
 const float CPlayer::PLAYER_GRAVITY = 2.0f;
@@ -179,7 +180,7 @@ void CPlayer::Update()
 	Collision();
 
 	//ダメージ中は動けない
-	if (!m_bHit)
+	if (m_nInvincibleTime < 60)
 	{
 		//移動の処理の更新
 		Move();
@@ -405,12 +406,10 @@ void CPlayer::Move()
 	//ジャンプ
 	if (pInput->Trigger(DIK_SPACE) && !m_bJump)
 	{
+		//サウンド
+		PlaySound(SOUND_LABEL_SE_JUMP);
 		m_bJump = true;
 		move.y += JUMP_POWER;
-	}
-	else if (m_bJump)
-	{
-		
 	}
 	
 
@@ -572,6 +571,8 @@ void CPlayer::Collision()
 	//取得していた場合
 	if (bGet)
 	{
+		//サウンド
+		PlaySound(SOUND_LABEL_SE_ADRENALINE);
 		m_pAdrenaline_Gauge->AddGauge(10);
 	}
 
@@ -597,6 +598,9 @@ void CPlayer::Collision()
 	//-------------------------------------------------------
 	//ノックバック
 	//-------------------------------------------------------
+
+	//サウンド
+	PlaySound(SOUND_LABEL_SE_PLAYER_DAMAGE);
 
 	//方向ベクトルにノックバック用移動量を掛ける
 	KnockBack *= KNOCK_BACK;
@@ -671,7 +675,7 @@ void CPlayer::Motion()
 	int nMotionNumUp = 0;
 	int nMotionNumDown = 0;
 
-	if (m_bHit)
+	if (m_nInvincibleTime > 60)
 	{
 		if (m_nInvincibleTime >= INVINCIBLE_TIME)
 		{

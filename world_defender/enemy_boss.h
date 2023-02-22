@@ -55,6 +55,8 @@ public:
 	//ƒWƒƒƒ“ƒvŠµ«‚ÌGet
 	float GetJumpMoveInertia() override { return JUMP_INERTIA; }
 
+	void KnockBack(D3DXVECTOR3 vec) override;
+
 private:
 	CStatGauge *m_pLife;
 	bool m_bAppearanceMotion;

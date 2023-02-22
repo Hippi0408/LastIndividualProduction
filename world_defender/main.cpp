@@ -76,7 +76,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
 
 	g_pManager = new CManager;
 
-	if (FAILED(g_pManager->Init(hInstance ,hWnd,TRUE)))
+	if (FAILED(g_pManager->Init(hInstance ,hWnd,FALSE)))
 	{
 		return E_FAIL;
 	}

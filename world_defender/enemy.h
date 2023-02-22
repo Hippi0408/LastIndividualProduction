@@ -57,6 +57,8 @@ public:
 	void SetType(ENEMY_TYPE type) { m_Type = type; }
 	ENEMY_TYPE GetType() { return m_Type; }
 
+	virtual void KnockBack(D3DXVECTOR3 vec);
+
 private:
 	float m_fMovingDistance;
 	ENEMY_TYPE m_Type;

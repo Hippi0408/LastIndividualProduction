@@ -44,6 +44,11 @@ SOUNDPARAM g_aParam[SOUND_LABEL_MAX] =
 	{ "data/SE/explosion.wav", 0 },		// 爆発音
 	{ "data/SE/enemydamage.wav", 0 },	// エネミーダメージ
 	{ "data/SE/playerdamage.wav", 0 },	// プレイヤーダメージ
+	{ "data/SE/adrenaline.wav", 0 },	// アドレナリン
+	{ "data/SE/jump.wav", 0 },			// ジャンプ
+	{ "data/SE/floating.wav", 0 },		// 浮遊
+	{ "data/SE/attack.wav", 0 },		// アタック
+	{ "data/SE/shout.wav", 0 },			// 叫び
 };
 
 //=============================================================================

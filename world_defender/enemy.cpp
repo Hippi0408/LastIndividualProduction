@@ -169,3 +169,7 @@ bool CEnemy::IsUnused()
 void CEnemy::SetMotionModel()
 {
 }
+
+void CEnemy::KnockBack(D3DXVECTOR3 vec)
+{
+}

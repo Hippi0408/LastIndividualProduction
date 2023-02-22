@@ -19,6 +19,7 @@
 #include "convenience_function.h"
 #include "meshfield.h"
 #include "tutorial.h"
+#include "sound.h"
 
 const float CPsychokinesis::BALLAST_MOVE = 0.01f;
 
@@ -339,6 +340,9 @@ void CPsychokinesis::Psychokinesis()
 		return;
 	}
 
+	//サウンド
+	PlaySound(SOUND_LABEL_SE_FLOATING);
+
 	//浮遊数の増加
 	m_nCurrentFloatingNumber++;
 
@@ -445,6 +449,9 @@ void CPsychokinesis::PsychokinesisAttack()
 
 		//浮遊数の減少
 		m_nCurrentFloatingNumber--;
+
+		//サウンド
+		PlaySound(SOUND_LABEL_SE_ATTACK);
 	}
 
 	//浮遊数の調整

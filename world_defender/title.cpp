@@ -264,6 +264,8 @@ void CTitle::Update()
 	
 	if (pInput->Trigger(KEY_RIGHT) && m_bPress)
 	{
+		//サウンド
+		PlaySound(SOUND_LABEL_SE_LEFT_RIGHT);
 		m_pGameStart->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 		m_pTutorial->SetColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
 		m_pGameStart->SetFlashing(0);
@@ -272,6 +274,8 @@ void CTitle::Update()
 	}
 	else if (pInput->Trigger(KEY_LEFT) && m_bPress)
 	{
+		//サウンド
+		PlaySound(SOUND_LABEL_SE_LEFT_RIGHT);
 		m_pGameStart->SetColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
 		m_pTutorial->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 		m_pTutorial->SetFlashing(0);
@@ -308,6 +312,8 @@ void CTitle::Update()
 	//EndTitle
 	if (pInput->Trigger(KEY_DECISION) && m_bPress)
 	{
+		//サウンド
+		PlaySound(SOUND_LABEL_SE_DETERMINATION);
 		CManager * pManager = GetManager();
 		switch (m_Mode)
 		{
@@ -325,6 +331,8 @@ void CTitle::Update()
 	}
 	else if (pInput->Trigger(KEY_DECISION) && !m_bPress)
 	{
+		//サウンド
+		PlaySound(SOUND_LABEL_SE_DETERMINATION);
 		m_bPress = true;
 	}
 }

@@ -27,7 +27,7 @@ class CPlayer : public CMovable_Obj
 {
 private:
 	static const int INIT_LIFE = 100;
-	static const int INVINCIBLE_TIME = 120;
+	static const int INVINCIBLE_TIME = 180;
 	static const int CHECK_RANGE_X = 3;
 	static const int CHECK_RANGE_Z = 3;
 	static const int CHECK_RANGE = CHECK_RANGE_X * CHECK_RANGE_Z;
