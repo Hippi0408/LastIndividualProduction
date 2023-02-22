@@ -38,6 +38,7 @@ public:
 
 private:
 	D3DXVECTOR3 m_Vec;
+	bool m_bFallenGroundOnce;
 };
 
 #endif

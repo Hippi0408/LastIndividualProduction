@@ -28,6 +28,7 @@ const float CBallast_Acquired::MOVE_MAGNIFICATION = 3.0f;
 CBallast_Acquired::CBallast_Acquired()
 {
 	m_Vec = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_bFallenGroundOnce = false;
 }
 
 //*****************************************************************************
@@ -45,8 +46,14 @@ void CBallast_Acquired::Update()
 	//親クラスの更新
 	CBallast::Update();
 
+	if (m_bFallenGroundOnce)
+	{
+		return;
+	}
+
 	if (GetParentPos().y < 0.0f)
 	{
+		m_bFallenGroundOnce = true;
 		SetPosMove(D3DXVECTOR3(0.0f,0.0f,0.0f));
 
 		D3DXVECTOR3 pos = GetParentPos();
