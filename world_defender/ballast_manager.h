@@ -30,6 +30,8 @@ class CBallast_Manager : public CObject
 private:
 	static const float MAP_MAX;
 	static const D3DXVECTOR3 INIT_POS;
+	static const float BASE_RADIUS_PER_RUBBLE_ONE;
+	static const int BALLAST_PATTERN = 5;
 public:
 	CBallast_Manager();
 	~CBallast_Manager() override;
@@ -65,7 +67,7 @@ public:
 	void SetFloatingBallst(CBallast* pBallast);
 
 	//後天的瓦礫の生成(引数は飛ばしたい方向ベクトル,あとは基本情報)
-	void SetBallastAcquired(D3DXVECTOR3 vec,D3DXVECTOR3 pos, D3DXVECTOR3 rot);
+	void SetBallastAcquired(D3DXVECTOR3 vec,D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fRadius);
 
 	//リスト内の入れ替え
 	void ReplacementList(CBallast* pBallast, int nNext);
@@ -84,7 +86,7 @@ private:
 	int m_nPlListNumber;
 	CMeshfield *m_pMeshfieldCopy;								//メッシュフィールドポインタのコピー（このコピーは解放をしない）
 	int m_nMeshfieldNumMax;										//メッシュのマスの数の最大
-	int m_nBallast_Acquired_Model;
+	int m_nBallast_Acquired_Model[BALLAST_PATTERN];
 	D3DXVECTOR3 m_Light;		//ライトの向き
 };
 

@@ -23,6 +23,8 @@
 
 const float CBallast_Manager::MAP_MAX = 15000.0f;
 const D3DXVECTOR3 CBallast_Manager::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+const float CBallast_Manager::BASE_RADIUS_PER_RUBBLE_ONE = 250.0f;
+
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
@@ -52,7 +54,11 @@ HRESULT CBallast_Manager::Init()
 	m_pMeshfieldCopy = nullptr;
 
 	CRead Read;
-	m_nBallast_Acquired_Model = Read.ReadXFile("data/MODEL/岩.x");
+	m_nBallast_Acquired_Model[0] = Read.ReadXFile("data/MODEL/瓦礫01.x");
+	m_nBallast_Acquired_Model[1] = Read.ReadXFile("data/MODEL/瓦礫02.x");
+	m_nBallast_Acquired_Model[2] = Read.ReadXFile("data/MODEL/瓦礫03.x");
+	m_nBallast_Acquired_Model[3] = Read.ReadXFile("data/MODEL/瓦礫04.x");
+	m_nBallast_Acquired_Model[4] = Read.ReadXFile("data/MODEL/瓦礫05.x");
 
 	return S_OK;
 }
@@ -488,7 +494,7 @@ void CBallast_Manager::CollisionEnemy()
 
 		D3DXVec3Normalize(&vec, &vec);
 
-		SetBallastAcquired(vec, pBallast->GetParentPos() + pBallast->GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+		SetBallastAcquired(vec, pBallast->GetParentPos() + pBallast->GetPos(), D3DXVECTOR3(0.0f, 0.0f, 0.0f), pBallast->GetRadius());
 
 		//瓦礫の使用状態を変更
 		pBallast->SetUse(false);
@@ -512,62 +518,71 @@ void CBallast_Manager::SetFloatingBallst(CBallast * pBallast)
 //*****************************************************************************
 //後天的瓦礫の生成(引数は飛ばしたい方向ベクトル,あとは基本情報)
 //*****************************************************************************
-void CBallast_Manager::SetBallastAcquired(D3DXVECTOR3 vec, D3DXVECTOR3 pos, D3DXVECTOR3 rot)
+void CBallast_Manager::SetBallastAcquired(D3DXVECTOR3 vec, D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fRadius)
 {
-	//マップチップの位置
-	int nNumber = 0;
-
-	//吹っ飛ぶ方向
-	D3DXVECTOR3 Vec = vec;
-
-	//後天的瓦礫クラスの生成
-	CBallast_Acquired* pBallastAcquired = new CBallast_Acquired;
-
-	//初期化
-	if (FAILED(pBallastAcquired->Init()))
-	{
-		assert(false);
-	}
-	
-	//マップチップの位置確認
-	nNumber = m_pMeshfieldCopy->CheckPosLocation(pos);
-
-	if (nNumber < 0 || nNumber >= m_nBallastListDataMax)
+	if (BASE_RADIUS_PER_RUBBLE_ONE > fRadius)
 	{
 		return;
 	}
 
-	//メッシュ内の位置（番号）
-	pBallastAcquired->SetListNumber(nNumber);
+	int nBallastNum = (int)fRadius / BASE_RADIUS_PER_RUBBLE_ONE;
 
-	//使用するモデル番号、瓦礫の位置、瓦礫の向き
-	pBallastAcquired->Set3DObject(m_nBallast_Acquired_Model, D3DXVECTOR3(0.0f,0.0f,0.0f), rot);
+	for (int nCnt = 0; nCnt < nBallastNum; nCnt++)
+	{
+		//マップチップの位置
+		int nNumber = 0;
 
-	pBallastAcquired->SetParentPos(pos);
+		//吹っ飛ぶ方向
+		D3DXVECTOR3 Vec = vec;
 
-	//吹っ飛ぶ方向(乱数を含める)
-	Vec.x += (float)(rand() % 10 - 5);
-	Vec.y += (float)(rand() % 10 - 5);
-	Vec.z += (float)(rand() % 10 - 5);
+		//後天的瓦礫クラスの生成
+		CBallast_Acquired* pBallastAcquired = new CBallast_Acquired;
 
-	//ノーマライズ
-	D3DXVec3Normalize(&Vec,&Vec);
+		//初期化
+		if (FAILED(pBallastAcquired->Init()))
+		{
+			assert(false);
+		}
 
-	//吹っ飛ぶ方向の設定
-	pBallastAcquired->SetVec(Vec);                                                                                                                      
+		//マップチップの位置確認
+		nNumber = m_pMeshfieldCopy->CheckPosLocation(pos);
 
-	//法線設定
-	pBallastAcquired->SetNormal();
+		if (nNumber < 0 || nNumber >= m_nBallastListDataMax)
+		{
+			return;
+		}
 
-	//半径設定
-	pBallastAcquired->SetRadius();
+		//メッシュ内の位置（番号）
+		pBallastAcquired->SetListNumber(nNumber);
 
-	//影の設定
-	pBallastAcquired->SetLightVec(m_Light);
+		//使用するモデル番号、瓦礫の位置、瓦礫の向き
+		pBallastAcquired->Set3DObject(m_nBallast_Acquired_Model[rand() % BALLAST_PATTERN], D3DXVECTOR3(0.0f, 0.0f, 0.0f), rot);
 
-	//リストに瓦礫情報を追加
-	m_pBallastListData[nNumber].push_back(pBallastAcquired);
+		pBallastAcquired->SetParentPos(pos);
 
+		//吹っ飛ぶ方向(乱数を含める)
+		Vec.x += (float)(rand() % 10 - 5);
+		Vec.y += (float)(rand() % 10 - 5);
+		Vec.z += (float)(rand() % 10 - 5);
+
+		//ノーマライズ
+		D3DXVec3Normalize(&Vec, &Vec);
+
+		//吹っ飛ぶ方向の設定
+		pBallastAcquired->SetVec(Vec);
+
+		//法線設定
+		pBallastAcquired->SetNormal();
+
+		//半径設定
+		pBallastAcquired->SetRadius();
+
+		//影の設定
+		pBallastAcquired->SetLightVec(m_Light);
+
+		//リストに瓦礫情報を追加
+		m_pBallastListData[nNumber].push_back(pBallastAcquired);
+	}
 }
 
 //*****************************************************************************
