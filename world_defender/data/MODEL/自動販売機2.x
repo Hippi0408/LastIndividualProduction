@@ -172,7 +172,7 @@ Mesh {
   0,
   0;;
   Material {
-   0.172800;0.370400;0.580000;1.000000;;
+   0.800000;0.800000;0.800000;1.000000;;
    5.000000;
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
@@ -183,7 +183,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Documents\\Visual Studio 2015\\Projects\\MapEditor\\data\\TEXTURE\\zihannki.jpg";
+    "C:\\Users\\student\\Documents\\Visual Studio 2015\\Projects\\MapEditor\\data\\TEXTURE\\zihannki_2.jpg";
    }
   }
  }
