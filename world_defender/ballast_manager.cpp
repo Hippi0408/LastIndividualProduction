@@ -23,7 +23,7 @@
 
 const float CBallast_Manager::MAP_MAX = 15000.0f;
 const D3DXVECTOR3 CBallast_Manager::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-const float CBallast_Manager::BASE_RADIUS_PER_RUBBLE_ONE = 300.0f;
+const float CBallast_Manager::BASE_RADIUS_PER_RUBBLE_ONE = 500.0f;
 
 //*****************************************************************************
 // コンストラクタ
@@ -190,8 +190,6 @@ void CBallast_Manager::Draw()
 			{
 				//描画処理
 				pBallast->Draw();
-
-				//pBallast->SetWithinRangeColor(false);
 			}
 		}
 	}

@@ -83,7 +83,6 @@ private:
 	CPsychokinesis* m_pPsychokinesis;
 	CAdrenaline_Gauge* m_pAdrenaline_Gauge;
 	int m_nMapGrid;//マップ上の位置
-	bool m_bJump;
 	bool m_bHit;//ダメージの有無
 	int m_nInvincibleTime;
 };

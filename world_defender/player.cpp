@@ -79,8 +79,6 @@ HRESULT CPlayer::Init()
 
 	m_DestRotLowerBody = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
-	m_bJump = false;
-
 	m_bHit = false;
 
 	m_nInvincibleTime = 0;
@@ -343,17 +341,12 @@ void CPlayer::Move()
 	D3DXVECTOR3 move = GetMove();
 
 	//Move倍率
-	float fMove = MOVE_NORMAL;
+	float fMove = MOVE_DASH;
 
 	if (pInput->Press(DIK_S))
 	{
 		fMove = MOVE_BACK;
 	}
-	else if (pInput->Press(DIK_LSHIFT))
-	{
-		fMove = MOVE_DASH;
-	}
-
 
 	//視点移動
 	if (pInput->Press(KEY_UP))
@@ -402,16 +395,6 @@ void CPlayer::Move()
 		move.x = sinf(rotY + D3DX_PI * 0.5f) * fMove;
 		move.z = cosf(rotY + D3DX_PI * 0.5f) * fMove;
 	}
-
-	//ジャンプ
-	if (pInput->Trigger(DIK_SPACE) && !m_bJump)
-	{
-		//サウンド
-		PlaySound(SOUND_LABEL_SE_JUMP);
-		m_bJump = true;
-		move.y += JUMP_POWER;
-	}
-	
 
 	//移動量を保管
 	SetMove(move);
@@ -486,29 +469,14 @@ void CPlayer::Collision()
 	// 床当たり判定
 	//-------------------------------------------------------
 
-	//床との当たり判定用変数
-	D3DXVECTOR3 groundpos;
+	////床との当たり判定用変数
+	//D3DXVECTOR3 groundpos;
 
-	//プレイヤーがいる床の高さ
-	groundpos = pMeshfield->Collision(pos);
+	////プレイヤーがいる床の高さ
+	//groundpos = pMeshfield->Collision(pos);
 
-	//プレイヤーがいる床の高さがプレイヤーより上だったら
-	if (pos.y <= groundpos.y)
-	{
-		m_bJump = false;
-		pos = D3DXVECTOR3(pos.x, groundpos.y, pos.z);
-		SetPos(pos);
-
-		D3DXVECTOR3 move = GetMove();
-		SetMove(D3DXVECTOR3(move.x, 0.0f, move.z));
-
-	}
-	else
-	{
-		D3DXVECTOR3 move = GetMove();
-		move.y -= PLAYER_GRAVITY;
-		SetMove(move);
-	}
+	////地面の高さに合わせる
+	//SetPos(groundpos);
 
 	//プレイヤーが既定の高さより下だったら
 	if (pos.y < -100.0f)
@@ -554,7 +522,6 @@ void CPlayer::Collision()
 
 		if (Add != GetPos())
 		{
-			m_bJump = false;
 			D3DXVECTOR3 move = GetMove();
 			SetMove(D3DXVECTOR3(move.x, 0.0f, move.z));
 			break;
@@ -684,12 +651,6 @@ void CPlayer::Motion()
 			nMotionNumDown = nMotionNumUp;
 		}
 	}
-	else if (m_bJump)
-	{
-		//ジャンプ中用のモーション番号
-		nMotionNumUp = 6;
-		nMotionNumDown = nMotionNumUp;
-	}
 	else if (pInput->Press(KEY_MOVE))
 	{//プレイヤーが動いていたら
 		if (pInput->Press(KEY_DOWN))
@@ -697,15 +658,10 @@ void CPlayer::Motion()
 			//後ろ歩き用のモーション番号
 			nMotionNumUp = 3;
 		}
-		else if (pInput->Press(DIK_LSHIFT))
+		else
 		{
 			//ダッシュ用のモーション番号
 			nMotionNumUp = 2;
-		}
-		else
-		{
-			//走る用のモーション番号
-			nMotionNumUp = 1;
 		}
 
 		nMotionNumDown = nMotionNumUp;

@@ -131,8 +131,8 @@ void CInputMouse::Update(void)
 		m_pDevMouse->Acquire();
 	}
 
-	// マウスが指定のスクリーン内にする場合カーソルを消す
-	MouseCursorErase();
+	//カーソルをオンオフ
+	ShowCursor(m_bCursorErase);
 }
 
 //=============================================================================
@@ -254,30 +254,4 @@ int CInputMouse::GetMouseWheel(void)
 D3DXVECTOR3 CInputMouse::GetMouseMove(void)
 {
 	return D3DXVECTOR3((float)(m_aKeyState.lX), (float)(m_aKeyState.lY), (float)(m_aKeyState.lZ));
-}
-
-
-//=============================================================================
-// マウスが指定のスクリーン内にする場合カーソルを消す
-// Author : 小綱啓仁
-//=============================================================================
-void CInputMouse::MouseCursorErase()
-{
-	////画面内時にカーソルを消すかどうか
-	//if (!m_bCursorErase)
-	//{
-	//	return;
-	//}
-
-	////カーソルの位置
-	//D3DXVECTOR3 pos = GetMouseCursor();
-
-	////画面内
-	//if (pos.x > 0.0f && pos.x < m_fWidthWnd && pos.y > 0.0f && pos.y < m_fHeightWnd)
-	//{
-	//	ShowCursor(m_bCursorErase);
-	//}
-
-	//画面外
-	ShowCursor(m_bCursorErase);
 }

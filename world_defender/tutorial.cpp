@@ -298,8 +298,6 @@ void CTutorial::Update()
 	if (pInput->Trigger(KEY_DECISION))
 	{
 		m_bGameEnd = true;
-		//‰æ–Ê“à‚ÌƒJ[ƒ\ƒ‹‚Ì•œŠˆ
-		pInput->SetCursorErase(false);
 		CManager * pManager = GetManager();
 		pManager->NextMode(TYPE_TITLE);
 	}
