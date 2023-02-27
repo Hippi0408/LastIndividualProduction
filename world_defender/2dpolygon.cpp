@@ -173,7 +173,8 @@ void C2DPolygon::Draw()
 	pD3DDevice->SetTexture(0, tex);
 
 	//ポリゴンの描画
-	pD3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,		//プリミティブの種類
+
+pD3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,		//プリミティブの種類
 		0,						//描画する最初の頂点インデックス
 		2);		//プリミティブ（ポリゴン）数
 }

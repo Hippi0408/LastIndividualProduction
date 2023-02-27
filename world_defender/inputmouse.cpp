@@ -28,7 +28,7 @@ CInputMouse::CInputMouse()
 
 	m_fHeightWnd = 0.0f;
 	m_fWidthWnd = 0.0f;
-	m_bCursorErase = false;
+	m_bCursorErase = true;
 }
 
 //=============================================================================

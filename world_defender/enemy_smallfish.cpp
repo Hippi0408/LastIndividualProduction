@@ -24,7 +24,7 @@
 #include "adrenaline_item.h"
 
 const D3DXVECTOR3 CEnemy_SmallFish::INIT_POS = D3DXVECTOR3(1000.0f, 0.0f, -0.0f);
-const float CEnemy_SmallFish::MOVE_INERTIA = 5.0f;
+const float CEnemy_SmallFish::MOVE_INERTIA = 2.5f;
 const float CEnemy_SmallFish::JUMP_INERTIA = 0.1f; 
 const float CEnemy_SmallFish::INIT_RADIUS = 100.0f;
 const float CEnemy_SmallFish::SEARCH_RANGE = 1500.0f;

@@ -27,11 +27,16 @@ public:
 	void Draw(const int nFps);
 	LPDIRECT3DDEVICE9 GetDeviceRenderer() { return m_pD3DDevice; }
 
+	void WindowChange();
+
 #ifdef _DEBUG
 	void DrawFPS(const int nFps);
 #endif // _DEBUG
 private:
-
+	//ウインドウの状態(true = 非フルスクリーン、false = フルスクリーン)
+	bool m_bWindow;
+	//ウインドウハンドル
+	HWND m_pWindowHandle;
 	// Direct3Dオブジェクト
 	LPDIRECT3D9 m_pD3D = nullptr;
 	// Deviceオブジェクト

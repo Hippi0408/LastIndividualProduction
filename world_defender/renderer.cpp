@@ -15,7 +15,8 @@
 #include <cstdio>
 #include "game.h"
 #include "player.h"
-
+#include <assert.h>
+#include "input.h"
 
 //*****************************************************************************
 // グローバル変数宣言
@@ -49,14 +50,14 @@ HRESULT CRenderer::Init(HWND hWnd, bool bWindow)
 	d3dpp.BackBufferHeight = SCREEN_HEIGHT;				// ゲーム画面サイズ(高さ)
 	d3dpp.BackBufferFormat = d3ddm.Format;				// カラーモードの指定
 	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;		// 映像信号に同期してフリップする
-	d3dpp.EnableAutoDepthStencil = TRUE;						// デプスバッファ（Ｚバッファ）とステンシルバッファを作成
-	d3dpp.AutoDepthStencilFormat = D3DFMT_D16;					// デプスバッファとして16bitを使う
-	d3dpp.Windowed = bWindow;						// ウィンドウモード
+	d3dpp.EnableAutoDepthStencil = bWindow;			// デプスバッファ（Ｚバッファ）とステンシルバッファを作成
+	d3dpp.AutoDepthStencilFormat = D3DFMT_D16;		// デプスバッファとして16bitを使う
+	d3dpp.Windowed = true;						// ウィンドウモード
 	d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;		// リフレッシュレート
 	d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;	// インターバル
 
-																// ディスプレイアダプタを表すためのデバイスを作成
-																// 描画と頂点処理をハードウェアで行なう
+	// ディスプレイアダプタを表すためのデバイスを作成
+	// 描画と頂点処理をハードウェアで行なう
 	if ((FAILED(m_pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING, &d3dpp, &m_pD3DDevice))) &&
 		// 上記の設定が失敗したら
 		// 描画をハードウェアで行い、頂点処理はCPUで行なう
@@ -89,6 +90,11 @@ HRESULT CRenderer::Init(HWND hWnd, bool bWindow)
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);
 
+	//ウィンドウハンドルの保存
+	m_pWindowHandle = hWnd;
+
+	//ウインドウの状態を保存
+	m_bWindow = bWindow;
 
 #ifdef _DEBUG
 	// デバッグ情報表示用フォントの生成
@@ -168,7 +174,47 @@ void CRenderer::Draw(const int nFps)
 	}
 
 	// バックバッファとフロントバッファの入れ替え
-	m_pD3DDevice->Present(NULL, NULL, NULL, NULL);
+	if (m_pD3DDevice->Present(NULL, NULL, NULL, NULL) == D3DERR_DEVICELOST)
+	{
+		// ロスト検知！
+		int n = 0;
+	}
+
+	//inputの取得
+	CInput* pInput = CInput::GetKey();
+
+	//ウインドウの変更
+	if (pInput->Trigger(DIK_F9))
+	{
+		WindowChange();
+	}
+}
+
+//=============================================================================
+// ウインドウの変更
+//=============================================================================
+void CRenderer::WindowChange()
+{
+	//ウインドウの状態の保存
+	m_bWindow = !m_bWindow;
+
+	// デバイスをリセットする前にウィンドウのスタイルを変更する
+	if (m_bWindow)
+	{
+		RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+		// 指定したクライアント領域を確保するために必要なウィンドウ座標を計算
+		AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
+		SetWindowPos(m_pWindowHandle, HWND_TOP, 0, 0, (rect.right - rect.left), (rect.bottom - rect.top), SWP_SHOWWINDOW);
+		SetWindowLong(m_pWindowHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE);
+	}
+	else
+	{
+		SetWindowPos(m_pWindowHandle, HWND_TOP, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), SWP_SHOWWINDOW);
+		SetWindowLong(m_pWindowHandle, GWL_STYLE, WS_POPUP | WS_VISIBLE);
+	}
+
+	
+
 }
 
 #ifdef _DEBUG
@@ -192,6 +238,7 @@ void CRenderer::DrawFPS(const int nFps)
 //*****************************************************************************
 CRenderer::CRenderer()
 {
+	m_pWindowHandle = nullptr;
 }
 
 //*****************************************************************************
