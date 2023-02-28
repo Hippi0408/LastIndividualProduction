@@ -103,7 +103,7 @@ HRESULT CTutorial::Init()
 
 	CRead cRead;
 	//BG3D
-	m_pMeshfieldBG = cRead.ReadMap("data/MAPTXT/map.txt", m_pBallastManager);
+	m_pMeshfieldBG = cRead.ReadMap("data/MAPTXT/maptutorial.txt", m_pBallastManager);
 
 	m_pMesh_Cylinder = new CMesh_Cylinder;
 	if (FAILED(m_pMesh_Cylinder->Init()))
@@ -124,12 +124,6 @@ HRESULT CTutorial::Init()
 
 	m_pMesh_Cylinder->SetMesh_Cylinder(Mesh_Cylinder_Structure);
 
-	//入力デバイスの取得
-	CInput *pInput = CInput::GetKey();
-
-	//画面内のカーソルを消す
-	pInput->SetCursorErase(true);
-
 	//アイテム初期化
 	if (FAILED(CAdrenalineItem::AllInit()))
 	{
@@ -137,24 +131,6 @@ HRESULT CTutorial::Init()
 	}
 
 	CAdrenalineItem::AllSetLightVec(m_LightVec);
-
-	//UFOの生成
-	m_pUfo = new CUfo;
-
-	//UFOの初期化
-	if (FAILED(m_pUfo->Init()))
-	{
-		return -1;
-	}
-
-	//影の設定
-	m_pUfo->SetLightVec(m_LightVec);
-
-	//細かい設定
-	m_pUfo->Set3DObject(cRead.ReadXFile("data/MODEL/UFO.x"), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-
-	//初期エネミー生成
-	m_pEnmeyManager->InitPopEnemy();
 
 	//UI
 	m_pUi = new C2DPolygon;
@@ -236,13 +212,6 @@ void CTutorial::Uninit()
 		m_pMesh_Cylinder = nullptr;
 	}
 
-	if (m_pUfo != nullptr)
-	{
-		m_pUfo->Uninit();
-		delete m_pUfo;
-		m_pUfo = nullptr;
-	}
-
 	if (m_pUi != nullptr)
 	{
 		m_pUi->Uninit();
@@ -287,8 +256,6 @@ void CTutorial::Update()
 
 	m_pBallastManager->Update();
 
-	m_pUfo->Update();
-
 	CInput *pInput = CInput::GetKey();
 
 	CMotionParts::ALLUpdate();
@@ -320,8 +287,6 @@ void CTutorial::Draw()
 	m_pBallastManager->Draw();
 
 	m_pEnmeyManager->Draw();
-
-	m_pUfo->Draw();
 
 	CAdrenalineItem::AllDraw();
 

@@ -309,3 +309,42 @@ D3DXVECTOR3 CBallast::ConclusionCollision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, D
 	//押し出す値を返す
 	return D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 }
+
+//*****************************************************************************
+//カメラ描画の有無
+//*****************************************************************************
+bool CBallast::IsExistingDuring2Point(D3DXVECTOR3 posR, D3DXVECTOR3 posV)
+{
+	//マトリックス
+	D3DXMATRIX mat, invmat;
+
+	//マトリックスの取得
+	mat = GetMatrix();
+
+	//逆行列の計算
+	D3DXMatrixInverse(&invmat, NULL, &mat);
+
+	//変換
+	D3DXVec3TransformCoord(&posR, &posR, &invmat);
+	D3DXVec3TransformCoord(&posV, &posV, &invmat);
+
+	//メッシュ情報
+	LPD3DXMESH pMesh = GetMeshData();
+
+	//注視点から視点のベクトル
+	D3DXVECTOR3 Vec = posV - posR;
+
+	//長さを１にする
+	D3DXVec3Normalize(&Vec,&Vec);
+
+	//当たったかどうか
+	BOOL bHit = false;
+
+	//レイを飛ばしてメッシュと当たってるかどうか
+	if (FAILED(D3DXIntersect(pMesh, &posR, &Vec, &bHit,nullptr, nullptr, nullptr, nullptr, nullptr, nullptr)))
+	{
+		return false;
+	}
+
+	return bHit;
+}

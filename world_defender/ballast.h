@@ -72,6 +72,9 @@ public:
 
 	//“–‚½‚è”»’è(‚Ü‚Æ‚ß)
 	D3DXVECTOR3 ConclusionCollision(D3DXVECTOR3 pos, D3DXVECTOR3 oldpos, D3DXVECTOR3 max, D3DXVECTOR3 min);
+
+	//ƒJƒƒ‰•`‰æ‚Ì—L–³
+	bool IsExistingDuring2Point(D3DXVECTOR3 posR, D3DXVECTOR3 posV);
 	
 private:
 	D3DXVECTOR3 m_PositionWithPlayer;

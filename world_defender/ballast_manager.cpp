@@ -20,6 +20,7 @@
 #include "ballast_acquired.h"
 #include "sound.h"
 #include "tutorial.h"
+#include "tps_camera.h"
 
 const float CBallast_Manager::MAP_MAX = 15000.0f;
 const D3DXVECTOR3 CBallast_Manager::INIT_POS = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -176,6 +177,59 @@ void CBallast_Manager::Update()
 //*****************************************************************************
 void CBallast_Manager::Draw()
 {
+
+	//マネージャーからプレイヤーの情報の取得
+	CManager* pManager = GetManager();
+
+	//カメラのポインター
+	CTpsCamera* pTpsCamera = nullptr;
+
+	CTutorial* pTutorial = nullptr;
+	CGame* pGame = nullptr;
+
+	//注視点と視点
+	D3DXVECTOR3 posR, posV;
+
+	switch (pManager->GetCurrentMode())
+	{
+	case TYPE_TUTORIAL:
+
+		//チュートリアルの取得
+		pTutorial = (CTutorial*)pManager->GetGameObject();
+		//カメラの取得
+		pTpsCamera = (CTpsCamera*)pTutorial->GetCamera();
+
+		posR = pTpsCamera->GetPosR();
+		posV = pTpsCamera->GetPosV();
+		break;
+
+	case TYPE_GAME:
+
+		//ゲームの取得
+		pGame = (CGame*)pManager->GetGameObject();
+		//カメラの取得
+		pTpsCamera = (CTpsCamera*)pGame->GetCamera();
+
+		posR = pTpsCamera->GetPosR();
+		posV = pTpsCamera->GetPosV();
+		break;
+
+	case TYPE_TITLE:
+	case TYPE_RESULT:
+		posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		posV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		break;
+
+	default:
+		assert(false);
+		break;
+	}
+
+	
+
+	
+
+
 	//リストの更新
 	for (int nCnt = 0; nCnt < m_nMeshfieldNumMax; nCnt++)
 	{
@@ -188,6 +242,16 @@ void CBallast_Manager::Draw()
 			//瓦礫の描画
 			if (pBallast != nullptr)
 			{
+				if (pBallast->IsExistingDuring2Point(posR, posV))
+				{
+					pBallast->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.6f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.6f), 0.0f);
+					pBallast->SetWithinRangeColor(true);
+				}
+				else
+				{
+					pBallast->SetWithinRangeColor(false);
+				}
+
 				//描画処理
 				pBallast->Draw();
 			}
@@ -581,9 +645,9 @@ void CBallast_Manager::SetBallastAcquired(D3DXVECTOR3 vec, D3DXVECTOR3 pos, D3DX
 		pBallastAcquired->SetParentPos(pos);
 
 		//吹っ飛ぶ方向(乱数を含める)
-		Vec.x += (float)(rand() % 10 - 5);
-		Vec.y += (float)(rand() % 10 - 5);
-		Vec.z += (float)(rand() % 10 - 5);
+		Vec.x += (float)(rand() % 20 - 10);
+		Vec.y += (float)(rand() % 20 - 10);
+		Vec.z += (float)(rand() % 20 - 10);
 
 		//ノーマライズ
 		D3DXVec3Normalize(&Vec, &Vec);

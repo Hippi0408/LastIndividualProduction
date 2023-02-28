@@ -93,13 +93,13 @@ void CTpsCamera::Update()
 
 	m_Rot += rot;
 
-	if (m_Rot.x  > D3DXToRadian(30))
+	if (m_Rot.x  > D3DXToRadian(80))
 	{
-		m_Rot.x = D3DXToRadian(30);
+		m_Rot.x = D3DXToRadian(80);
 	}
-	else if (m_Rot.x  < D3DXToRadian(-30))
+	else if (m_Rot.x  < D3DXToRadian(-50))
 	{
-		m_Rot.x = D3DXToRadian(-30);
+		m_Rot.x = D3DXToRadian(-50);
 	}
 
 	rot = CConvenience_Function::NormalizationRot(m_Rot);
@@ -172,12 +172,23 @@ void CTpsCamera::Update()
 	//’Ž‹“_‚Ì•Û‘¶
 	SetPosR(posR);
 
+
+
+	if (posV.y < 10.0f)
+	{
+		float fPosR = 10.0f - posV.y;
+		AddPosR(D3DXVECTOR3(0.0f, fPosR, 0.0f));
+		posV.y = 10.0f;
+	}
+
+
 	m_DestPos = posV;
 
 	add = (m_DestPos - GetPosV()) * 1.0f;
 
 	//Ž‹“_‚Ì•Û‘¶
 	AddPosV(add);
+	
 }
 
 //*****************************************************************************
