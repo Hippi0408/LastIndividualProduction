@@ -23,7 +23,7 @@ class CPlayer;
 class CBallast_Manager;
 class CEnemy_Manager;
 class CMesh_Cylinder;
-class CUfo;
+class CAdrenalineItemTutorial;
 
 //*****************************************************************************
 // ƒNƒ‰ƒX’è‹`
@@ -31,7 +31,7 @@ class CUfo;
 class CTutorial : public CObject
 {
 private:
-
+	static const int ITEM_COOL_TIME = 100;
 public:
 	CTutorial();
 	~CTutorial() override;
@@ -56,10 +56,12 @@ private:
 	CEnemy_Manager* m_pEnmeyManager;
 	CBallast_Manager* m_pBallastManager;
 	CMesh_Cylinder* m_pMesh_Cylinder;
-	CUfo* m_pUfo;
 	C2DPolygon* m_pUi;
+	CAdrenalineItemTutorial* m_pAdrenalineItemTutorial;
 	D3DXVECTOR3 m_LightVec;
 	bool m_bGameEnd;
+
+	int m_nItemCoolTime;
 };
 
 #endif

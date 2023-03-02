@@ -225,10 +225,6 @@ void CBallast_Manager::Draw()
 		break;
 	}
 
-	
-
-	
-
 
 	//リストの更新
 	for (int nCnt = 0; nCnt < m_nMeshfieldNumMax; nCnt++)

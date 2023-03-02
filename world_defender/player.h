@@ -71,7 +71,7 @@ public:
 	//ƒvƒŒƒCƒ„[‚Ì‚¢‚é¡–Ú
 	int GetMpaGrid() { return m_nMapGrid; }
 
-	
+	void AddGauge();
 
 
 private:

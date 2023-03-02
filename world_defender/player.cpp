@@ -684,3 +684,8 @@ void CPlayer::Motion()
 	//ã”¼g‚Ìƒ‚[ƒVƒ‡ƒ“İ’è
 	CMotionParts::MoveMotionModel(m_nMotionNum1, nMotionNumDown);
 }
+
+void CPlayer::AddGauge()
+{
+	m_pAdrenaline_Gauge->AddGauge(10);
+}

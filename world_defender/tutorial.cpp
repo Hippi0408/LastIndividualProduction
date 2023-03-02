@@ -26,8 +26,8 @@
 #include "mesh_cylinder.h"
 #include "sound.h"
 #include "gauge.h"
+#include "adrenaline_item_tutorial.h"
 #include "adrenaline_item.h"
-#include "ufo.h"
 #include "2dpolygon.h"
 
 //*****************************************************************************
@@ -124,6 +124,21 @@ HRESULT CTutorial::Init()
 
 	m_pMesh_Cylinder->SetMesh_Cylinder(Mesh_Cylinder_Structure);
 
+
+	m_pAdrenalineItemTutorial = new CAdrenalineItemTutorial;
+	//アイテム初期化
+	if (FAILED(m_pAdrenalineItemTutorial->Init()))
+	{
+		return -1;
+	}
+
+	//細かい設定
+	m_pAdrenalineItemTutorial->Set3DObject(cRead.ReadXFile("data/MODEL/アドレナリン.x"), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+
+	m_pAdrenalineItemTutorial->SetParentPos(D3DXVECTOR3(0.0f, 0.0f, 400.0f));
+
+	m_pAdrenalineItemTutorial->SetLightVec(m_LightVec);
+
 	//アイテム初期化
 	if (FAILED(CAdrenalineItem::AllInit()))
 	{
@@ -198,6 +213,14 @@ void CTutorial::Uninit()
 		m_pPlayer = nullptr;
 	}
 
+	//アドレナリンアイテム
+	if (m_pAdrenalineItemTutorial != nullptr)
+	{
+		m_pAdrenalineItemTutorial->Uninit();
+		delete m_pAdrenalineItemTutorial;
+		m_pAdrenalineItemTutorial = nullptr;
+	}
+
 	if (m_pEnmeyManager != nullptr)
 	{
 		m_pEnmeyManager->Uninit();
@@ -218,7 +241,6 @@ void CTutorial::Uninit()
 		delete m_pUi;
 		m_pUi = nullptr;
 	}
-
 
 	CAdrenalineItem::AllUninit();
 
@@ -258,9 +280,54 @@ void CTutorial::Update()
 
 	CInput *pInput = CInput::GetKey();
 
+	CAdrenalineItem::AllUpdate();
+
 	CMotionParts::ALLUpdate();
 
-	CAdrenalineItem::AllUpdate();
+	//アドレナリンアイテムの更新
+	if (m_pAdrenalineItemTutorial != nullptr)
+	{
+		m_pAdrenalineItemTutorial->Update();
+
+		//当たり判定
+		if (m_pAdrenalineItemTutorial->PlayerCollision(m_pPlayer->GetPos()))
+		{
+			//サウンド
+			PlaySound(SOUND_LABEL_SE_ADRENALINE);
+			m_pPlayer->AddGauge();
+			m_pAdrenalineItemTutorial->Uninit();
+			delete m_pAdrenalineItemTutorial;
+			m_pAdrenalineItemTutorial = nullptr;
+		}
+	}
+	else
+	{//アドレナリンアイテムの自動生成
+
+		if (m_nItemCoolTime > ITEM_COOL_TIME)
+		{
+			m_pAdrenalineItemTutorial = new CAdrenalineItemTutorial;
+			//アイテム初期化
+			if (FAILED(m_pAdrenalineItemTutorial->Init()))
+			{
+				assert(false);
+			}
+			CRead cRead;
+			//細かい設定
+			m_pAdrenalineItemTutorial->Set3DObject(cRead.ReadXFile("data/MODEL/アドレナリン.x"), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+
+			m_pAdrenalineItemTutorial->SetParentPos(D3DXVECTOR3(0.0f, 0.0f, 400.0f));
+
+			m_pAdrenalineItemTutorial->SetLightVec(m_LightVec);
+
+			m_nItemCoolTime = 0;
+		}
+		else
+		{
+			m_nItemCoolTime++;
+		}
+	}
+
+	
 
 	if (pInput->Trigger(KEY_DECISION))
 	{
@@ -287,6 +354,12 @@ void CTutorial::Draw()
 	m_pBallastManager->Draw();
 
 	m_pEnmeyManager->Draw();
+
+	//アドレナリンアイテムの描画
+	if (m_pAdrenalineItemTutorial != nullptr)
+	{
+		m_pAdrenalineItemTutorial->Draw();
+	}
 
 	CAdrenalineItem::AllDraw();
 

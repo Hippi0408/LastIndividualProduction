@@ -173,7 +173,7 @@ void CEnemy_Manager::Draw()
 //*****************************************************************************
 // クリエイト処理
 //*****************************************************************************
-void CEnemy_Manager::CreateEnemy(EnemyInitData enemyinitdata)
+CEnemy* CEnemy_Manager::CreateEnemy(EnemyInitData enemyinitdata)
 {
 	//エネミークラスのポインタ変数
 	CEnemy* pEnemy = nullptr;
@@ -220,6 +220,8 @@ void CEnemy_Manager::CreateEnemy(EnemyInitData enemyinitdata)
 	pEnemy->SetType(enemyinitdata.type);
 
 	pEnemy->Update();
+
+	return pEnemy;
 }
 
 //*****************************************************************************

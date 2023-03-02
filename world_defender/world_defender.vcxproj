@@ -157,6 +157,7 @@
     <ClCompile Include="3dpolygon.cpp" />
     <ClCompile Include="adrenaline_gauge.cpp" />
     <ClCompile Include="adrenaline_item.cpp" />
+    <ClCompile Include="adrenaline_item_tutorial.cpp" />
     <ClCompile Include="ballast.cpp" />
     <ClCompile Include="ballast_acquired.cpp" />
     <ClCompile Include="ballast_manager.cpp" />
@@ -211,6 +212,7 @@
     <ClInclude Include="3dpolygon.h" />
     <ClInclude Include="adrenaline_gauge.h" />
     <ClInclude Include="adrenaline_item.h" />
+    <ClInclude Include="adrenaline_item_tutorial.h" />
     <ClInclude Include="ballast.h" />
     <ClInclude Include="ballast_acquired.h" />
     <ClInclude Include="ballast_manager.h" />

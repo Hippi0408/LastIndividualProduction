@@ -65,7 +65,7 @@ public:
 	void Update() override;
 	void Draw() override;
 
-	void CreateEnemy(EnemyInitData enemyinitdata);
+	CEnemy* CreateEnemy(EnemyInitData enemyinitdata);
 
 	void InitPopEnemy();
 
