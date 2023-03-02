@@ -24,6 +24,7 @@ class CBallast_Manager;
 class CEnemy_Manager;
 class CMesh_Cylinder;
 class CAdrenalineItemTutorial;
+class CEnemy_Tutorial;
 
 //*****************************************************************************
 // ƒNƒ‰ƒX’è‹`
@@ -32,6 +33,7 @@ class CTutorial : public CObject
 {
 private:
 	static const int ITEM_COOL_TIME = 100;
+	static const int ENEMY_COOL_TIME = 100;
 public:
 	CTutorial();
 	~CTutorial() override;
@@ -60,8 +62,10 @@ private:
 	CAdrenalineItemTutorial* m_pAdrenalineItemTutorial;
 	D3DXVECTOR3 m_LightVec;
 	bool m_bGameEnd;
-
+	CEnemy_Tutorial* m_pEnemyTutorial;
+	int m_nEnemyCoolTime;
 	int m_nItemCoolTime;
+	bool m_bEnemyCoolTime;
 };
 
 #endif

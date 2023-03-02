@@ -11,6 +11,7 @@
 #include "enemy.h"
 #include "enemy_boss.h"
 #include "enemy_smallfish.h"
+#include "enemy_tutorial.h"
 #include "enemy_manager.h"
 #include <assert.h>
 #include "convenience_function.h"
@@ -190,6 +191,10 @@ CEnemy* CEnemy_Manager::CreateEnemy(EnemyInitData enemyinitdata)
 		break;
 	case ENEMY_02:
 		pEnemy = new CEnemy_Boss;
+		break;
+	case ENEMY_03:
+		pEnemy = new CEnemy_Tutorial;
+		pEnemy->SetMotionNum(CMotionParts::CopyMotionModel(m_nEnemySmasllfish));
 		break;
 	default:
 		assert(false);

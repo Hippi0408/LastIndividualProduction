@@ -171,6 +171,7 @@
     <ClCompile Include="enemy_boss.cpp" />
     <ClCompile Include="enemy_manager.cpp" />
     <ClCompile Include="enemy_smallfish.cpp" />
+    <ClCompile Include="enemy_tutorial.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="gauge.cpp" />
@@ -226,6 +227,7 @@
     <ClInclude Include="enemy_boss.h" />
     <ClInclude Include="enemy_manager.h" />
     <ClInclude Include="enemy_smallfish.h" />
+    <ClInclude Include="enemy_tutorial.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gauge.h" />

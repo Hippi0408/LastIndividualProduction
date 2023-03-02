@@ -29,6 +29,7 @@
 #include "adrenaline_item_tutorial.h"
 #include "adrenaline_item.h"
 #include "2dpolygon.h"
+#include "enemy_tutorial.h"
 
 //*****************************************************************************
 // コンストラクタ
@@ -36,6 +37,7 @@
 CTutorial::CTutorial()
 {
 	m_bGameEnd = false;
+	m_bEnemyCoolTime = false;
 }
 
 //*****************************************************************************
@@ -162,6 +164,22 @@ HRESULT CTutorial::Init()
 	m_pUi->SetDiagonalLine(SCREEN_WIDTH, SCREEN_HEIGHT);
 	m_pUi->SetPolygon();
 
+
+
+	//エネミーの情報の設定
+	EnemyInitData EnemyInitData;
+	EnemyInitData.fmove = -50.0f;
+	EnemyInitData.pos = D3DXVECTOR3(-400.0f, 0.0f, 400.0f);
+	EnemyInitData.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	EnemyInitData.type = ENEMY_03;
+
+	//生成
+	m_pEnemyTutorial = (CEnemy_Tutorial*)m_pEnmeyManager->CreateEnemy(EnemyInitData);
+
+
+	m_nEnemyCoolTime = 0;
+	m_nItemCoolTime = 0;
+
 	return S_OK;
 }
 
@@ -268,6 +286,40 @@ void CTutorial::Update()
 	//カメラの更新
 	m_pCamera->Update();
 
+
+	if (m_pEnemyTutorial != nullptr)
+	{
+		if (m_pEnemyTutorial->CheckLife())
+		{
+			m_bEnemyCoolTime = true;
+			m_pEnemyTutorial = nullptr;
+		}
+	}
+
+	if (m_bEnemyCoolTime)
+	{
+		if (m_nEnemyCoolTime > ENEMY_COOL_TIME)
+		{
+			//エネミーの情報の設定
+			EnemyInitData EnemyInitData;
+			EnemyInitData.fmove = -50.0f;
+			EnemyInitData.pos = D3DXVECTOR3(-400.0f, 0.0f, 400.0f);
+			EnemyInitData.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			EnemyInitData.type = ENEMY_03;
+
+			//生成
+			m_pEnemyTutorial = (CEnemy_Tutorial*)m_pEnmeyManager->CreateEnemy(EnemyInitData);
+
+			m_nEnemyCoolTime = 0;
+
+			m_bEnemyCoolTime = false;
+		}
+		else
+		{
+			m_nEnemyCoolTime++;
+		}
+	}
+
 	m_pEnmeyManager->Update();
 
 	//ゲームエンドではなかったら更新
@@ -326,7 +378,6 @@ void CTutorial::Update()
 			m_nItemCoolTime++;
 		}
 	}
-
 	
 
 	if (pInput->Trigger(KEY_DECISION))
